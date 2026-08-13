@@ -1,225 +1,420 @@
-CREATE DATABASE IF NOT EXISTS hair_salon_db;
+CREATE DATABASE IF NOT EXISTS salondb
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
 
-USE hair_salon_db;
+USE salondb;
 
-CREATE TABLE role (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-INSERT INTO role (name) VALUES ('ADMIN'), ('RECEPTIONIST'), ('STYLIST'), ('CUSTOMER');
-
-CREATE TABLE gender (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(20) NOT NULL UNIQUE
-);
-
-INSERT INTO gender (name) VALUES ('MALE'), ('FEMALE'), ('OTHER');
-
-CREATE TABLE appointment_status (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
-INSERT INTO appointment_status (name) VALUES ('PENDING'), ('CONFIRMED'), ('IN_SERVICE'), ('COMPLETED'), ('CANCELLED');
-
-CREATE TABLE payment_method (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
-INSERT INTO payment_method (name) VALUES ('CASH'), ('MOMO'), ('VNPAY'), ('ZALOPAY');
-
-CREATE TABLE payment_status (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
-INSERT INTO payment_status (name) VALUES ('PENDING'), ('PAID'), ('FAILED'), ('REFUNDED');
-
-CREATE TABLE base_user (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     fullname VARCHAR(255) NOT NULL,
+
     email VARCHAR(255) NOT NULL UNIQUE,
+
     password VARCHAR(255) NOT NULL,
-    phone_number VARCHAR(20) NOT NULL UNIQUE,
-    avatar VARCHAR(255) NULL,
-    role_id INT NOT NULL DEFAULT 4, 
-    is_active BOOLEAN DEFAULT TRUE NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (role_id) REFERENCES role(id)
+    phone_number VARCHAR(20) UNIQUE,
+
+    avatar VARCHAR(500),
+
+    role VARCHAR(30) NOT NULL,
+
+    is_active BOOLEAN DEFAULT TRUE,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE customer_profile (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL UNIQUE,
-    dob DATE NULL,
-    gender_id INT NULL,
+CREATE TABLE customer(
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    user_id BIGINT NOT NULL UNIQUE,
+
+    dob DATE,
+
+    gender VARCHAR(20),
+
     total_visits INT DEFAULT 0,
-    total_spent DECIMAL(12, 2) DEFAULT 0.00,
 
-    FOREIGN KEY (gender_id) REFERENCES gender(id),
-    FOREIGN KEY (user_id) REFERENCES base_user(id) ON DELETE CASCADE
+    total_spent DECIMAL(12,2) DEFAULT 0,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE stylist_profile (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL UNIQUE,
-    specialization VARCHAR(255) NULL, 
-    experience_years INT DEFAULT 0,
-    bio TEXT NULL,
-    average_rating DECIMAL(3, 2) DEFAULT 0.00,
+CREATE TABLE stylist (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    FOREIGN KEY (user_id) REFERENCES base_user(id) ON DELETE CASCADE
+    user_id BIGINT NOT NULL UNIQUE,
+
+    specialization VARCHAR(255),
+
+    experience_years INT DEFAULT 0,
+
+    bio TEXT,
+
+    average_rating DECIMAL(3,2) DEFAULT 0,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE stylist_schedule (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    stylist_id INT NOT NULL,
-    work_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    is_off BOOLEAN DEFAULT FALSE,
-    is_checked_in BOOLEAN DEFAULT FALSE,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    FOREIGN KEY (stylist_id) REFERENCES stylist_profile(id) ON DELETE CASCADE,
-    UNIQUE KEY uq_stylist_date (stylist_id, work_date)
+    stylist_id BIGINT NOT NULL,
+
+    work_date DATE NOT NULL,
+
+    start_time TIME NOT NULL,
+
+    end_time TIME NOT NULL,
+
+    is_off BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (stylist_id) REFERENCES stylist(id) ON DELETE CASCADE
+);
+
+CREATE TABLE attendance (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    stylist_id BIGINT NOT NULL,
+
+    schedule_id BIGINT NOT NULL,
+
+    check_in_time DATETIME,
+
+    check_out_time DATETIME,
+
+    total_hours DECIMAL(5,2),
+
+    attendance_status VARCHAR(30),
+
+    FOREIGN KEY (stylist_id) REFERENCES stylist(id),
+
+    FOREIGN KEY (schedule_id) REFERENCES stylist_schedule(id)
 );
 
 CREATE TABLE category (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT NULL
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    name VARCHAR(255) NOT NULL UNIQUE,
+
+    description TEXT
 );
 
-INSERT INTO category (name) VALUES ('Cắt tóc nam'), ('Cắt tóc nữ'), ('Gội đầu'), ('Uốn tóc'), ('Duỗi tóc'), ('Nhuộm tóc'), ('Phục hồi tóc'), ('Combo làm tóc');
-
 CREATE TABLE service (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    service_code VARCHAR(30) UNIQUE,
+
+    category_id BIGINT NOT NULL,
+
     name VARCHAR(255) NOT NULL,
-    description TEXT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    duration_minutes INT NOT NULL DEFAULT 30, 
-    image_url VARCHAR(255) NULL,
+
+    description TEXT,
+
+    price DECIMAL(12,2) NOT NULL,
+
+    duration_minutes INT NOT NULL,
+
+    image_url VARCHAR(500),
+
     is_active BOOLEAN DEFAULT TRUE,
 
     FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
 CREATE TABLE supplier (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
     name VARCHAR(255) NOT NULL,
-    phone VARCHAR(20) NULL,
-    email VARCHAR(255) NULL,
-    address VARCHAR(255) NULL
+
+    phone VARCHAR(20),
+
+    email VARCHAR(255),
+
+    address VARCHAR(255)
 );
 
 CREATE TABLE product (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    supplier_id INT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    product_code VARCHAR(30) UNIQUE,
+
+    supplier_id BIGINT,
+
     name VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    stock_quantity INT NOT NULL DEFAULT 0,
-    min_stock_alert INT NOT NULL DEFAULT 5, -- Mức cảnh báo sắp hết hàng
-    image_url VARCHAR(255) NULL,
+
+    price DECIMAL(12,2) NOT NULL,
+
+    stock_quantity INT DEFAULT 0,
+
+    min_stock_alert INT DEFAULT 5,
+
+    image_url VARCHAR(500),
+
     is_active BOOLEAN DEFAULT TRUE,
 
     FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE SET NULL
 );
 
 CREATE TABLE purchase_order (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    supplier_id INT NOT NULL,
-    order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-    note VARCHAR(255) NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    supplier_id BIGINT NOT NULL,
+
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    total_amount DECIMAL(12,2) DEFAULT 0,
+
+    note VARCHAR(500),
 
     FOREIGN KEY (supplier_id) REFERENCES supplier(id)
 );
 
 CREATE TABLE purchase_order_item (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    purchase_order_id INT NOT NULL,
-    product_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    purchase_order_id BIGINT NOT NULL,
+
+    product_id BIGINT NOT NULL,
+
     quantity INT NOT NULL,
-    import_price DECIMAL(10, 2) NOT NULL,
+
+    import_price DECIMAL(12,2) NOT NULL,
 
     FOREIGN KEY (purchase_order_id) REFERENCES purchase_order(id) ON DELETE CASCADE,
+
     FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
 CREATE TABLE appointment (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    customer_id INT NOT NULL,
-    stylist_id INT NOT NULL,
-    service_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    appointment_code VARCHAR(30) UNIQUE,
+
+    customer_id BIGINT NOT NULL,
+
+    stylist_id BIGINT NOT NULL,
+
+    service_id BIGINT NOT NULL,
+
     appointment_date DATE NOT NULL,
+
     start_time TIME NOT NULL,
+
     end_time TIME NOT NULL,
-    status_id INT NOT NULL DEFAULT 1,
-    customer_note TEXT NULL,
-    stylist_note TEXT NULL,
+
+    booking_amount DECIMAL(12,2) NOT NULL,
+
+    status VARCHAR(50) NOT NULL,
+    
+    refund_amount DECIMAL(12,2) DEFAULT 0,
+
+    customer_note TEXT,
+
+    stylist_note TEXT,
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (customer_id) REFERENCES customer_profile(id) ON DELETE RESTRICT,
-    FOREIGN KEY (stylist_id) REFERENCES stylist_profile(id) ON DELETE RESTRICT,
-    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE RESTRICT,
-    FOREIGN KEY (status_id) REFERENCES appointment_status(id)
+    FOREIGN KEY (customer_id) REFERENCES customer(id),
+
+    FOREIGN KEY (stylist_id) REFERENCES stylist(id),
+
+    FOREIGN KEY (service_id) REFERENCES service(id),
+
+    UNIQUE KEY uq_stylist_slot (stylist_id, appointment_date, start_time)
 );
 
 CREATE TABLE review (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    appointment_id INT NOT NULL UNIQUE,
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    comment TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    FOREIGN KEY (appointment_id) REFERENCES appointment(id) ON DELETE RESTRICT
+    appointment_id BIGINT NOT NULL UNIQUE,
+
+    rating INT NOT NULL,
+
+    comment TEXT,
+
+    FOREIGN KEY (appointment_id) REFERENCES appointment(id),
+
+    CHECK ( rating >= 1 AND rating <= 5)
 );
 
 CREATE TABLE invoice (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    appointment_id INT NULL UNIQUE, 
-    customer_id INT NOT NULL,
-    sub_total DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-    discount_amount DECIMAL(10, 2) DEFAULT 0.00,
-    total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-    payment_status_id INT NOT NULL DEFAULT 1, -- PENDING
-    payment_method_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    invoice_code VARCHAR(30) UNIQUE,
+
+    appointment_id BIGINT NOT NULL UNIQUE,
+
+    customer_id BIGINT NOT NULL,
+
+    sub_total DECIMAL(12,2) NOT NULL,
+
+    discount_amount DECIMAL(12,2) DEFAULT 0,
+
+    total_amount DECIMAL(12,2) NOT NULL,
+    
+    refund_amount DECIMAL(12,2) DEFAULT 0,
+    
+    refund_time DATETIME NULL,
+
+    payment_method VARCHAR(30) NOT NULL,
+
+    payment_status VARCHAR(30) NOT NULL,
+
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (appointment_id) REFERENCES appointment(id) ON DELETE SET NULL,
-    FOREIGN KEY (customer_id) REFERENCES customer_profile(id) ON DELETE RESTRICT,
-    FOREIGN KEY (payment_status_id) REFERENCES payment_status(id),
-    FOREIGN KEY (payment_method_id) REFERENCES payment_method(id)
+    FOREIGN KEY (appointment_id) REFERENCES appointment(id),
+
+    FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
 CREATE TABLE invoice_item (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    invoice_id INT NOT NULL,
-    service_id INT NULL,
-    product_id INT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    unit_price DECIMAL(10, 2) NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    invoice_id BIGINT NOT NULL,
+
+    service_id BIGINT,
+
+    product_id BIGINT,
+
+    quantity INT DEFAULT 1,
+
+    unit_price DECIMAL(12,2) NOT NULL,
+
+    total_price DECIMAL(12,2) NOT NULL,
 
     FOREIGN KEY (invoice_id) REFERENCES invoice(id) ON DELETE CASCADE,
+
     FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE SET NULL,
+
     FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE SET NULL
 );
 
 CREATE TABLE payment_transaction (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    invoice_id INT NOT NULL,
-    transaction_no VARCHAR(100) NULL, 
-    amount DECIMAL(12, 2) NOT NULL,
-    payment_method_id INT NOT NULL,
-    payment_status_id INT NOT NULL,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    invoice_id BIGINT NOT NULL,
+
+    transaction_no VARCHAR(100),
+
+    amount DECIMAL(12,2) NOT NULL,
+
+    payment_method VARCHAR(30) NOT NULL,
+
+    payment_status VARCHAR(30) NOT NULL,
+
     transaction_time DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (invoice_id) REFERENCES invoice(id) ON DELETE CASCADE,
-    FOREIGN KEY (payment_method_id) REFERENCES payment_method(id),
-    FOREIGN KEY (payment_status_id) REFERENCES payment_status(id)
+    FOREIGN KEY (invoice_id) REFERENCES invoice(id) ON DELETE CASCADE
+);
+
+CREATE TABLE notification (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    user_id BIGINT NOT NULL,
+
+    title VARCHAR(255) NOT NULL,
+
+    message TEXT NOT NULL,
+
+    is_read BOOLEAN DEFAULT FALSE,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE cart (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    customer_id BIGINT NOT NULL UNIQUE,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_cart_customer FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE cart_item (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    cart_id BIGINT NOT NULL,
+
+    product_id BIGINT NOT NULL,
+
+    quantity INT NOT NULL DEFAULT 1,
+
+    added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_cart_item_quantity CHECK (quantity > 0),
+
+    CONSTRAINT fk_cart_item_cart FOREIGN KEY (cart_id) REFERENCES cart(id) ON DELETE CASCADE,
+
+    CONSTRAINT fk_cart_item_product FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE RESTRICT,
+
+    CONSTRAINT uq_cart_product UNIQUE (cart_id, product_id)
+);
+
+CREATE TABLE product_order (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    order_code VARCHAR(50) NOT NULL UNIQUE,
+
+    customer_id BIGINT NOT NULL,
+
+    sub_total DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+    discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+    shipping_fee DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+    total_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+
+    payment_method VARCHAR(30) NOT NULL,
+
+    payment_status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+
+    order_status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+
+    receiver_name VARCHAR(255) NOT NULL,
+
+    receiver_phone VARCHAR(20) NOT NULL,
+
+    shipping_address VARCHAR(500) NOT NULL,
+
+    note VARCHAR(500) NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_product_order_customer FOREIGN KEY (customer_id) REFERENCES customer(id) ON DELETE RESTRICT
+);
+
+CREATE TABLE product_order_item (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    order_id BIGINT NOT NULL,
+
+    product_id BIGINT NULL,
+
+    quantity INT NOT NULL,
+
+    unit_price DECIMAL(12,2) NOT NULL,
+
+    total_price DECIMAL(12,2) NOT NULL,
+
+    product_name VARCHAR(255) NOT NULL,
+
+    CONSTRAINT chk_order_item_quantity CHECK (quantity > 0),
+
+    CONSTRAINT chk_order_item_price CHECK (unit_price >= 0),
+
+    CONSTRAINT chk_order_item_total_price CHECK (total_price >= 0),
+
+    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES product_order(id) ON DELETE CASCADE,
+
+    CONSTRAINT fk_order_item_product FOREIGN KEY (product_id)REFERENCES product(id) ON DELETE SET NULL
 );
