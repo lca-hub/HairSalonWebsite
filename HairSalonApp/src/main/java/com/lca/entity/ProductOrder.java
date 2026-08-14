@@ -1,5 +1,8 @@
 package com.lca.entity;
 
+import com.lca.enums.PaymentMethod;
+import com.lca.enums.PaymentStatus;
+import com.lca.enums.ProductOrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,6 +12,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -45,22 +50,22 @@ public class ProductOrder {
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
-    @Size(max = 30)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "payment_method", nullable = false, length = 30)
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
-    @Size(max = 30)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @ColumnDefault("'PENDING'")
     @Column(name = "payment_status", nullable = false, length = 30)
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
-    @Size(max = 30)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @ColumnDefault("'PENDING'")
     @Column(name = "order_status", nullable = false, length = 30)
-    private String orderStatus;
+    private ProductOrderStatus orderStatus;
 
     @Size(max = 255)
     @NotNull
@@ -91,5 +96,10 @@ public class ProductOrder {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOrderItem> items = new ArrayList<>();
 }

@@ -8,49 +8,31 @@ public class AttendanceMapper {
     private AttendanceMapper() {
     }
 
-    public static AttendanceResponseDTO toResponse(
-            Attendance attendance) {
+    public static AttendanceResponseDTO toResponse(Attendance attendance) {
 
-        AttendanceResponseDTO dto =
-                new AttendanceResponseDTO();
+        AttendanceResponseDTO dto = new AttendanceResponseDTO();
 
         dto.setId(attendance.getId());
 
         if (attendance.getStylist() != null) {
-            dto.setStylistId(
-                    attendance.getStylist().getId()
-            );
+            dto.setStylistId(attendance.getStylist().getId());
 
             if (attendance.getStylist().getUser() != null) {
-                dto.setStylistName(
-                        attendance.getStylist()
-                                .getUser()
-                                .getFullname()
-                );
+                dto.setStylistName(attendance.getStylist().getUser().getFullname());
             }
         }
 
         if (attendance.getSchedule() != null) {
-            dto.setScheduleId(
-                    attendance.getSchedule().getId()
-            );
+            dto.setScheduleId(attendance.getSchedule().getId());
         }
 
-        dto.setCheckInTime(
-                attendance.getCheckInTime()
-        );
+        dto.setCheckInTime(attendance.getCheckInTime());
 
-        dto.setCheckOutTime(
-                attendance.getCheckOutTime()
-        );
+        dto.setCheckOutTime(attendance.getCheckOutTime());
 
-        dto.setTotalHours(
-                attendance.getTotalHours()
-        );
+        dto.setTotalHours(attendance.getTotalHours());
 
-        dto.setAttendanceStatus(
-                attendance.getAttendanceStatus()
-        );
+        dto.setAttendanceStatus(attendance.getAttendanceStatus());
 
         return dto;
     }

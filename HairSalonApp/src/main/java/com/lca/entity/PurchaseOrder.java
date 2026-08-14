@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,5 +39,6 @@ public class PurchaseOrder {
     @Column(name = "note", length = 500)
     private String note;
 
-
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> items = new ArrayList<>();
 }

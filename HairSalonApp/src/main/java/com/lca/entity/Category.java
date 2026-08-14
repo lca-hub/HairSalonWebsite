@@ -21,8 +21,7 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
 

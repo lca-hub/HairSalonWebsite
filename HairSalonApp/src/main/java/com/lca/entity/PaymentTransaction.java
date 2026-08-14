@@ -1,5 +1,7 @@
 package com.lca.entity;
 
+import com.lca.enums.PaymentMethod;
+import com.lca.enums.PaymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -36,15 +38,15 @@ public class PaymentTransaction {
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
-    @Size(max = 30)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "payment_method", nullable = false, length = 30)
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
-    @Size(max = 30)
+    @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "payment_status", nullable = false, length = 30)
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "transaction_time")

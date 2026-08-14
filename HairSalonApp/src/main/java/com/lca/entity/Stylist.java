@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "stylist_profile")
+@Table(name = "stylist")
 public class Stylist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +35,7 @@ public class Stylist {
     @Column(name = "experience_years")
     private Integer experienceYears;
 
-    @Lob
-    @Column(name = "bio")
+    @Column(name = "bio", columnDefinition = "TEXT")
     private String bio;
 
     @ColumnDefault("0.00")

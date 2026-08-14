@@ -66,12 +66,10 @@ public class Appointment {
     @Column(name = "refund_amount", precision = 12, scale = 2)
     private BigDecimal refundAmount;
 
-    @Lob
-    @Column(name = "customer_note")
+    @Column(name = "customer_note", columnDefinition = "TEXT")
     private String customerNote;
 
-    @Lob
-    @Column(name = "stylist_note")
+    @Column(name = "stylist_note", columnDefinition = "TEXT")
     private String stylistNote;
 
     @ColumnDefault("CURRENT_TIMESTAMP")

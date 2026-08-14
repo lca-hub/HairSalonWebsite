@@ -24,8 +24,7 @@ public class Review {
     @Column(name = "rating", nullable = false)
     private Integer rating;
 
-    @Lob
-    @Column(name = "comment")
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
 

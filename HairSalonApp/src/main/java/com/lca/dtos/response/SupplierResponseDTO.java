@@ -5,11 +5,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryResponseDTO {
+public class SupplierResponseDTO {
 
     private Long id;
 
     private String name;
 
-    private String description;
+    private String phone;
+
+    private String email;
+
+    private String address;
 }
