@@ -37,11 +37,16 @@ public class ReviewMapper {
             dto.setAppointmentId(review.getAppointment().getId());
 
             if (review.getAppointment().getCustomer() != null && review.getAppointment().getCustomer().getUser() != null) {
-                dto.setCustomerName(review.getAppointment().getCustomer().getUser().getFullname());
+                var user = review.getAppointment().getCustomer().getUser();
+
+                dto.setCustomerName((user.getFirstName() + " " + user.getLastName()).trim());
+
             }
 
             if (review.getAppointment().getStylist() != null && review.getAppointment().getStylist().getUser() != null) {
-                dto.setStylistName(review.getAppointment().getStylist().getUser().getFullname());
+                var user = review.getAppointment().getStylist().getUser();
+
+                dto.setStylistName((user.getFirstName() + " " + user.getLastName()).trim());
             }
         }
 

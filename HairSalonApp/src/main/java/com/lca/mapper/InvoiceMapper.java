@@ -27,7 +27,10 @@ public class InvoiceMapper {
             dto.setCustomerId(invoice.getCustomer().getId());
 
             if (invoice.getCustomer().getUser() != null) {
-                dto.setCustomerName(invoice.getCustomer().getUser().getFullname());
+                var user = invoice.getCustomer().getUser();
+
+                dto.setCustomerName((user.getFirstName() + " " + user.getLastName()).trim());
+
             }
         }
 

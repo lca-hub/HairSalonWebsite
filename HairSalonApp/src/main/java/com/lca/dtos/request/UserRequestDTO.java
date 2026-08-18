@@ -10,8 +10,11 @@ import lombok.Data;
 @Data
 public class UserRequestDTO {
 
-    @NotBlank(message = "Họ tên không được để trống")
-    private String fullname;
+    @NotBlank(message = "Tên không được để trống")
+    private String firstName;
+
+    @NotBlank(message = "Họ không được để trống")
+    private String lastName;
 
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")

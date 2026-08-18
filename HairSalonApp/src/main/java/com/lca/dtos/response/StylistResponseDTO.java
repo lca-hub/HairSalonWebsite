@@ -11,7 +11,9 @@ public class StylistResponseDTO {
 
     private Long userId;
 
-    private String fullname;
+    private String firstName;
+
+    private String lastName;
 
     private String email;
 

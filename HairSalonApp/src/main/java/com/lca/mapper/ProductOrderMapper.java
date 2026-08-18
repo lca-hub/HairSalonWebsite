@@ -57,7 +57,10 @@ public class ProductOrderMapper {
             dto.setCustomerId(order.getCustomer().getId());
 
             if (order.getCustomer().getUser() != null) {
-                dto.setCustomerName(order.getCustomer().getUser().getFullname());
+                var user = order.getCustomer().getUser();
+
+                dto.setCustomerName((user.getFirstName() + " " + user.getLastName()).trim());
+
             }
         }
 

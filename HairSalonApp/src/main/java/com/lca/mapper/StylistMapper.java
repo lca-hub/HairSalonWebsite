@@ -17,6 +17,15 @@ public class StylistMapper {
         return stylist;
     }
 
+    public static void updateEntity(Stylist stylist, StylistRequestDTO dto) {
+
+        stylist.setSpecialization(dto.getSpecialization());
+
+        stylist.setExperienceYears(dto.getExperienceYears());
+
+        stylist.setBio(dto.getBio());
+    }
+
     public static StylistResponseDTO toResponse(Stylist stylist) {
 
         StylistResponseDTO dto = new StylistResponseDTO();
@@ -24,8 +33,10 @@ public class StylistMapper {
         dto.setId(stylist.getId());
 
         if (stylist.getUser() != null) {
+            var user = stylist.getUser();
             dto.setUserId(stylist.getUser().getId());
-            dto.setFullname(stylist.getUser().getFullname());
+            dto.setFirstName(user.getFirstName());
+            dto.setLastName(user.getLastName());
             dto.setEmail(stylist.getUser().getEmail());
             dto.setPhoneNumber(stylist.getUser().getPhoneNumber());
             dto.setAvatar(stylist.getUser().getAvatar());

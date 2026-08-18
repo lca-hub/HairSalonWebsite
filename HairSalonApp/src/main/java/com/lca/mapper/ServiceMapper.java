@@ -22,6 +22,21 @@ public class ServiceMapper {
         return service;
     }
 
+    public static void updateEntity(Service service, ServiceRequestDTO dto) {
+
+        service.setServiceCode(dto.getServiceCode());
+        service.setName(dto.getName());
+        service.setDescription(dto.getDescription());
+        service.setPrice(dto.getPrice());
+        service.setDurationMinutes(dto.getDurationMinutes());
+        service.setImageUrl(dto.getImageUrl());
+
+        if (dto.getIsActive() != null) {
+            service.setIsActive(dto.getIsActive());
+        }
+    }
+
+
     public static ServiceResponseDTO toResponse(Service service) {
 
         ServiceResponseDTO dto = new ServiceResponseDTO();

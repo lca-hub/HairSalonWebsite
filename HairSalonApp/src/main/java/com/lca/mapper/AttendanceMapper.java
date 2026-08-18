@@ -18,7 +18,10 @@ public class AttendanceMapper {
             dto.setStylistId(attendance.getStylist().getId());
 
             if (attendance.getStylist().getUser() != null) {
-                dto.setStylistName(attendance.getStylist().getUser().getFullname());
+                var user = attendance.getStylist().getUser();
+
+                dto.setStylistName((user.getFirstName() + " " + user.getLastName()).trim());
+
             }
         }
 

@@ -76,5 +76,6 @@ public class Appointment {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-
+    @Column(name = "payment_deadline")
+    private LocalDateTime paymentDeadline;
 }

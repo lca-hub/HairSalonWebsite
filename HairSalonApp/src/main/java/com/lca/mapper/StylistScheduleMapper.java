@@ -19,7 +19,12 @@ public class StylistScheduleMapper {
             dto.setStylistId(schedule.getStylist().getId());
 
             if (schedule.getStylist().getUser() != null) {
-                dto.setStylistName(schedule.getStylist().getUser().getFullname());
+
+                var user = schedule.getStylist().getUser();
+
+                String stylistName = user.getFirstName() + " " + user.getLastName();
+
+                dto.setStylistName(stylistName);
             }
         }
 
@@ -38,4 +43,17 @@ public class StylistScheduleMapper {
         schedule.setEndTime(dto.getEndTime());
         schedule.setIsOff(dto.getIsOff() != null ? dto.getIsOff() : false);
     }
+
+    public static StylistSchedule toEntity(StylistScheduleRequestDTO dto) {
+
+        StylistSchedule schedule = new StylistSchedule();
+
+        schedule.setWorkDate(dto.getWorkDate());
+        schedule.setStartTime(dto.getStartTime());
+        schedule.setEndTime(dto.getEndTime());
+        schedule.setIsOff(dto.getIsOff());
+
+        return schedule;
+    }
+
 }

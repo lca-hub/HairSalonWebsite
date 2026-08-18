@@ -23,8 +23,9 @@ public class CustomerProfileMapper {
         dto.setId(customer.getId());
 
         if (customer.getUser() != null) {
+            var user = customer.getUser();
             dto.setUserId(customer.getUser().getId());
-            dto.setFullname(customer.getUser().getFullname());
+            dto.setFullname((user.getFirstName() + " " + user.getLastName()).trim());
             dto.setEmail(customer.getUser().getEmail());
             dto.setPhoneNumber(customer.getUser().getPhoneNumber());
             dto.setAvatar(customer.getUser().getAvatar());

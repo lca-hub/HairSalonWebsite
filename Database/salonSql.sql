@@ -7,7 +7,9 @@ USE salondb;
 CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    fullname VARCHAR(255) NOT NULL,
+	first_name VARCHAR(100) NOT NULL,
+
+    last_name VARCHAR(100) NOT NULL,
 
     email VARCHAR(255) NOT NULL UNIQUE,
 
@@ -214,6 +216,8 @@ CREATE TABLE appointment (
     stylist_note TEXT,
 
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    payment_deadline DATETIME NULL,
 
     FOREIGN KEY (customer_id) REFERENCES customer(id),
 
@@ -418,4 +422,20 @@ CREATE TABLE product_order_item (
     CONSTRAINT fk_order_item_order FOREIGN KEY (order_id) REFERENCES product_order(id) ON DELETE CASCADE,
 
     CONSTRAINT fk_order_item_product FOREIGN KEY (product_id)REFERENCES product(id) ON DELETE SET NULL
+);
+
+CREATE TABLE appointment_slot (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    appointment_id BIGINT NOT NULL,
+    stylist_id BIGINT NOT NULL,
+
+    slot_date DATE NOT NULL,
+    slot_time TIME NOT NULL,
+
+    CONSTRAINT fk_appointment_slot_appointment FOREIGN KEY (appointment_id) REFERENCES appointment(id) ON DELETE CASCADE,
+
+    CONSTRAINT fk_appointment_slot_stylist FOREIGN KEY (stylist_id) REFERENCES stylist(id) ON DELETE CASCADE,
+
+    CONSTRAINT uq_stylist_slot UNIQUE (stylist_id,slot_date, slot_time)
 );

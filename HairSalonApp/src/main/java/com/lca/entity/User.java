@@ -2,6 +2,7 @@ package com.lca.entity;
 
 import com.lca.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -20,10 +21,15 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "fullname", nullable = false)
-    private String fullname;
+    @NotBlank
+    @Size(max = 100)
+    @Column(name = "first_name", nullable = false, length = 100)
+    private String firstName;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(name = "last_name", nullable = false, length = 100)
+    private String lastName;
 
     @Size(max = 255)
     @NotNull

@@ -1,9 +1,24 @@
 package com.lca.mapper;
 
+import com.lca.dtos.request.AppointmentRequestDTO;
 import com.lca.dtos.response.AppointmentResponseDTO;
 import com.lca.entity.Appointment;
 
 public class AppointmentMapper {
+
+    public static Appointment toEntity(AppointmentRequestDTO dto) {
+
+        Appointment appointment = new Appointment();
+
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+
+        appointment.setStartTime(dto.getStartTime());
+
+        appointment.setCustomerNote(dto.getCustomerNote());
+
+        return appointment;
+    }
+
 
     public static AppointmentResponseDTO toResponse(Appointment appointment) {
 
@@ -30,7 +45,9 @@ public class AppointmentMapper {
             dto.setCustomerId(appointment.getCustomer().getId());
 
             if (appointment.getCustomer().getUser() != null) {
-                dto.setCustomerName(appointment.getCustomer().getUser().getFullname());
+                var user = appointment.getCustomer().getUser();
+
+                dto.setCustomerName((user.getFirstName() + " " + user.getLastName()).trim());
             }
         }
 
@@ -38,7 +55,10 @@ public class AppointmentMapper {
             dto.setStylistId(appointment.getStylist().getId());
 
             if (appointment.getStylist().getUser() != null) {
-                dto.setStylistName(appointment.getStylist().getUser().getFullname());
+                var user = appointment.getStylist().getUser();
+
+                dto.setStylistName((user.getFirstName() + " " + user.getLastName()).trim());
+
             }
         }
 
