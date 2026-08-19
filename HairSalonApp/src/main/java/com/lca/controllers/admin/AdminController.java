@@ -1,4 +1,4 @@
-package com.lca.controllers;
+package com.lca.controllers.admin;
 
 import com.lca.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ public class AdminController {
 
     @GetMapping("/login")
     public String loginPage() {
+
         return "admin/login";
     }
 

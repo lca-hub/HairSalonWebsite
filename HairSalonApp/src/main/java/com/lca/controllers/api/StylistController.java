@@ -1,4 +1,4 @@
-package com.lca.controllers;
+package com.lca.controllers.api;
 
 import com.lca.dtos.response.StylistResponseDTO;
 import com.lca.service.StylistService;

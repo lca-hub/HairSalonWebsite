@@ -1,4 +1,4 @@
-package com.lca.controllers;
+package com.lca.controllers.api;
 
 import com.lca.dtos.request.LoginRequestDTO;
 import com.lca.dtos.response.LoginResponseDTO;
