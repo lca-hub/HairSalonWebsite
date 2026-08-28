@@ -78,7 +78,8 @@ public class ServiceServiceImpl implements ServiceService {
             throw new RuntimeException("Không tìm thấy category với ID: " + categoryId);
         }
 
-        return serviceRepository.findByCategoryId(categoryId).stream().map(ServiceMapper::toResponse).toList();
+
+        return serviceRepository.findByCategoryIdAndIsActiveTrue(categoryId).stream().map(ServiceMapper::toResponse).toList();
     }
 
     @Override
@@ -108,10 +109,13 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     public void delete(Long id) {
+
         Service service = serviceRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + id));
 
-        serviceRepository.delete(service);
+        service.setIsActive(false);
+
+        serviceRepository.save(service);
     }
 
     @Override
@@ -126,4 +130,6 @@ public class ServiceServiceImpl implements ServiceService {
 
         return ServiceMapper.toResponse(updated);
     }
+
+
 }

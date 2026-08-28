@@ -1,4 +1,4 @@
-package com.lca.controllers.api;
+package com.lca.controllers.admin;
 
 import com.lca.dtos.request.UserCreateRequestDTO;
 import com.lca.dtos.request.UserUpdateRequestDTO;

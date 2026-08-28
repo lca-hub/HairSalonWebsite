@@ -4,6 +4,10 @@ import com.lca.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,24 +25,37 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+
+        provider.setPasswordEncoder(passwordEncoder());
+
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(
-                                "/api/**"
-                        )
+                        .ignoringRequestMatchers("/api/**")
                 )
 
-                .userDetailsService(
-                        userDetailsService
-                )
+                .userDetailsService(userDetailsService)
+                .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
                                 "/admin/login",
+                                "/403",
+                                "/404",
+                                "/500",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"
@@ -51,51 +68,43 @@ public class SecurityConfig {
                                 "/api/products/**"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/admin/**",
-                                "/api/admin/**"
-                        ).hasRole("ADMIN")
+                        .requestMatchers("/admin/**")
+                        .hasRole("ADMIN")
 
-                        .requestMatchers(
-                                "/api/appointments/**"
-                        ).permitAll()
+                        .requestMatchers("/api/admin/**")
+                        .hasRole("ADMIN")
 
+                        .requestMatchers("/api/appointments/**")
+                        .authenticated()
 
-                        .anyRequest().authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .formLogin(form -> form
                         .loginPage("/admin/login")
                         .loginProcessingUrl("/admin/login")
-
                         .usernameParameter("email")
                         .passwordParameter("password")
-
-                        .defaultSuccessUrl(
-                                "/admin/dashboard",
-                                true
-                        )
-
-                        .failureUrl(
-                                "/admin/login?error=true"
-                        )
-
+                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .failureUrl("/admin/login?error=true")
                         .permitAll()
                 )
 
                 .logout(logout -> logout
                         .logoutUrl("/admin/logout")
-                        .logoutSuccessUrl(
-                                "/admin/login?logout=true"
-                        )
+                        .logoutSuccessUrl("/admin/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
 
-                .httpBasic(httpBasic ->
-                        httpBasic.disable()
-                );
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response,
+                                              accessDeniedException) -> {response.sendRedirect("/403");})
+                )
+
+                .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Lỗi hệ thống</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f5f5, #e9ecef);
+            color: #333;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            height: 52px;
+            background: #202020;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 16px;
+        }
+
+        .error-card {
+            width: 100%;
+            max-width: 520px;
+            background: white;
+            border: 1px solid #e3e3e3;
+            padding: 45px 38px;
+            text-align: center;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.10);
+        }
+
+        .error-code {
+            font-size: 92px;
+            font-weight: 800;
+            line-height: 1;
+            color: #b22f3a;
+            margin-bottom: 15px;
+        }
+
+        .error-title {
+            font-size: 25px;
+            font-weight: 700;
+            color: #292929;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #777;
+            max-width: 400px;
+            margin: 0 auto 25px;
+        }
+
+        .scissors {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-width: 130px;
+            padding: 11px 18px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #b22f3a, #d54b56);
+            color: white;
+            box-shadow: 0 7px 16px rgba(178, 47, 58, 0.18);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(178, 47, 58, 0.24);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #555;
+            border: 1px solid #d8d8d8;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 18px;
+            color: #8a8a8a;
+            font-size: 12px;
+        }
+
+        .footer strong {
+            color: #b22f3a;
+        }
+
+        @media (max-width: 480px) {
+            .error-card {
+                padding: 35px 22px;
+            }
+
+            .error-code {
+                font-size: 72px;
+            }
+
+            .error-title {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">Hair Salon Administration</div>
+
+    <main class="main">
+
+        <section class="error-card">
+
+            <div class="error-code">500</div>
+
+            <div class="error-title">Có lỗi xảy ra</div>
+
+            <p class="error-message">
+                Hệ thống đang gặp sự cố không mong muốn.
+                Vui lòng thử lại sau hoặc quay lại Dashboard
+                để tiếp tục sử dụng hệ thống.
+            </p>
+
+            <div class="actions">
+
+                <a href="javascript:history.back()" class="btn btn-secondary">← Quay lại</a>
+
+                <a th:href="@{/admin/dashboard}" class="btn btn-primary">Về Dashboard</a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        © 2026 <strong>Hair Salon</strong> · Admin System
+    </footer>
+
+</div>
+
+</body>
+</html>
