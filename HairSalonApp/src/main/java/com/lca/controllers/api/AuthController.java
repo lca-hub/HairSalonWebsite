@@ -1,13 +1,12 @@
 package com.lca.controllers.api;
 
-import com.lca.dtos.request.ForgotPasswordRequestDTO;
-import com.lca.dtos.request.LoginRequestDTO;
-import com.lca.dtos.request.ResetPasswordRequestDTO;
-import com.lca.dtos.request.VerifyOtpRequestDTO;
+import com.lca.dtos.request.*;
 import com.lca.dtos.response.LoginResponseDTO;
+import com.lca.dtos.response.UserResponseDTO;
 import com.lca.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {

@@ -1,12 +1,14 @@
 package com.lca.service.impl;
 
-import com.lca.dtos.request.ForgotPasswordRequestDTO;
-import com.lca.dtos.request.LoginRequestDTO;
-import com.lca.dtos.request.ResetPasswordRequestDTO;
-import com.lca.dtos.request.VerifyOtpRequestDTO;
+import com.lca.dtos.request.*;
 import com.lca.dtos.response.LoginResponseDTO;
+import com.lca.dtos.response.UserResponseDTO;
+import com.lca.entity.Customer;
 import com.lca.entity.User;
+import com.lca.enums.Role;
 import com.lca.jwt.JwtService;
+import com.lca.mapper.UserMapper;
+import com.lca.repository.CustomerRepository;
 import com.lca.repository.UserRepository;
 import com.lca.service.AuthService;
 import com.lca.service.EmailService;
@@ -18,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,11 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Transactional
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final CustomerRepository customerRepo;
 
     private final Map<String, OtpData> otpStorage = new ConcurrentHashMap<>();
 
@@ -41,11 +45,53 @@ public class AuthServiceImpl implements AuthService {
     private static final int OTP_EXPIRATION_MINUTES = 5;
 
     @Override
+    public UserResponseDTO register(RegisterRequestDTO request) {
+
+        if (userRepo.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email đã được đăng ký");
+        }
+
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank() && userRepo.existsByPhoneNumber(request.getPhoneNumber())) {
+
+            throw new RuntimeException("Số điện thoại đã được đăng ký");
+        }
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Mật khẩu xác nhận không khớp");
+        }
+
+        User user = new User();
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        user.setRole(Role.CUSTOMER);
+
+        user.setIsActive(true);
+
+        User savedUser = userRepo.save(user);
+
+        Customer customer = new Customer();
+
+        customer.setUser(savedUser);
+        customer.setTotalVisits(0);
+        customer.setTotalSpent(BigDecimal.ZERO);
+
+        customerRepo.save(customer);
+
+        return UserMapper.toResponse(savedUser);
+    }
+
+    @Override
     public LoginResponseDTO login(LoginRequestDTO request) {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy tài khoản"));
 
         if (!Boolean.TRUE.equals(user.getIsActive())) {
@@ -67,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void forgotPassword(ForgotPasswordRequestDTO request) {
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
                 () -> new RuntimeException("Email chưa được đăng ký"));
 
         if (!Boolean.TRUE.equals(user.getIsActive())) {
@@ -106,12 +152,12 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Mật khẩu xác nhận không khớp");
         }
 
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy tài khoản"));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
-        userRepository.save(user);
+        userRepo.save(user);
 
         otpStorage.remove(request.getEmail());
     }
@@ -154,4 +200,6 @@ public class AuthServiceImpl implements AuthService {
             this.verified = verified;
         }
     }
+
+
 }

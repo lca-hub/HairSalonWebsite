@@ -2,22 +2,23 @@ package com.lca.service;
 
 import com.lca.dtos.request.AppointmentRequestDTO;
 import com.lca.dtos.response.AppointmentResponseDTO;
+import com.lca.enums.AppointmentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.time.LocalDate;
 
 public interface AppointmentService {
 
-    AppointmentResponseDTO create(AppointmentRequestDTO request);
+    AppointmentResponseDTO create(String email, AppointmentRequestDTO request);
 
-    List<AppointmentResponseDTO> getMyAppointments(Long customerId);
+    Page<AppointmentResponseDTO> getMyAppointments(String email, Pageable pageable);
 
-    AppointmentResponseDTO getMyAppointmentById(Long customerId, Long appointmentId);
+    AppointmentResponseDTO getMyAppointmentById(String email, Long appointmentId);
 
-    void cancel(Long customerId, Long appointmentId);
+    void cancel(String email, Long appointmentId);
 
-    AppointmentResponseDTO reschedule(Long customerId, Long appointmentId, AppointmentRequestDTO request);
-
-    List<AppointmentResponseDTO> getAll();
+    AppointmentResponseDTO reschedule(String email, Long appointmentId, AppointmentRequestDTO request);
 
     AppointmentResponseDTO getById(Long id);
 
@@ -31,13 +32,17 @@ public interface AppointmentService {
 
     AppointmentResponseDTO adminReschedule(Long id, AppointmentRequestDTO request);
 
-    List<AppointmentResponseDTO> getMyAppointments(Long stylistId, boolean todayOnly);
+    Page<AppointmentResponseDTO> getAll(Pageable pageable);
 
-    AppointmentResponseDTO getStylistAppointment(Long stylistId, Long appointmentId);
+    Page<AppointmentResponseDTO> search(Long customerId, Long stylistId, AppointmentStatus status, LocalDate date, LocalDate from, LocalDate to, Pageable pageabl);
 
-    AppointmentResponseDTO start(Long stylistId, Long appointmentId);
+    Page<AppointmentResponseDTO> getStylistAppointments(String email, boolean todayOnly, Pageable pageable);
 
-    AppointmentResponseDTO complete(Long stylistId, Long appointmentId);
+    AppointmentResponseDTO getStylistAppointment(String email, Long appointmentId);
 
-    AppointmentResponseDTO updateNote(Long stylistId, Long appointmentId, String stylistNote);
+    AppointmentResponseDTO start(String email, Long appointmentId);
+
+    AppointmentResponseDTO complete(String email, Long appointmentId);
+
+    AppointmentResponseDTO updateNote(String email, Long appointmentId, String stylistNote);
 }

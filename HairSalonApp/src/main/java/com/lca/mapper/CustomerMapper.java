@@ -4,7 +4,7 @@ import com.lca.dtos.request.CustomerRequestDTO;
 import com.lca.dtos.response.CustomerResponseDTO;
 import com.lca.entity.Customer;
 
-public class CustomerProfileMapper {
+public class CustomerMapper {
 
     public static Customer toEntity(CustomerRequestDTO dto) {
 

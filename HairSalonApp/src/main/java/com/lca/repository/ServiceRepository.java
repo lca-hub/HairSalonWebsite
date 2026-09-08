@@ -1,20 +1,20 @@
 package com.lca.repository;
 
 import com.lca.entity.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface ServiceRepository extends JpaRepository<Service, Long> {
+public interface ServiceRepository extends JpaRepository<Service, Long>, JpaSpecificationExecutor<Service> {
 
     Optional<Service> findByServiceCode(String serviceCode);
 
     boolean existsByServiceCode(String serviceCode);
 
-    List<Service> findByCategoryId(Long categoryId);
+    Page<Service> findByIsActiveTrue(Pageable pageable);
 
-    List<Service> findByIsActiveTrue();
-
-    List<Service> findByCategoryIdAndIsActiveTrue(Long categoryId);
+    Page<Service> findByCategoryIdAndIsActiveTrue(Long categoryId, Pageable pageable);
 }

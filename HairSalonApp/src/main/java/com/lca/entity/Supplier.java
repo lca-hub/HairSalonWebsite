@@ -32,6 +32,4 @@ public class Supplier {
     @Size(max = 255)
     @Column(name = "address")
     private String address;
-
-
 }

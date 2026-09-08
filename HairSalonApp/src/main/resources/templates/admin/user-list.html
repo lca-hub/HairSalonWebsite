@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
@@ -82,6 +81,9 @@
         .main-content {
             margin-left: 260px;
             min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
         }
 
         .top-header {
@@ -148,7 +150,10 @@
             color: #fff;
         }
 
-        .content { padding: 28px; }
+        .content {
+            padding: 28px;
+            flex: 1;
+        }
 
         .page-card,
         .filter-card,
@@ -346,13 +351,21 @@
         .empty-state p { font-size: 12px; }
 
         .footer {
-            padding: 25px;
+            margin-top: auto;
+            padding: 20px 25px;
+
             text-align: center;
+
+            background: #fff;
+            border-top: 1px solid #e4e4e4;
+
             color: #969696;
             font-size: 12px;
         }
 
-        .footer strong { color: #b22f3a; }
+        .footer strong {
+            color: #b22f3a;
+        }
 
         @media (max-width: 992px) {
             .sidebar { width: 220px; }
@@ -395,16 +408,6 @@
 
     <div class="menu-title">Quản lý</div>
     <a th:href="@{/admin/users}" class="menu-link active">Người dùng</a>
-    <a href="#" class="menu-link">Stylist</a>
-    <a href="#" class="menu-link">Dịch vụ</a>
-    <a href="#" class="menu-link">Sản phẩm</a>
-    <a href="#" class="menu-link">Nhà cung cấp</a>
-    <a href="#" class="menu-link">Lịch hẹn</a>
-    <a href="#" class="menu-link">Hóa đơn</a>
-
-    <div class="menu-title">Hệ thống</div>
-    <a href="#" class="menu-link">Thông báo</a>
-    <a href="#" class="menu-link">Thống kê</a>
 </aside>
 
 <div class="main-content">
@@ -592,12 +595,10 @@
             </div>
         </section>
 
-        <div class="footer">© 2026 <strong>Hair Salon</strong> · Admin System</div>
-
     </main>
+    <div class="footer">© 2026 <strong>Hair Salon</strong> · Admin System</div>
 </div>
 
-<!-- CREATE -->
 <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -674,7 +675,6 @@
     </div>
 </div>
 
-<!-- EDIT -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -810,7 +810,8 @@
     const hasCreateError = /*[[${errorMessage != null}]]*/ false;
 
     document.addEventListener("DOMContentLoaded", () => {
-        if (!hasCreateError) return;
+        if (!hasCreateError)
+            return;
 
         const modalElement = document.getElementById("createUserModal");
 

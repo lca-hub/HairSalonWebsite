@@ -8,7 +8,11 @@ import com.lca.mapper.ServiceMapper;
 import com.lca.repository.CategoryRepository;
 import com.lca.repository.ServiceRepository;
 import com.lca.service.ServiceService;
+import com.lca.specification.ServiceSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -18,19 +22,19 @@ import java.util.List;
 @Transactional
 public class ServiceServiceImpl implements ServiceService {
 
-    private final ServiceRepository serviceRepository;
-    private final CategoryRepository categoryRepository;
+    private final ServiceRepository serviceRepo;
+    private final CategoryRepository categoryRepo;
 
     @Override
     public ServiceResponseDTO create(ServiceRequestDTO request) {
 
         if (request.getServiceCode() != null
-                && serviceRepository.existsByServiceCode(request.getServiceCode())) {
+                && serviceRepo.existsByServiceCode(request.getServiceCode())) {
 
             throw new RuntimeException("Mã dịch vụ đã tồn tại: " + request.getServiceCode());
         }
 
-        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
+        Category category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy category với ID: " + request.getCategoryId()));
 
         Service service = ServiceMapper.toEntity(request);
@@ -41,7 +45,7 @@ public class ServiceServiceImpl implements ServiceService {
             service.setIsActive(true);
         }
 
-        Service saved = serviceRepository.save(service);
+        Service saved = serviceRepo.save(service);
 
         return ServiceMapper.toResponse(saved);
     }
@@ -50,7 +54,7 @@ public class ServiceServiceImpl implements ServiceService {
     @Transactional(readOnly = true)
     public ServiceResponseDTO getById(Long id) {
 
-        Service service = serviceRepository.findById(id).orElseThrow(
+        Service service = serviceRepo.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + id));
 
         return ServiceMapper.toResponse(service);
@@ -58,51 +62,50 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceResponseDTO> getAll() {
+    public Page<ServiceResponseDTO> getAll(Pageable pageable) {
 
-        return serviceRepository.findAll().stream().map(ServiceMapper::toResponse).toList();
+        return serviceRepo.findAll(pageable).map(ServiceMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceResponseDTO> getActiveServices() {
+    public Page<ServiceResponseDTO> getActiveServices(Pageable pageable) {
 
-        return serviceRepository.findByIsActiveTrue().stream().map(ServiceMapper::toResponse).toList();
+        return serviceRepo.findByIsActiveTrue(pageable).map(ServiceMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceResponseDTO> getByCategory(Long categoryId) {
+    public Page<ServiceResponseDTO> getByCategory(Long categoryId, Pageable pageable) {
 
-        if (!categoryRepository.existsById(categoryId)) {
+        if (!categoryRepo.existsById(categoryId)) {
             throw new RuntimeException("Không tìm thấy category với ID: " + categoryId);
         }
 
-
-        return serviceRepository.findByCategoryIdAndIsActiveTrue(categoryId).stream().map(ServiceMapper::toResponse).toList();
+        return serviceRepo.findByCategoryIdAndIsActiveTrue(categoryId,pageable).map(ServiceMapper::toResponse);
     }
 
     @Override
     public ServiceResponseDTO update(Long id, ServiceRequestDTO request) {
 
-        Service service = serviceRepository.findById(id).orElseThrow(
+        Service service = serviceRepo.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + id));
 
         if (request.getServiceCode() != null
                 && !request.getServiceCode().equals(service.getServiceCode())
-                && serviceRepository.existsByServiceCode(request.getServiceCode())) {
+                && serviceRepo.existsByServiceCode(request.getServiceCode())) {
 
             throw new RuntimeException("Mã dịch vụ đã tồn tại: " + request.getServiceCode());
         }
 
-        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
+        Category category = categoryRepo.findById(request.getCategoryId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy category với ID: " + request.getCategoryId()));
 
         ServiceMapper.updateEntity(service, request);
 
         service.setCategory(category);
 
-        Service updated = serviceRepository.save(service);
+        Service updated = serviceRepo.save(service);
 
         return ServiceMapper.toResponse(updated);
     }
@@ -110,26 +113,33 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public void delete(Long id) {
 
-        Service service = serviceRepository.findById(id).orElseThrow(
+        Service service = serviceRepo.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + id));
 
         service.setIsActive(false);
 
-        serviceRepository.save(service);
+        serviceRepo.save(service);
     }
 
     @Override
     public ServiceResponseDTO updateStatus(Long id, Boolean isActive) {
 
-        Service service = serviceRepository.findById(id).orElseThrow(
+        Service service = serviceRepo.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + id));
 
         service.setIsActive(isActive);
 
-        Service updated = serviceRepository.save(service);
+        Service updated = serviceRepo.save(service);
 
         return ServiceMapper.toResponse(updated);
     }
 
-
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ServiceResponseDTO> search(String keyword, Long categoryId, Pageable pageable) {
+        Specification<Service> specification = Specification.where(ServiceSpecification.isActive())
+                .and(ServiceSpecification.keyword(keyword))
+                .and(ServiceSpecification.categoryId(categoryId));
+        return serviceRepo.findAll(specification, pageable).map(ServiceMapper::toResponse);
+    }
 }

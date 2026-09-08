@@ -23,6 +23,8 @@ public class PurchaseOrderResponseDTO {
 
     private String note;
 
+    private Boolean isReceived;
+
     private List<Item> items;
 
     @Getter

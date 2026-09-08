@@ -39,6 +39,10 @@ public class PurchaseOrder {
     @Column(name = "note", length = 500)
     private String note;
 
+    @ColumnDefault("0")
+    @Column(name = "is_received")
+    private Boolean isReceived;
+
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderItem> items = new ArrayList<>();
 }

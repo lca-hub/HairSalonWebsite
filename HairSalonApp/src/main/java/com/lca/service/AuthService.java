@@ -1,10 +1,8 @@
 package com.lca.service;
 
-import com.lca.dtos.request.ForgotPasswordRequestDTO;
-import com.lca.dtos.request.LoginRequestDTO;
-import com.lca.dtos.request.ResetPasswordRequestDTO;
-import com.lca.dtos.request.VerifyOtpRequestDTO;
+import com.lca.dtos.request.*;
 import com.lca.dtos.response.LoginResponseDTO;
+import com.lca.dtos.response.UserResponseDTO;
 
 public interface AuthService {
 
@@ -15,4 +13,6 @@ public interface AuthService {
     void verifyOtp(VerifyOtpRequestDTO request);
 
     void resetPassword(ResetPasswordRequestDTO request);
+
+    UserResponseDTO register(RegisterRequestDTO request);
 }

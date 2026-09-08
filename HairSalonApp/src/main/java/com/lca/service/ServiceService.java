@@ -2,8 +2,8 @@ package com.lca.service;
 
 import com.lca.dtos.request.ServiceRequestDTO;
 import com.lca.dtos.response.ServiceResponseDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ServiceService {
 
@@ -11,15 +11,17 @@ public interface ServiceService {
 
     ServiceResponseDTO getById(Long id);
 
-    List<ServiceResponseDTO> getAll();
+    Page<ServiceResponseDTO> getAll(Pageable pageable);
 
-    List<ServiceResponseDTO> getActiveServices();
+    Page<ServiceResponseDTO> getActiveServices(Pageable pageable);
 
-    List<ServiceResponseDTO> getByCategory(Long categoryId);
+    Page<ServiceResponseDTO> getByCategory(Long categoryId, Pageable pageable);
 
     ServiceResponseDTO update(Long id, ServiceRequestDTO request);
 
     void delete(Long id);
 
     ServiceResponseDTO updateStatus(Long id, Boolean isActive);
+
+    Page<ServiceResponseDTO> search(String keyword, Long categoryId, Pageable pageable);
 }

@@ -23,6 +23,9 @@ public class ProductRequestDTO {
     @PositiveOrZero
     private BigDecimal price;
 
+    @NotNull
+    private Long categoryId;
+
     @PositiveOrZero
     private Integer stockQuantity;
 

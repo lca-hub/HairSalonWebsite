@@ -4,11 +4,13 @@ import com.lca.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +28,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
+
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
 
         provider.setPasswordEncoder(passwordEncoder());
@@ -39,56 +42,43 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
+                .securityMatcher(
+                        "/admin/**", "/login",
+                        "/403", "/404", "/500"
                 )
 
-                .userDetailsService(userDetailsService)
+                .csrf(csrf -> csrf.disable())
+
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+
                 .authenticationProvider(authenticationProvider())
 
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(
-                                "/admin/login",
-                                "/403",
-                                "/404",
-                                "/500",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
+                                "/admin/login", "/login",
+                                "/403", "/404", "/500",
+                                "/css/**", "/js/**", "/images/**"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/services/**",
-                                "/api/stylists/**",
-                                "/api/products/**"
-                        ).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        .requestMatchers("/admin/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/admin/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/appointments/**")
-                        .authenticated()
-
-                        .anyRequest()
-                        .authenticated()
+                        .anyRequest().authenticated()
                 )
 
                 .formLogin(form -> form
                         .loginPage("/admin/login")
-                        .loginProcessingUrl("/admin/login")
+                        .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/admin/dashboard", true)
-                        .failureUrl("/admin/login?error=true")
-                        .permitAll()
+                        .failureUrl("/admin/login?error=true").permitAll()
                 )
 
                 .logout(logout -> logout
@@ -99,12 +89,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                .exceptionHandling(exception -> exception
-                        .accessDeniedHandler((request, response,
-                                              accessDeniedException) -> {response.sendRedirect("/403");})
-                )
-
-                .httpBasic(httpBasic -> httpBasic.disable());
+                .exceptionHandling(exception ->
+                        exception.accessDeniedHandler((request, response, accessDeniedException) -> response.sendRedirect("/403")));
 
         return http.build();
     }

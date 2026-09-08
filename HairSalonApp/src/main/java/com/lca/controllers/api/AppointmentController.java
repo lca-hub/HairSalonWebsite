@@ -3,13 +3,15 @@ package com.lca.controllers.api;
 import com.lca.dtos.request.AppointmentRequestDTO;
 import com.lca.dtos.response.AppointmentResponseDTO;
 import com.lca.service.AppointmentService;
+import com.lca.utils.PaginationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -18,73 +20,93 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+
     @PostMapping("/appointments")
-    public ResponseEntity<AppointmentResponseDTO> create(@Valid @RequestBody AppointmentRequestDTO request) {
-        AppointmentResponseDTO response = appointmentService.create(request);
+    public ResponseEntity<AppointmentResponseDTO> create(Authentication authentication,
+            @Valid @RequestBody AppointmentRequestDTO request) {
+
+        AppointmentResponseDTO response = appointmentService.create(authentication.getName(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/appointments/my")
-    public ResponseEntity<List<AppointmentResponseDTO>> getMyAppointments(@RequestParam Long customerId) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> getMyAppointments(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity.ok(appointmentService.getMyAppointments(customerId));
+        Pageable pageable = PaginationUtil.create(page, size);
+
+        return ResponseEntity.ok(appointmentService.getMyAppointments(authentication.getName(), pageable));
     }
 
     @GetMapping("/appointments/my/{id}")
-    public ResponseEntity<AppointmentResponseDTO> getMyAppointmentById(@PathVariable Long id, @RequestParam Long customerId) {
+    public ResponseEntity<AppointmentResponseDTO> getMyAppointmentById(Authentication authentication, @PathVariable Long id) {
 
-        return ResponseEntity.ok(appointmentService.getMyAppointmentById(customerId, id));
+        return ResponseEntity.ok(appointmentService.getMyAppointmentById(authentication.getName(), id));
     }
 
     @PostMapping("/appointments/{id}/cancel")
-    public ResponseEntity<Void> cancel(@PathVariable Long id, @RequestParam Long customerId) {
+    public ResponseEntity<Void> cancel(Authentication authentication, @PathVariable Long id) {
 
-        appointmentService.cancel(customerId, id);
+        appointmentService.cancel(authentication.getName(), id);
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/appointments/{id}/reschedule")
-    public ResponseEntity<AppointmentResponseDTO> reschedule(@PathVariable Long id,
-            @RequestParam Long customerId, @Valid @RequestBody AppointmentRequestDTO request) {
+    public ResponseEntity<AppointmentResponseDTO> reschedule(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody AppointmentRequestDTO request) {
 
-        return ResponseEntity.ok(appointmentService.reschedule(customerId, id, request));
+        return ResponseEntity.ok(appointmentService.reschedule(authentication.getName(), id, request));
     }
 
     @GetMapping("/stylists/me/appointments")
-    public ResponseEntity<List<AppointmentResponseDTO>> getStylistAppointments(@RequestParam Long stylistId) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> getStylistAppointments(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PaginationUtil.create(page, size);
 
-        return ResponseEntity.ok(appointmentService.getMyAppointments(stylistId, false));
+        return ResponseEntity.ok(appointmentService.getStylistAppointments(authentication.getName(), false, pageable));
     }
 
     @GetMapping("/stylists/me/appointments/today")
-    public ResponseEntity<List<AppointmentResponseDTO>> getTodayAppointments(@RequestParam Long stylistId) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> getTodayAppointments(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PaginationUtil.create(page, size);
 
-        return ResponseEntity.ok(appointmentService.getMyAppointments(stylistId, true));
+        return ResponseEntity.ok(appointmentService.getStylistAppointments(authentication.getName(), true, pageable));
     }
 
     @GetMapping("/stylists/me/appointments/{id}")
-    public ResponseEntity<AppointmentResponseDTO> getStylistAppointment(@PathVariable Long id, @RequestParam Long stylistId) {
-
-        return ResponseEntity.ok(appointmentService.getStylistAppointment(stylistId, id));
+    public ResponseEntity<AppointmentResponseDTO> getStylistAppointment(Authentication authentication, @PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.getStylistAppointment(authentication.getName(), id));
     }
 
     @PostMapping("/stylists/me/appointments/{id}/start")
-    public ResponseEntity<AppointmentResponseDTO> start(@PathVariable Long id, @RequestParam Long stylistId) {
-
-        return ResponseEntity.ok(appointmentService.start(stylistId, id));
+    public ResponseEntity<AppointmentResponseDTO> start(Authentication authentication, @PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.start(authentication.getName(), id));
     }
 
     @PostMapping("/stylists/me/appointments/{id}/complete")
-    public ResponseEntity<AppointmentResponseDTO> complete(@PathVariable Long id, @RequestParam Long stylistId) {
-
-        return ResponseEntity.ok(appointmentService.complete(stylistId, id));
+    public ResponseEntity<AppointmentResponseDTO> complete(Authentication authentication, @PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.complete(authentication.getName(), id));
     }
 
     @PutMapping("/stylists/me/appointments/{id}/note")
-    public ResponseEntity<AppointmentResponseDTO> updateNote(@PathVariable Long id, @RequestParam Long stylistId, @RequestParam(required = false) String stylistNote) {
-
-        return ResponseEntity.ok(appointmentService.updateNote(stylistId, id, stylistNote));
+    public ResponseEntity<AppointmentResponseDTO> updateNote(
+            Authentication authentication,
+            @PathVariable Long id,
+            @RequestParam(required = false) String stylistNote
+    ) {
+        return ResponseEntity.ok(appointmentService.updateNote(authentication.getName(), id, stylistNote));
     }
 }

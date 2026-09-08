@@ -106,6 +106,9 @@
         .main-content {
             margin-left: 260px;
             min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
         }
 
         .top-header {
@@ -182,6 +185,7 @@
 
         .content {
             padding: 28px;
+            flex: 1;
         }
 
         .welcome-box {
@@ -300,10 +304,13 @@
         }
 
         .footer {
+            margin-top: auto;
             text-align: center;
             color: #969696;
             font-size: 12px;
-            padding: 25px;
+            padding: 20px 25px;
+            background: #fff;
+            border-top: 1px solid #e4e4e4;
         }
 
         .footer strong {
@@ -357,37 +364,16 @@
 <aside class="sidebar">
 
     <div class="brand">
-
         <h1 class="brand-title">Hair Salon</h1>
-
+        <span class="admin-badge">ADMIN</span>
     </div>
 
     <div class="menu-title">Tổng quan</div>
-
     <a th:href="@{/admin/dashboard}" class="menu-link active">Dashboard</a>
 
     <div class="menu-title">Quản lý</div>
 
     <a th:href="@{/admin/users}" class="menu-link">Người dùng</a>
-
-    <a href="#" class="menu-link">Stylist</a>
-
-    <a href="#" class="menu-link">Dịch vụ</a>
-
-    <a href="#" class="menu-link">Sản phẩm</a>
-
-    <a href="#" class="menu-link">Nhà cung cấp</a>
-
-    <a href="#" class="menu-link">Lịch hẹn</a>
-
-    <a href="#" class="menu-link">Hóa đơn</a>
-
-
-    <div class="menu-title">Hệ thống</div>
-
-    <a href="#" class="menu-link">Thông báo</a>
-
-    <a href="#" class="menu-link">Thống kê</a>
 
 </aside>
 
@@ -428,15 +414,11 @@
 
     </header>
 
-
-
     <main class="content">
-
 
         <section class="welcome-box">
 
-            <h2>
-                Xin chào,
+            <h2>Xin chào,
                 <span th:text="${fullname}"></span>
             </h2>
 
@@ -444,281 +426,8 @@
 
         </section>
 
-        <div class="row g-4">
-
-            <div class="col-xl-3 col-md-6">
-
-                <div class="stat-card">
-
-                    <div class="d-flex justify-content-between align-items-start">
-
-                        <div>
-
-                            <div class="stat-title">
-                                Khách hàng
-                            </div>
-
-                            <div class="stat-value">
-                                0
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-xl-3 col-md-6">
-
-                <div class="stat-card">
-
-                    <div class="d-flex justify-content-between align-items-start">
-
-                        <div>
-
-                            <div class="stat-title">
-                                Stylist
-                            </div>
-
-                            <div class="stat-value">
-                                0
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-xl-3 col-md-6">
-
-                <div class="stat-card">
-
-                    <div class="d-flex justify-content-between align-items-start">
-
-                        <div>
-
-                            <div class="stat-title">
-                                Lịch hẹn hôm nay
-                            </div>
-
-                            <div class="stat-value">
-                                0
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-xl-3 col-md-6">
-
-                <div class="stat-card">
-
-                    <div class="d-flex justify-content-between align-items-start">
-
-                        <div>
-
-                            <div class="stat-title">
-                                Doanh thu
-                            </div>
-
-                            <div class="stat-value">
-                                0đ
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- QUICK MANAGEMENT -->
-
-        <section class="section-card">
-
-            <div class="section-title">
-                Quản lý nhanh
-            </div>
-
-            <div class="section-subtitle">
-                Truy cập nhanh các chức năng quản trị chính.
-            </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Quản lý người dùng
-                        </div>
-
-                        <p class="quick-description">
-                            Tạo và quản lý tài khoản hệ thống.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Quản lý Stylist
-                        </div>
-
-                        <p class="quick-description">
-                            Quản lý stylist và lịch làm việc.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Quản lý dịch vụ
-                        </div>
-
-                        <p class="quick-description">
-                            Quản lý dịch vụ và giá dịch vụ.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Quản lý lịch hẹn
-                        </div>
-
-                        <p class="quick-description">
-                            Theo dõi và xử lý lịch hẹn.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Quản lý sản phẩm
-                        </div>
-
-                        <p class="quick-description">
-                            Quản lý sản phẩm và tồn kho.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Nhà cung cấp
-                        </div>
-
-                        <p class="quick-description">
-                            Quản lý nhà cung cấp và nhập hàng.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Hóa đơn
-                        </div>
-
-                        <p class="quick-description">
-                            Theo dõi hóa đơn và thanh toán.
-                        </p>
-
-                    </a>
-
-                </div>
-
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="#"
-                       class="quick-card">
-
-                        <div class="quick-title">
-                            Thống kê
-                        </div>
-
-                        <p class="quick-description">
-                            Xem báo cáo và doanh thu.
-                        </p>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <div class="footer">
-            © 2026
-            <strong>Hair Salon</strong>
-            · Admin System
-        </div>
-
     </main>
-
+    <div class="footer">© 2026<strong>Hair Salon</strong>· Admin System</div>
 </div>
 
 

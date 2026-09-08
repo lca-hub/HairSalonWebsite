@@ -14,10 +14,12 @@ import com.lca.repository.ServiceRepository;
 import com.lca.repository.StylistRepository;
 import com.lca.repository.UserRepository;
 import com.lca.service.StylistService;
+import com.lca.specification.StylistSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
@@ -31,17 +33,13 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<StylistResponseDTO> getAll() {
-
-        return stylistRepository.findAll().stream()
-                .filter(stylist -> stylist.getUser() != null && Boolean.TRUE.equals(stylist.getUser().getIsActive()))
-                .map(StylistMapper::toResponse).toList();
+    public Page<StylistResponseDTO> getAll(Pageable pageable) {
+        return stylistRepository.findByUserIsActiveTrue(pageable).map(StylistMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public StylistResponseDTO getById(Long id) {
-
         Stylist stylist = stylistRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + id));
 
@@ -54,28 +52,24 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ServiceResponseDTO> getServices(Long stylistId) {
-
-        Stylist stylist = stylistRepository.findById(stylistId).orElseThrow(
+    public Page<ServiceResponseDTO> getServices(Long stylistId, Pageable pageable) {
+        stylistRepository.findById(stylistId).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + stylistId));
 
-        return serviceRepository.findByIsActiveTrue().stream().map(ServiceMapper::toResponse).toList();
+        return serviceRepository.findByIsActiveTrue(pageable).map(ServiceMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponseDTO> getReviews(Long stylistId) {
-
+    public Page<ReviewResponseDTO> getReviews(Long stylistId, Pageable pageable) {
         stylistRepository.findById(stylistId).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + stylistId));
 
-        return reviewRepository.findByAppointmentStylistId(stylistId).stream()
-                .map(ReviewMapper::toResponse).toList();
+        return reviewRepository.findByAppointmentStylistId(stylistId, pageable).map(ReviewMapper::toResponse);
     }
 
     @Override
     public StylistResponseDTO create(StylistRequestDTO request) {
-
         User user = userRepository.findById(request.getUserId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy user với ID: " + request.getUserId()));
 
@@ -84,12 +78,10 @@ public class StylistServiceImpl implements StylistService {
         }
 
         if (stylistRepository.existsByUserId(request.getUserId())) {
-
             throw new RuntimeException("User này đã có stylist profile");
         }
 
         Stylist stylist = StylistMapper.toEntity(request);
-
         stylist.setUser(user);
 
         if (stylist.getExperienceYears() == null) {
@@ -107,15 +99,13 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<StylistResponseDTO> getAllForAdmin() {
-
-        return stylistRepository.findAll().stream().map(StylistMapper::toResponse).toList();
+    public Page<StylistResponseDTO> getAllForAdmin(Pageable pageable) {
+        return stylistRepository.findAll(pageable).map(StylistMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public StylistResponseDTO getByIdForAdmin(Long id) {
-
         Stylist stylist = stylistRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + id));
 
@@ -124,7 +114,6 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     public StylistResponseDTO update(Long id, StylistRequestDTO request) {
-
         Stylist stylist = stylistRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + id));
 
@@ -137,12 +126,10 @@ public class StylistServiceImpl implements StylistService {
 
         if (!stylist.getUser().getId().equals(request.getUserId())
                 && stylistRepository.existsByUserId(request.getUserId())) {
-
             throw new RuntimeException("User này đã có stylist profile");
         }
 
         StylistMapper.updateEntity(stylist, request);
-
         stylist.setUser(user);
 
         Stylist updated = stylistRepository.save(stylist);
@@ -152,7 +139,6 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     public void delete(Long id) {
-
         Stylist stylist = stylistRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + id));
 
@@ -161,7 +147,6 @@ public class StylistServiceImpl implements StylistService {
 
     @Override
     public StylistResponseDTO updateStatus(Long id, Boolean isActive) {
-
         Stylist stylist = stylistRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist với ID: " + id));
 
@@ -172,9 +157,19 @@ public class StylistServiceImpl implements StylistService {
         }
 
         user.setIsActive(isActive);
-
         userRepository.save(user);
 
         return StylistMapper.toResponse(stylist);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<StylistResponseDTO> search(String keyword, String specialization, Integer minExperience, Integer maxExperience, Boolean isActive, Pageable pageable) {
+        Specification<Stylist> specification = Specification.where(StylistSpecification.keyword(keyword))
+                .and(StylistSpecification.specialization(specialization))
+                .and(StylistSpecification.minExperience(minExperience))
+                .and(StylistSpecification.maxExperience(maxExperience))
+                .and(StylistSpecification.isActive(isActive));
+        return stylistRepository.findAll(specification, pageable).map(StylistMapper::toResponse);
     }
 }

@@ -5,13 +5,14 @@ import com.lca.dtos.request.UserUpdateRequestDTO;
 import com.lca.dtos.response.UserResponseDTO;
 import com.lca.enums.Role;
 import com.lca.service.UserService;
+import com.lca.utils.PaginationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -20,10 +21,6 @@ public class AdminUserController {
 
     private final UserService userService;
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id) {
@@ -60,5 +57,16 @@ public class AdminUserController {
     public ResponseEntity<Void> resetPassword(@PathVariable Long id) {
         userService.resetPassword(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponseDTO>> search(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Role role,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PaginationUtil.create(page, size);
+        return ResponseEntity.ok(userService.search(keyword, role, isActive, pageable));
     }
 }

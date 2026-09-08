@@ -9,7 +9,6 @@ import java.time.LocalTime;
 @Data
 public class AppointmentRequestDTO {
 
-    @NotNull
     private Long customerId;
 
     @NotNull

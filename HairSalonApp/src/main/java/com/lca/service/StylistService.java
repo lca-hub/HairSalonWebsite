@@ -4,22 +4,22 @@ import com.lca.dtos.request.StylistRequestDTO;
 import com.lca.dtos.response.ReviewResponseDTO;
 import com.lca.dtos.response.ServiceResponseDTO;
 import com.lca.dtos.response.StylistResponseDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface StylistService {
 
-    List<StylistResponseDTO> getAll();
+    Page<StylistResponseDTO> getAll(Pageable pageable);
 
     StylistResponseDTO getById(Long id);
 
-    List<ServiceResponseDTO> getServices(Long stylistId);
+    Page<ServiceResponseDTO> getServices(Long stylistId, Pageable pageable);
 
-    List<ReviewResponseDTO> getReviews(Long stylistId);
+    Page<ReviewResponseDTO> getReviews(Long stylistId, Pageable pageable);
 
     StylistResponseDTO create(StylistRequestDTO request);
 
-    List<StylistResponseDTO> getAllForAdmin();
+    Page<StylistResponseDTO> getAllForAdmin(Pageable pageable);
 
     StylistResponseDTO getByIdForAdmin(Long id);
 
@@ -28,4 +28,6 @@ public interface StylistService {
     void delete(Long id);
 
     StylistResponseDTO updateStatus(Long id, Boolean isActive);
+
+    Page<StylistResponseDTO> search(String keyword, String specialization, Integer minExperience, Integer maxExperience, Boolean isActive, Pageable pageable);
 }

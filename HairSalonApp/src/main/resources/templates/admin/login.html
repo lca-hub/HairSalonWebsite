@@ -252,21 +252,13 @@
 
         <section class="card">
 
-            <div class="brand">
-                <h1>Hair Salon</h1>
-            </div>
+            <div class="brand"><h1>Hair Salon</h1></div>
 
-            <div class="title">
-                <h2>Đăng nhập hệ thống</h2>
-            </div>
+            <div class="title"><h2>Đăng nhập hệ thống</h2></div>
 
-            <div th:if="${param.error}" class="alert error">
-                Email hoặc mật khẩu không đúng. Vui lòng thử lại.
-            </div>
+            <div th:if="${param.error}" class="alert error">Email hoặc mật khẩu không đúng. Vui lòng thử lại.</div>
 
-            <div th:if="${param.logout}" class="alert success">
-                Bạn đã đăng xuất thành công.
-            </div>
+            <div th:if="${param.logout}" class="alert success">Bạn đã đăng xuất thành công.</div>
 
             <form th:action="@{/admin/login}" method="post">
 
@@ -306,12 +298,7 @@
 
     </main>
 
-    <footer class="footer">
-        © 2026
-        <strong>Hair Salon</strong>
-        · Admin System
-    </footer>
-
+    <footer class="footer">© 2026<strong>Hair Salon</strong>· Admin System</footer>
 </div>
 
 <script>

@@ -14,6 +14,7 @@ import com.lca.repository.StylistRepository;
 import com.lca.repository.StylistScheduleRepository;
 import com.lca.service.StylistScheduleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -82,8 +83,7 @@ public class StylistScheduleServiceImpl implements StylistScheduleService {
             return List.of();
         }
 
-        List<Appointment> appointments = appointmentRepository
-                .findByStylistIdAndAppointmentDate(stylistId, workDate);
+        List<Appointment> appointments = appointmentRepository.findByStylistIdAndAppointmentDate(stylistId, workDate, Pageable.unpaged()).getContent();
 
         List<String> availableSlots = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class StylistScheduleServiceImpl implements StylistScheduleService {
         StylistSchedule schedule = scheduleRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy lịch làm việc với ID: " + id));
 
-        List<Appointment> appointments = appointmentRepository.findByStylistIdAndAppointmentDate(schedule.getStylist().getId(), schedule.getWorkDate());
+        List<Appointment> appointments = appointmentRepository.findByStylistIdAndAppointmentDate(schedule.getStylist().getId(), schedule.getWorkDate(), Pageable.unpaged()).getContent();
 
         boolean hasAppointment = appointments.stream()
                 .anyMatch(appointment -> appointment.getStatus() != AppointmentStatus.CANCELLED);

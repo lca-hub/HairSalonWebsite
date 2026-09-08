@@ -39,6 +39,11 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     @ColumnDefault("0")
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
@@ -54,6 +59,4 @@ public class Product {
     @ColumnDefault("1")
     @Column(name = "is_active")
     private Boolean isActive;
-
-
 }

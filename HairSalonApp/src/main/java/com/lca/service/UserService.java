@@ -3,13 +3,16 @@ package com.lca.service;
 import com.lca.dtos.request.UserCreateRequestDTO;
 import com.lca.dtos.request.UserUpdateRequestDTO;
 import com.lca.dtos.response.UserResponseDTO;
+import com.lca.entity.User;
 import com.lca.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<UserResponseDTO> getAll();
+    Page<UserResponseDTO> findAll(Pageable pageable);
 
     UserResponseDTO getById(Long id);
 
@@ -24,5 +27,7 @@ public interface UserService {
     void deleteByAdmin(Long id);
 
     void resetPassword(Long id);
+
+    Page<UserResponseDTO> search(String keyword, Role role, Boolean isActive, Pageable pageable);
 }
 

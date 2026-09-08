@@ -1,11 +1,13 @@
 package com.lca.repository;
 
 import com.lca.entity.PurchaseOrder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long>, JpaSpecificationExecutor<PurchaseOrder> {
+    Page<PurchaseOrder> findBySupplierId(Long supplierId, Pageable pageable);
 
-public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long> {
-
-    List<PurchaseOrder> findBySupplierId(Long supplierId);
+    Page<PurchaseOrder> findByIsReceived(Boolean isReceived, Pageable pageable);
 }

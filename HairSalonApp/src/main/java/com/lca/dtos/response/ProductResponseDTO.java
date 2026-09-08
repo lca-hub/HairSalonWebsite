@@ -19,6 +19,10 @@ public class ProductResponseDTO {
 
     private BigDecimal price;
 
+    private Long categoryId;
+
+    private String categoryName;
+
     private Integer stockQuantity;
 
     private Integer minStockAlert;

@@ -12,7 +12,11 @@ import com.lca.repository.CustomerRepository;
 import com.lca.repository.StylistRepository;
 import com.lca.repository.UserRepository;
 import com.lca.service.UserService;
+import com.lca.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +36,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponseDTO> getAll() {
+    public Page<UserResponseDTO> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserMapper::toResponse);
+    }
 
-        return userRepository.findAll().stream().map(UserMapper::toResponse).toList();
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserResponseDTO> search(String keyword, Role role, Boolean isActive, Pageable pageable) {
+        Specification<User> specification = Specification.where(UserSpecification.keyword(keyword))
+                .and(UserSpecification.role(role))
+                .and(UserSpecification.isActive(isActive));
+        return userRepository.findAll(specification, pageable).map(UserMapper::toResponse);
     }
 
     @Override

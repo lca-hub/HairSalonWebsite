@@ -2,24 +2,26 @@ package com.lca.repository;
 
 import com.lca.entity.Appointment;
 import com.lca.enums.AppointmentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
-public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-
+public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
     Optional<Appointment> findByAppointmentCode(String appointmentCode);
 
     boolean existsByAppointmentCode(String appointmentCode);
 
-    List<Appointment> findByCustomerId(Long customerId);
+    Page<Appointment> findByCustomerId(Long customerId, Pageable pageable);
 
-    List<Appointment> findByStylistId(Long stylistId);
+    Page<Appointment> findByStylistId(Long stylistId, Pageable pageable);
 
-    List<Appointment> findByStylistIdAndAppointmentDate(Long stylistId, LocalDate appointmentDate);
+    Page<Appointment> findByStylistIdAndAppointmentDate(Long stylistId, LocalDate appointmentDate, Pageable pageable);
 
     List<Appointment> findByCustomerIdAndAppointmentDate(Long customerId, LocalDate appointmentDate);
 
