@@ -1,0 +1,155 @@
+.auth-page {
+    min-height: 100vh;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 460px;
+    padding: 30px 20px;
+}
+
+.auth-brand {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.auth-brand h1 {
+    margin: 0;
+    color: #070909;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.auth-brand span {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #b4913f;
+}
+
+.auth-card {
+    border: 1px solid #d9d9d9;
+    background: #ffffff;
+    padding: 40px;
+}
+
+.auth-card h2 {
+    margin: 0;
+    color: #000;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.auth-description {
+    margin: 8px 0 30px;
+    color: #777;
+    font-size: 13px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d9d9d9;
+    outline: none;
+    font-size: 14px;
+    transition: .2s;
+}
+
+.form-group input:focus {
+    border-color: #b4913f;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 22px;
+}
+
+.forgot-password button {
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: #b4913f;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.auth-button {
+    width: 100%;
+    height: 46px;
+    border: none;
+    background: #070909;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.auth-button:hover {
+    background: #b4913f;
+}
+
+.auth-button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+.auth-error {
+    margin-bottom: 20px;
+    padding: 11px 12px;
+    background: #faf6ee;
+    border: 1px solid #e2d2b2;
+    color: #8a6b31;
+    font-size: 13px;
+}
+
+.auth-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeee;
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+}
+
+.auth-footer button {
+    margin-left: 5px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #b4913f;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 480px) {
+
+    .auth-card {
+        padding: 28px 20px;
+    }
+
+    .auth-brand h1 {
+        font-size: 25px;
+    }
+}

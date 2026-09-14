@@ -1,6 +1,7 @@
 package com.lca.controllers.api;
 
 import com.lca.dtos.response.CategoryResponseDTO;
+import com.lca.enums.CategoryType;
 import com.lca.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,8 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAll() {
-        return ResponseEntity.ok(categoryService.getAll());
+
+        return ResponseEntity.ok(categoryService.getAllByType(CategoryType.SERVICE));
     }
 
     @GetMapping("/{id}")

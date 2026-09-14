@@ -10,6 +10,7 @@ import com.lca.enums.PaymentStatus;
 import com.lca.mapper.InvoiceMapper;
 import com.lca.repository.*;
 import com.lca.service.InvoiceService;
+import com.lca.service.NotificationService;
 import com.lca.specification.InvoiceSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ServiceRepository serviceRepo;
     private final ProductRepository productRepo;
     private final PaymentTransactionRepository paymentTransactionRepo;
+    private final NotificationService notificationService;
     private final UserRepository userRepo;
 
     @Override
@@ -55,14 +57,39 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<InvoiceResponseDTO> search(String keyword, Long customerId, PaymentStatus paymentStatus,
-                                           PaymentMethod paymentMethod, LocalDateTime from, LocalDateTime to, Pageable pageable) {
-        Specification<Invoice> specification = Specification.where(InvoiceSpecification.keyword(keyword))
-                .and(InvoiceSpecification.customerId(customerId))
-                .and(InvoiceSpecification.paymentStatus(paymentStatus))
-                .and(InvoiceSpecification.paymentMethod(paymentMethod))
-                .and(InvoiceSpecification.createdFrom(from))
-                .and(InvoiceSpecification.createdTo(to));
+    public Page<InvoiceResponseDTO> search(String keyword, Long customerId, PaymentStatus paymentStatus, PaymentMethod paymentMethod,
+                                           LocalDateTime from, LocalDateTime to, Pageable pageable) {
+
+        Specification<Invoice> specification = null;
+
+        if (keyword != null && !keyword.isBlank()) {
+            specification = InvoiceSpecification.keyword(keyword);
+        }
+
+        if (customerId != null) {
+            specification = specification == null ? InvoiceSpecification.customerId(customerId) : specification.and(InvoiceSpecification.customerId(customerId));
+        }
+
+        if (paymentStatus != null) {
+            specification = specification == null ? InvoiceSpecification.paymentStatus(paymentStatus) : specification.and(InvoiceSpecification.paymentStatus(paymentStatus));
+        }
+
+        if (paymentMethod != null) {
+            specification = specification == null ? InvoiceSpecification.paymentMethod(paymentMethod) : specification.and(InvoiceSpecification.paymentMethod(paymentMethod));
+        }
+
+        if (from != null) {
+            specification = specification == null ? InvoiceSpecification.createdFrom(from) : specification.and(InvoiceSpecification.createdFrom(from));
+        }
+
+        if (to != null) {
+            specification = specification == null ? InvoiceSpecification.createdTo(to) : specification.and(InvoiceSpecification.createdTo(to));
+        }
+
+        if (specification == null) {
+            return invoiceRepo.findAll(pageable).map(InvoiceMapper::toResponse);
+        }
+
         return invoiceRepo.findAll(specification, pageable).map(InvoiceMapper::toResponse);
     }
 
@@ -74,10 +101,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         Customer customer = customerRepo.findById(request.getCustomerId()).orElseThrow(
-                        () -> new RuntimeException("Không tìm thấy customer với ID: " + request.getCustomerId()));
+                () -> new RuntimeException("Không tìm thấy customer với ID: " + request.getCustomerId()));
 
         Appointment appointment = appointmentRepo.findById(request.getAppointmentId()).orElseThrow(
-                        () -> new RuntimeException("Không tìm thấy appointment"));
+                () -> new RuntimeException("Không tìm thấy appointment"));
 
         if (!appointment.getCustomer().getId().equals(customer.getId())) {
             throw new RuntimeException("Appointment không thuộc customer này");
@@ -123,7 +150,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             } else if (itemRequest.getProductId() != null) {
 
                 Product product = productRepo.findById(itemRequest.getProductId()).orElseThrow(
-                                () -> new RuntimeException("Không tìm thấy product với ID: " + itemRequest.getProductId()));
+                        () -> new RuntimeException("Không tìm thấy product với ID: " + itemRequest.getProductId()));
 
                 if (!Boolean.TRUE.equals(product.getIsActive())) {
                     throw new RuntimeException("Sản phẩm không hoạt động");
@@ -186,6 +213,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         appointment.setPaymentDeadline(null);
 
         appointmentRepo.save(appointment);
+
+        notificationService.create(
+                customer.getUser().getId(),
+                "Thanh toán thành công",
+                "Hóa đơn " + savedInvoice.getInvoiceCode() + " đã được thanh toán tại salon. Lịch hẹn đã được xác nhận."
+        );
 
         return InvoiceMapper.toResponse(savedInvoice);
     }

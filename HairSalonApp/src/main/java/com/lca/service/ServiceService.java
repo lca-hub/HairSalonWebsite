@@ -23,5 +23,5 @@ public interface ServiceService {
 
     ServiceResponseDTO updateStatus(Long id, Boolean isActive);
 
-    Page<ServiceResponseDTO> search(String keyword, Long categoryId, Pageable pageable);
+    Page<ServiceResponseDTO> search(String keyword,Long categoryId, Boolean isActive, Pageable pageable);
 }

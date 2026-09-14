@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,24 +28,35 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
+
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO request) {
+
         authService.forgotPassword(request);
         return ResponseEntity.ok("OTP đã được gửi đến email");
     }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequestDTO request) {
+
         authService.verifyOtp(request);
         return ResponseEntity.ok("OTP hợp lệ");
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request) {
+
         authService.resetPassword(request);
         return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
+
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(Map.of("message", ex.getReason() != null ? ex.getReason() : "Có lỗi xảy ra."));
     }
 }

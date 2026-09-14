@@ -8,14 +8,13 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 
 public interface AttendanceService {
+    AttendanceResponseDTO checkIn(String email);
 
-    AttendanceResponseDTO checkIn(Long userId);
+    AttendanceResponseDTO checkOut(String email);
 
-    AttendanceResponseDTO checkOut(Long userId);
+    Page<AttendanceResponseDTO> getMyAttendance(String email, Pageable pageable);
 
-    Page<AttendanceResponseDTO> getMyAttendance(Long userId, Pageable pageable);
-
-    AttendanceResponseDTO getToday(Long userId);
+    AttendanceResponseDTO getToday(String email);
 
     Page<AttendanceResponseDTO> getAll(Pageable pageable);
 

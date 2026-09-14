@@ -11,8 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -27,14 +29,21 @@ public class AdminUserController {
         return ResponseEntity.ok(userService.getById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createByAdmin(request));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponseDTO> create(
+            @Valid @RequestPart("data") UserCreateRequestDTO request,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createByAdmin(request, avatar));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateRequestDTO request) {
-        return ResponseEntity.ok(userService.updateByAdmin(id, request));
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserResponseDTO> update(
+            @PathVariable Long id,
+            @Valid @RequestPart("data") UserUpdateRequestDTO request,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
+
+        return ResponseEntity.ok(userService.updateByAdmin(id, request, avatar));
     }
 
     @DeleteMapping("/{id}")

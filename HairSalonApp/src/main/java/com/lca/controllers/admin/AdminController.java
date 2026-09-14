@@ -15,6 +15,11 @@ public class AdminController {
 
     private final UserRepository userRepository;
 
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/admin/login";
+    }
+
     @GetMapping("/login")
     public String loginPage() {
 

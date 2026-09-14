@@ -7,15 +7,17 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReviewService {
 
-    ReviewResponseDTO create(ReviewRequestDTO request);
+    ReviewResponseDTO create(String email, ReviewRequestDTO request);
 
     Page<ReviewResponseDTO> getByStylist(Long stylistId, Pageable pageable);
 
     ReviewResponseDTO getById(Long id);
 
-    ReviewResponseDTO update(Long id, ReviewRequestDTO request);
+    ReviewResponseDTO update(String email, Long id, ReviewRequestDTO request);
 
-    void delete(Long id);
+    void delete(String email, Long id);
+
+    void adminDelete(Long id);
 
     Page<ReviewResponseDTO> findAll(Pageable pageable);
 }

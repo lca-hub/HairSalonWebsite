@@ -14,7 +14,7 @@ public interface ProductService {
 
     Page<ProductResponseDTO> getActiveProducts(Pageable pageable);
 
-    Page<ProductResponseDTO> search(String keyword, Long categoryId, Long supplierId, Pageable pageable);
+    Page<ProductResponseDTO> search(String keyword, Long categoryId, Long supplierId, Boolean isActive, Pageable pageable);
 
     Page<ProductResponseDTO> getBySupplier(Long supplierId, Pageable pageable);
 
@@ -29,4 +29,5 @@ public interface ProductService {
     ProductResponseDTO updateStatus(Long id, Boolean isActive);
 
     Page<ProductResponseDTO> getLowStockProducts(Pageable pageable);
+
 }

@@ -14,11 +14,13 @@ import com.lca.service.AuthService;
 import com.lca.service.EmailService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -48,12 +50,12 @@ public class AuthServiceImpl implements AuthService {
     public UserResponseDTO register(RegisterRequestDTO request) {
 
         if (userRepo.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã được đăng ký");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email đã được đăng ký");
         }
 
         if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank() && userRepo.existsByPhoneNumber(request.getPhoneNumber())) {
 
-            throw new RuntimeException("Số điện thoại đã được đăng ký");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Số điện thoại đã được đăng ký");
         }
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {

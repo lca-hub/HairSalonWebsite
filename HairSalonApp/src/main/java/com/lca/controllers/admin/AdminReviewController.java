@@ -33,7 +33,7 @@ public class AdminReviewController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        reviewService.delete(id);
+        reviewService.adminDelete(id);
         return ResponseEntity.noContent().build();
     }
 }

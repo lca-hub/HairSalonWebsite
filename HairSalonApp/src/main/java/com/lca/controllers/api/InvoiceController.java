@@ -30,7 +30,7 @@ public class InvoiceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceResponseDTO> getMyInvoiceById(Authentication authentication,
-            @PathVariable Long id) {
+                                                               @PathVariable Long id) {
 
         return ResponseEntity.ok(invoiceService.getMyInvoiceById(authentication.getName(), id));
     }

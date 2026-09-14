@@ -7,6 +7,7 @@ import com.lca.dtos.response.ProductResponseDTO;
 import com.lca.entity.Category;
 import com.lca.entity.Product;
 import com.lca.entity.Supplier;
+import com.lca.enums.CategoryType;
 import com.lca.mapper.ProductMapper;
 import com.lca.repository.CategoryRepository;
 import com.lca.repository.ProductRepository;
@@ -43,6 +44,12 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy category với ID: " + request.getCategoryId()));
 
+        if (category.getType() != CategoryType.PRODUCT) {
+            throw new RuntimeException(
+                    "Category được chọn không phải category của sản phẩm."
+            );
+        }
+
         Product product = ProductMapper.toEntity(request);
         product.setSupplier(supplier);
         product.setCategory(category);
@@ -74,6 +81,12 @@ public class ProductServiceImpl implements ProductService {
                 () -> new RuntimeException("Không tìm thấy supplier với ID: " + request.getSupplierId()));
         Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy category với ID: " + request.getCategoryId()));
+
+        if (category.getType() != CategoryType.PRODUCT) {
+            throw new RuntimeException(
+                    "Category được chọn không phải category của sản phẩm."
+            );
+        }
 
         ProductMapper.updateEntity(product, request);
         product.setSupplier(supplier);
@@ -120,8 +133,41 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductResponseDTO> search(String keyword, Long categoryId, Long supplierId, Pageable pageable) {
-        Specification<Product> specification = Specification.where(ProductSpecification.isActive()).and(ProductSpecification.keyword(keyword)).and(ProductSpecification.categoryId(categoryId)).and(ProductSpecification.supplierId(supplierId));
+    public Page<ProductResponseDTO> search(
+            String keyword,
+            Long categoryId,
+            Long supplierId,
+            Boolean isActive,
+            Pageable pageable) {
+
+        Specification<Product> specification = null;
+
+        if (keyword != null && !keyword.isBlank()) {
+            specification = ProductSpecification.keyword(keyword);
+        }
+
+        if (categoryId != null) {
+            specification = specification == null
+                    ? ProductSpecification.categoryId(categoryId)
+                    : specification.and(ProductSpecification.categoryId(categoryId));
+        }
+
+        if (supplierId != null) {
+            specification = specification == null
+                    ? ProductSpecification.supplierId(supplierId)
+                    : specification.and(ProductSpecification.supplierId(supplierId));
+        }
+
+        if (isActive != null) {
+            specification = specification == null
+                    ? ProductSpecification.isActive(isActive)
+                    : specification.and(ProductSpecification.isActive(isActive));
+        }
+
+        if (specification == null) {
+            return productRepository.findAll(pageable).map(ProductMapper::toResponse);
+        }
+
         return productRepository.findAll(specification, pageable).map(ProductMapper::toResponse);
     }
 
@@ -135,6 +181,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponseDTO> getByCategory(Long categoryId, Pageable pageable) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy category với ID: " + categoryId));
+
+        if (category.getType() != CategoryType.PRODUCT) {
+            throw new RuntimeException("Category này không thuộc nhóm sản phẩm.");
+        }
         Specification<Product> specification = Specification.where(ProductSpecification.isActive()).and(ProductSpecification.categoryId(categoryId));
         return productRepository.findAll(specification, pageable).map(ProductMapper::toResponse);
     }

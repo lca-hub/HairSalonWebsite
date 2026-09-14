@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -17,8 +18,10 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<ReviewResponseDTO> create(@Valid @RequestBody ReviewRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.create(request));
+    public ResponseEntity<ReviewResponseDTO> create(
+            Authentication authentication,
+            @Valid @RequestBody ReviewRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.create(authentication.getName(), request));
     }
 
     @GetMapping("/{id}")
@@ -27,13 +30,16 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReviewResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ReviewRequestDTO request) {
-        return ResponseEntity.ok(reviewService.update(id, request));
+    public ResponseEntity<ReviewResponseDTO> update(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequestDTO request) {
+        return ResponseEntity.ok(reviewService.update(authentication.getName(), id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        reviewService.delete(id);
+    public ResponseEntity<Void> delete(Authentication authentication, @PathVariable Long id) {
+        reviewService.delete(authentication.getName(), id);
         return ResponseEntity.noContent().build();
     }
 }

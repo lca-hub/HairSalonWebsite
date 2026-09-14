@@ -8,6 +8,8 @@ import com.lca.enums.AttendanceStatus;
 import com.lca.mapper.AttendanceMapper;
 import com.lca.repository.AttendanceRepository;
 import com.lca.repository.StylistRepository;
+import com.lca.repository.UserRepository;
+import com.lca.entity.User;
 import com.lca.repository.StylistScheduleRepository;
 import com.lca.service.AttendanceService;
 import com.lca.specification.AttendanceSpecification;
@@ -32,10 +34,11 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final StylistRepository stylistRepository;
     private final StylistScheduleRepository stylistScheduleRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public AttendanceResponseDTO checkIn(Long userId) {
-        Stylist stylist = stylistRepository.findByUserId(userId).orElseThrow(
+    public AttendanceResponseDTO checkIn(String email) {
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist"));
         StylistSchedule schedule = stylistScheduleRepository.findFirstByStylistIdAndWorkDate(stylist.getId(), LocalDate.now()).orElseThrow(
                 () -> new RuntimeException("Hôm nay stylist không có lịch làm việc"));
@@ -47,15 +50,22 @@ public class AttendanceServiceImpl implements AttendanceService {
         Attendance attendance = new Attendance();
         attendance.setStylist(stylist);
         attendance.setSchedule(schedule);
-        attendance.setCheckInTime(LocalDateTime.now());
-        attendance.setAttendanceStatus(LocalDateTime.now()
-                .toLocalTime().isAfter(schedule.getStartTime()) ? AttendanceStatus.LATE : AttendanceStatus.PRESENT);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        attendance.setCheckInTime(now);
+
+        attendance.setAttendanceStatus(
+                now.toLocalTime().isAfter(schedule.getStartTime())
+                        ? AttendanceStatus.LATE
+                        : AttendanceStatus.PRESENT
+        );
         return AttendanceMapper.toResponse(attendanceRepository.save(attendance));
     }
 
     @Override
-    public AttendanceResponseDTO checkOut(Long userId) {
-        Stylist stylist = stylistRepository.findByUserId(userId).orElseThrow(
+    public AttendanceResponseDTO checkOut(String email) {
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist"));
         Attendance attendance = attendanceRepository.findByStylistIdAndScheduleWorkDate(stylist.getId(), LocalDate.now()).orElseThrow(
                 () -> new RuntimeException("Stylist chưa check-in hôm nay"));
@@ -74,19 +84,28 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AttendanceResponseDTO> getMyAttendance(Long userId, Pageable pageable) {
-        Stylist stylist = stylistRepository.findByUserId(userId).orElseThrow(
+    public Page<AttendanceResponseDTO> getMyAttendance(String email, Pageable pageable) {
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy stylist"));
         return attendanceRepository.findByStylistId(stylist.getId(), pageable).map(AttendanceMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AttendanceResponseDTO getToday(Long userId) {
-        Stylist stylist = stylistRepository.findByUserId(userId).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist"));
-        Attendance attendance = attendanceRepository.findByStylistIdAndScheduleWorkDate(stylist.getId(), LocalDate.now()).orElseThrow(() -> new RuntimeException("Hôm nay chưa có dữ liệu điểm danh"));
-        return AttendanceMapper.toResponse(attendance);
+    public AttendanceResponseDTO getToday(String email) {
+
+        Stylist stylist = stylistRepository
+                .findByUserId(getUserByEmail(email).getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist"));
+
+        return attendanceRepository
+                .findByStylistIdAndScheduleWorkDate(stylist.getId(), LocalDate.now())
+                .map(AttendanceMapper::toResponse).orElse(null);
+    }
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
     }
 
     @Override

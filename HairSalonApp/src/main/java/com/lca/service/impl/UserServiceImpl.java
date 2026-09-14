@@ -1,5 +1,7 @@
 package com.lca.service.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.lca.dtos.request.UserCreateRequestDTO;
 import com.lca.dtos.request.UserUpdateRequestDTO;
 import com.lca.dtos.response.UserResponseDTO;
@@ -20,9 +22,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final CustomerRepository customerRepository;
     private final StylistRepository stylistRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Cloudinary cloudinary;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,8 +64,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseDTO createByAdmin(UserCreateRequestDTO request) {
+        return createByAdmin(request, null);
+    }
+
+    @Override
     public UserResponseDTO createByAdmin(
-            UserCreateRequestDTO request) {
+            UserCreateRequestDTO request,
+            MultipartFile avatar) {
 
         if (request.getRole() == Role.ADMIN) {
             throw new RuntimeException("Không được tạo tài khoản ADMIN");
@@ -92,6 +102,10 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(request.getPhoneNumber());
 
         user.setAvatar(request.getAvatar());
+
+        if (avatar != null && !avatar.isEmpty()) {
+            user.setAvatar(uploadAvatar(avatar));
+        }
 
         user.setRole(request.getRole());
 
@@ -126,6 +140,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO updateByAdmin(Long id, UserUpdateRequestDTO request) {
+        return updateByAdmin(id, request, null);
+    }
+
+    @Override
+    public UserResponseDTO updateByAdmin(
+            Long id,
+            UserUpdateRequestDTO request,
+            MultipartFile avatar) {
 
         User user = userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy user với ID: " + id));
@@ -156,7 +178,11 @@ public class UserServiceImpl implements UserService {
 
         user.setPhoneNumber(request.getPhoneNumber());
 
-        user.setAvatar(request.getAvatar());
+        if (avatar != null && !avatar.isEmpty()) {
+            user.setAvatar(uploadAvatar(avatar));
+        } else if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
 
         if (request.getIsActive() != null) {
 
@@ -190,6 +216,38 @@ public class UserServiceImpl implements UserService {
         User updated = userRepository.save(user);
 
         return UserMapper.toResponse(updated);
+    }
+
+    private String uploadAvatar(MultipartFile avatar) {
+        String contentType = avatar.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Avatar phải là file hình ảnh");
+        }
+
+        if (avatar.getSize() > 5 * 1024 * 1024) {
+            throw new IllegalArgumentException("Avatar không được vượt quá 5MB");
+        }
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    avatar.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "hair-salon/avatars",
+                            "resource_type", "image"
+                    )
+            );
+
+            String secureUrl = (String) uploadResult.get("secure_url");
+            if (secureUrl == null || secureUrl.isBlank()) {
+                throw new RuntimeException("Cloudinary không trả về URL avatar");
+            }
+
+            return secureUrl;
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Upload avatar lên Cloudinary thất bại", e);
+        }
     }
 
     @Override

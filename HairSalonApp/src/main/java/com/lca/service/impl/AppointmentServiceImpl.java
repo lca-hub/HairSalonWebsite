@@ -8,13 +8,16 @@ import com.lca.enums.PaymentStatus;
 import com.lca.mapper.AppointmentMapper;
 import com.lca.repository.*;
 import com.lca.service.AppointmentService;
+import com.lca.service.NotificationService;
 import com.lca.specification.AppointmentSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -39,6 +42,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final InvoiceRepository invoiceRepo;
     private final PaymentTransactionRepository  paymentTransactionRepo;
     private final UserRepository userRepo;
+    private final NotificationService notificationService;
 
 
     private AppointmentResponseDTO createInternal(Customer customer, AppointmentRequestDTO request) {
@@ -96,7 +100,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointmentSlotRepo.saveAndFlush(slot);
             }
 
-            return AppointmentMapper.toResponse(saved);
+            AppointmentResponseDTO response = AppointmentMapper.toResponse(saved);
+            notificationService.create(
+                    customer.getUser().getId(),
+                    "Đặt lịch thành công",
+                    "Lịch hẹn " + saved.getAppointmentCode() + " đã được tạo và đang chờ thanh toán tại salon."
+            );
+            return response;
 
         } catch (DataIntegrityViolationException e) {
             throw new RuntimeException("Khung giờ này vừa được người khác đặt. " + "Vui lòng chọn giờ khác.");
@@ -151,6 +161,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setStatus(AppointmentStatus.CANCELLED);
 
             appointmentRepo.save(appointment);
+            notificationService.create(
+                    customer.getUser().getId(),
+                    "Hủy lịch hẹn",
+                    "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy."
+            );
             return;
         }
 
@@ -192,6 +207,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         releaseSlots(appointment.getId());
 
         appointmentRepo.save(appointment);
+        notificationService.create(
+                customer.getUser().getId(),
+                "Hủy lịch hẹn",
+                "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy." +
+                        (appointment.getRefundAmount().signum() > 0 ? " Số tiền hoàn: " + appointment.getRefundAmount() : " Không có hoàn tiền.")
+        );
     }
 
     @Override
@@ -253,6 +274,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment updated = appointmentRepo.saveAndFlush(appointment);
 
         reserveSlots(updated, stylist, request.getAppointmentDate(), startTime, endTime);
+
+        notificationService.create(
+                customer.getUser().getId(),
+                "Đổi lịch hẹn",
+                "Lịch hẹn " + updated.getAppointmentCode() + " đã được đổi sang " +
+                        updated.getAppointmentDate() + " " + updated.getStartTime() + "."
+        );
 
         return AppointmentMapper.toResponse(updated);
     }
@@ -340,32 +368,28 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     @Override
+    @Transactional(noRollbackFor = ResponseStatusException.class)
     public AppointmentResponseDTO confirm(Long id) {
 
-        Appointment appointment = appointmentRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy appointment"));
+        Appointment appointment = appointmentRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy appointment"));
 
         if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
-
-            throw new RuntimeException("Appointment không ở trạng thái PENDING_PAYMENT");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ lịch hẹn ở trạng thái CHỜ THANH TOÁN mới được xác nhận.");
         }
 
         if (appointment.getPaymentDeadline() != null && LocalDateTime.now().isAfter(appointment.getPaymentDeadline())) {
 
             releaseSlots(appointment.getId());
-
             appointment.setStatus(AppointmentStatus.EXPIRED);
+            appointmentRepo.saveAndFlush(appointment);
 
-            appointmentRepo.save(appointment);
-
-            throw new RuntimeException("Thời gian thanh toán đã hết");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian thanh toán đã hết. Lịch hẹn đã chuyển sang EXPIRED, vui lòng tạo lịch mới.");
         }
 
         appointment.setStatus(AppointmentStatus.CONFIRMED);
-
         appointment.setPaymentDeadline(null);
 
-        return AppointmentMapper.toResponse(appointmentRepo.save(appointment));
+        return AppointmentMapper.toResponse(appointmentRepo.saveAndFlush(appointment));
     }
 
     @Override

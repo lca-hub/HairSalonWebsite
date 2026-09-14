@@ -1,5 +1,6 @@
 package com.lca.entity;
 
+import com.lca.enums.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,5 +25,9 @@ public class Category {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 20)
+    private CategoryType type;
 
 }

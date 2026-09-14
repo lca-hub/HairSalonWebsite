@@ -20,9 +20,9 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
-
     @PostMapping("/appointments")
-    public ResponseEntity<AppointmentResponseDTO> create(Authentication authentication,
+    public ResponseEntity<AppointmentResponseDTO> create(
+            Authentication authentication,
             @Valid @RequestBody AppointmentRequestDTO request) {
 
         AppointmentResponseDTO response = appointmentService.create(authentication.getName(), request);

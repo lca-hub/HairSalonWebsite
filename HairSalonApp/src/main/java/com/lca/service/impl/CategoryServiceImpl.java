@@ -3,6 +3,7 @@ package com.lca.service.impl;
 import com.lca.dtos.request.CategoryRequestDTO;
 import com.lca.dtos.response.CategoryResponseDTO;
 import com.lca.entity.Category;
+import com.lca.enums.CategoryType;
 import com.lca.mapper.CategoryMapper;
 import com.lca.repository.CategoryRepository;
 import com.lca.service.CategoryService;
@@ -22,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDTO create(CategoryRequestDTO request) {
 
-        if (categoryRepo.existsByName(request.getName())) {
+        if (categoryRepo.existsByNameAndType(request.getName(), request.getType())) {
             throw new RuntimeException("Tên danh mục đã tồn tại: " + request.getName());
         }
 
@@ -37,8 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponseDTO getById(Long id) {
 
-        Category category = categoryRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
+        Category category = categoryRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
 
         return CategoryMapper.toResponse(category);
     }
@@ -46,19 +46,26 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> getAll() {
+
         return categoryRepo.findAll().stream().map(CategoryMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDTO> getAllByType(CategoryType type) {
+
+        return categoryRepo.findByType(type).stream().map(CategoryMapper::toResponse).toList();
     }
 
     @Override
     public CategoryResponseDTO update(Long id, CategoryRequestDTO request) {
 
-        Category category = categoryRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
+        Category category = categoryRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
 
         boolean nameChanged = !category.getName().equals(request.getName());
 
-        if (nameChanged && categoryRepo.existsByName(request.getName())) {
-
+        if ((nameChanged || category.getType() != request.getType()) &&
+                categoryRepo.existsByNameAndType(request.getName(), request.getType())) {
             throw new RuntimeException("Tên danh mục đã tồn tại: " + request.getName());
         }
 
@@ -71,8 +78,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
-        Category category = categoryRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
+
+        Category category = categoryRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với ID: " + id));
 
         categoryRepo.delete(category);
     }

@@ -15,14 +15,16 @@ public class CategoryMapper {
 
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
+        category.setType(dto.getType());
 
         return category;
     }
 
-    public static void updateEntity(Category category, CategoryRequestDTO dto) {
+    public static void updateEntity(Category category,CategoryRequestDTO dto) {
 
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
+        category.setType(dto.getType());
     }
 
     public static CategoryResponseDTO toResponse(Category category) {
@@ -32,6 +34,7 @@ public class CategoryMapper {
         dto.setId(category.getId());
         dto.setName(category.getName());
         dto.setDescription(category.getDescription());
+        dto.setType(category.getType());
 
         return dto;
     }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
+
 public interface StylistRepository extends JpaRepository<Stylist, Long>, JpaSpecificationExecutor<Stylist> {
 
     Optional<Stylist> findByUserId(Long userId);

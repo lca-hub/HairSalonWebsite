@@ -21,45 +21,44 @@ public class AdminServiceController {
 
     @PostMapping
     public ResponseEntity<ServiceResponseDTO> create(@Valid @RequestBody ServiceRequestDTO request) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(serviceService.create(request));
     }
 
     @GetMapping
-    public ResponseEntity<Page<ServiceResponseDTO>> getAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<ServiceResponseDTO>> getAll(
+            @RequestParam(required = false) String keyword,
+
+            @RequestParam(required = false) Long categoryId,
+
+            @RequestParam(required = false) Boolean isActive,
+
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PaginationUtil.create(page, size);
 
-        return ResponseEntity.ok(serviceService.getAll(pageable));
+        return ResponseEntity.ok(serviceService.search(keyword, categoryId, isActive, pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponseDTO> getById(@PathVariable Long id) {
-
         return ResponseEntity.ok(serviceService.getById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ServiceRequestDTO request) {
-
-        return ResponseEntity.ok(
-                serviceService.update(id, request)
-        );
+        return ResponseEntity.ok(serviceService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-
         serviceService.delete(id);
-
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<ServiceResponseDTO> updateStatus(@PathVariable Long id, @RequestParam Boolean isActive) {
-
-        return ResponseEntity.ok(
-                serviceService.updateStatus(id, isActive)
-        );
+        return ResponseEntity.ok(serviceService.updateStatus(id, isActive));
     }
 }

@@ -19,10 +19,14 @@ public class ServiceController {
     @GetMapping
     public ResponseEntity<Page<ServiceResponseDTO>> getAll(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long categoryId, @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
         Pageable pageable = PaginationUtil.create(page, size);
-        return ResponseEntity.ok(serviceService.search(keyword, categoryId, pageable));
+
+        return ResponseEntity.ok(serviceService.search(keyword, categoryId, isActive, pageable));
     }
 
     @GetMapping("/{id}")

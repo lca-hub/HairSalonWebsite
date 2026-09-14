@@ -1,0 +1,301 @@
+.account-page {
+    min-height: 100vh;
+    background: #fbfaf7;
+    color: #292724;
+}
+
+.account-main {
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 26px 0 70px;
+}
+
+.account-breadcrumb {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 11px;
+    color: #8a857d;
+    margin-bottom: 36px;
+}
+
+.account-breadcrumb a {
+    color: #4a4743;
+    text-decoration: none;
+}
+
+.account-layout {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 58px;
+    align-items: start;
+}
+
+.account-sidebar {
+    border-top: 1px solid #dcd6cd;
+}
+
+.account-sidebar-title {
+    padding: 17px 0 15px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #8c6d3e;
+}
+
+.account-sidebar a,
+.account-sidebar button {
+    width: 100%;
+    display: block;
+    padding: 13px 0;
+    border: 0;
+    border-top: 1px solid #ece8e1;
+    background: transparent;
+    color: #57534d;
+    text-align: left;
+    text-decoration: none;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.account-sidebar a:hover,
+.account-sidebar a.active,
+.account-sidebar button:hover {
+    color: #9a7138;
+}
+
+.account-content {
+    min-width: 0;
+}
+
+.account-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #dcd6cd;
+}
+
+.account-heading p {
+    margin: 0 0 9px;
+    color: #a17a43;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.9px;
+}
+
+.account-heading h1 {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    font-size: 34px;
+    line-height: 1.1;
+    color: #22201e;
+}
+
+.account-heading > span {
+    color: #777169;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 4px;
+}
+
+.profile-form {
+    margin-top: 8px;
+}
+
+.profile-section {
+    padding: 28px 0;
+    border-bottom: 1px solid #e4ded5;
+}
+
+.profile-section h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #282522;
+}
+
+.profile-section p {
+    margin: 0;
+    color: #7f7971;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.profile-photo-section {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 38px;
+    align-items: center;
+}
+
+.profile-photo-area {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-photo {
+    width: 92px;
+    height: 92px;
+    border: 1px solid #d4cabc;
+    background: #f0ece5;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: #967341;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 28px;
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.photo-actions small {
+    color: #949087;
+    font-size: 10px;
+}
+
+.outline-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 108px;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid #373431;
+    color: #2d2a27;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.outline-button:hover {
+    background: #2d2a27;
+    color: #fff;
+}
+
+.outline-button input {
+    display: none;
+}
+
+.profile-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 23px 28px;
+    margin-top: 20px;
+}
+
+.profile-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #605b55;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.profile-fields input,
+.profile-fields select {
+    width: 100%;
+    height: 43px;
+    border: 1px solid #d9d3ca;
+    background: #fff;
+    border-radius: 0;
+    padding: 0 13px;
+    color: #2e2b28;
+    font: inherit;
+    font-size: 12px;
+    outline: none;
+}
+
+.profile-fields input:focus,
+.profile-fields select:focus {
+    border-color: #9e7b49;
+}
+
+.profile-fields input:disabled {
+    background: #f4f1eb;
+    color: #938e86;
+}
+
+.profile-footer {
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.save-button {
+    border: 0;
+    background: #1c1a18;
+    color: #fff;
+    min-width: 150px;
+    height: 42px;
+    padding: 0 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    background: #8d6938;
+}
+
+.save-message {
+    color: #88704c;
+    font-size: 11px;
+}
+
+@media (max-width: 820px) {
+    .account-layout {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .account-sidebar {
+        border-top: 1px solid #dcd6cd;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 18px;
+    }
+
+    .account-sidebar-title {
+        grid-column: 1 / -1;
+    }
+
+    .profile-photo-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .account-main {
+        width: min(100% - 28px, 1180px);
+    }
+
+    .profile-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .account-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

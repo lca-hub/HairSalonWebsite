@@ -1,0 +1,385 @@
+/* =====================================================
+   SERVICE FILTER
+===================================================== */
+
+.admin-service-filters {
+    display: grid;
+
+    grid-template-columns:
+        minmax(240px, 1.7fr)
+        minmax(180px, 1fr)
+        minmax(160px, .9fr)
+        auto;
+
+    align-items: end;
+
+    gap: 13px;
+}
+
+.admin-service-filters > * {
+    min-width: 0;
+}
+
+.admin-service-filters > label {
+    margin-bottom: 0;
+}
+
+.admin-service-filters > label > span {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.admin-service-filters .admin-filter-reset {
+    height: 42px;
+    min-height: 42px;
+    align-self: end;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   SERVICE TABLE
+===================================================== */
+
+.admin-services-table {
+    min-width: 980px;
+}
+
+.admin-service-cell {
+    min-width: 220px;
+}
+
+.admin-service-cell strong,
+.admin-service-cell span {
+    display: block;
+}
+
+.admin-service-cell strong {
+    color: #2d2924;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-service-cell span {
+    margin-top: 4px;
+    max-width: 340px;
+
+    overflow: hidden;
+
+    color: #928b83;
+
+    font-size: 10px;
+    line-height: 1.45;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.admin-service-status {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 25px;
+
+    padding: 0 9px;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: .35px;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.admin-service-status.active {
+    background: #f0f6ed;
+    color: #557448;
+}
+
+.admin-service-status.inactive {
+    background: #f7eeee;
+    color: #945b52;
+}
+
+
+/* =====================================================
+   SERVICE ACTIONS
+===================================================== */
+
+.admin-service-actions {
+    display: inline-flex;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 5px;
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.admin-service-modal-backdrop {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1200;
+
+    display: grid;
+
+    place-items: center;
+
+    padding: 20px;
+
+    background: rgba(35, 31, 26, .58);
+}
+
+.admin-service-modal {
+    width: min(720px, 100%);
+
+    max-height:
+        min(820px, calc(100vh - 40px));
+
+    overflow: auto;
+
+    border: 1px solid #ddd6cd;
+
+    background: #fff;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, .2);
+}
+
+
+/* =====================================================
+   CATEGORY
+===================================================== */
+
+.admin-heading-actions {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.admin-category-card {
+    margin-bottom: 18px;
+
+    border: 1px solid #e2dcd4;
+
+    background: #fff;
+}
+
+.admin-category-list {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    border-top: 1px solid #eee9e3;
+}
+
+.admin-category-item {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 14px;
+
+    padding: 15px 18px;
+
+    border-right:
+        1px solid #eee9e3;
+
+    border-bottom:
+        1px solid #eee9e3;
+}
+
+.admin-category-item:nth-child(even) {
+    border-right: 0;
+}
+
+.admin-category-item > div {
+    min-width: 0;
+}
+
+.admin-category-item strong,
+.admin-category-item span {
+    display: block;
+}
+
+.admin-category-item strong {
+    color: #2d2924;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.admin-category-item span {
+    margin-top: 4px;
+
+    overflow: hidden;
+
+    color: #928b83;
+
+    font-size: 10px;
+
+    line-height: 1.45;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.admin-category-empty {
+    border-top: 1px solid #eee9e3;
+}
+
+.admin-category-modal {
+    width: min(560px, 100%);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .admin-service-filters {
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .admin-service-filters
+    .admin-filter-reset {
+        grid-column: 1 / -1;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .admin-heading-actions {
+        width: 100%;
+
+        justify-content:
+            flex-start;
+    }
+
+    .admin-category-list {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-category-item,
+    .admin-category-item:nth-child(even) {
+        border-right: 0;
+    }
+
+}
+
+
+@media (max-width: 680px) {
+
+    .admin-service-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-service-filters
+    .admin-filter-reset {
+        grid-column: auto;
+    }
+
+    .admin-services-table {
+        min-width: 0;
+    }
+
+    .admin-services-table thead {
+        display: none;
+    }
+
+    .admin-services-table,
+    .admin-services-table tbody,
+    .admin-services-table tr,
+    .admin-services-table td {
+        display: block;
+
+        width: 100%;
+    }
+
+    .admin-services-table tbody {
+        padding: 10px;
+    }
+
+    .admin-services-table tr {
+        margin-bottom: 12px;
+
+        padding: 5px 0;
+
+        border: 1px solid #e4ded6;
+
+        background: #fff;
+    }
+
+    .admin-services-table td {
+        display: grid;
+
+        grid-template-columns:
+            105px minmax(0, 1fr);
+
+        gap: 12px;
+
+        padding: 11px 12px;
+
+        border-bottom:
+            1px solid #f0ece6;
+    }
+
+    .admin-services-table td:last-child {
+        border-bottom: 0;
+    }
+
+    .admin-services-table td::before {
+        content: attr(data-label);
+
+        color: #8a837a;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        letter-spacing: .07em;
+
+        text-transform: uppercase;
+    }
+
+    .admin-service-actions {
+        justify-content: flex-start;
+    }
+
+    .admin-service-modal-backdrop {
+        padding: 10px;
+    }
+
+}

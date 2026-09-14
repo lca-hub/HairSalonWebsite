@@ -1,0 +1,1008 @@
+/* =========================================================
+   APPOINTMENT DETAIL
+========================================================= */
+
+.appointment-detail-page {
+    min-height: calc(100vh - 82px);
+    background: #f7f5f1;
+    color: #1d1d1d;
+    padding: 55px 0 80px;
+}
+
+.appointment-detail-container {
+    width: min(1180px, calc(100% - 60px));
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+.appointment-back {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 35px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #777;
+    font-size: 12px;
+    letter-spacing: .5px;
+
+    cursor: pointer;
+    transition: color .2s ease;
+}
+
+.appointment-back:hover {
+    color: #a17a42;
+}
+
+.appointment-back span:first-child {
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.appointment-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+    margin-bottom: 38px;
+}
+
+.appointment-eyebrow {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #a17a42;
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 2.8px;
+}
+
+.appointment-page-header h1 {
+    margin: 0;
+
+    color: #1b1b1b;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 42px;
+    font-weight: 400;
+
+    letter-spacing: -.5px;
+}
+
+.appointment-page-header p {
+    margin: 12px 0 0;
+
+    color: #888;
+    font-size: 12px;
+}
+
+.appointment-page-header p strong {
+    color: #333;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.appointment-status {
+    min-width: 145px;
+
+    padding: 11px 17px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    border-radius: 3px;
+
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .4px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+    background: currentColor;
+}
+
+
+/* PENDING */
+
+.appointment-status.pending {
+    background: #f5ead6;
+    color: #a17a42;
+}
+
+
+/* CONFIRMED */
+
+.appointment-status.confirmed {
+    background: #e9f3ec;
+    color: #39734a;
+}
+
+
+/* IN SERVICE */
+
+.appointment-status.in-service {
+    background: #eee8f5;
+    color: #70518c;
+}
+
+
+/* COMPLETED */
+
+.appointment-status.completed {
+    background: #e7f1ec;
+    color: #3e7353;
+}
+
+
+/* CANCELLED */
+
+.appointment-status.cancelled {
+    background: #f5e8e6;
+    color: #a65a50;
+}
+
+
+/* NO SHOW */
+
+.appointment-status.no-show {
+    background: #eeeeee;
+    color: #666;
+}
+
+
+/* EXPIRED */
+
+.appointment-status.expired {
+    background: #eeeeee;
+    color: #777;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.appointment-alert {
+    margin-bottom: 25px;
+
+    padding: 13px 16px;
+
+    background: #fff4f2;
+    border: 1px solid #ecd2ce;
+
+    color: #984f47;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.appointment-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 28px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.appointment-main-card {
+    background: #fff;
+
+    border: 1px solid #e8e3db;
+
+    box-shadow: 0 12px 35px rgba(38, 30, 20, .045);
+}
+
+
+/* =========================================================
+   DETAIL ROW
+========================================================= */
+
+.detail-row {
+    padding: 31px 34px;
+
+    border-bottom: 1px solid #eeeae4;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.detail-label {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    margin-bottom: 22px;
+
+    color: #222;
+
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+.detail-number {
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #d9c4a0;
+
+    color: #a17a42;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: .5px;
+}
+
+
+/* =========================================================
+   SERVICE
+========================================================= */
+
+.service-content {
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+}
+
+.service-symbol {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    background: #f5f1eb;
+
+    color: #a17a42;
+
+    font-size: 20px;
+}
+
+.service-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.service-text h2 {
+    margin: 0;
+
+    color: #252525;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.service-text p {
+    margin: 5px 0 0;
+
+    color: #999;
+
+    font-size: 11px;
+}
+
+.service-amount {
+    color: #a17a42;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STYLIST
+========================================================= */
+
+.stylist-content {
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+}
+
+.stylist-avatar-large {
+    width: 58px;
+    height: 58px;
+
+    flex: 0 0 auto;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    background: #eee9e2;
+
+    display: grid;
+    place-items: center;
+
+    color: #a17a42;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+}
+
+.stylist-avatar-large img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.stylist-text h2 {
+    margin: 0;
+
+    color: #252525;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.stylist-text p {
+    margin: 5px 0 0;
+
+    color: #999;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   DATE TIME
+========================================================= */
+
+.appointment-datetime {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 14px;
+}
+
+.datetime-box {
+    min-height: 72px;
+
+    padding: 15px 17px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    background: #faf9f7;
+
+    border: 1px solid #eeeae4;
+}
+
+.datetime-icon {
+    width: 34px;
+    height: 34px;
+
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #dfd1bb;
+
+    color: #a17a42;
+
+    font-size: 16px;
+}
+
+.datetime-box div {
+    min-width: 0;
+}
+
+.datetime-box small {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #a17a42;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+}
+
+.datetime-box strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.note-box {
+    padding: 17px 19px;
+
+    background: #faf9f7;
+
+    border-left: 2px solid #c4a36a;
+
+    color: #666;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.appointment-summary {
+    background: #1b1b1b;
+
+    padding: 30px 27px;
+
+    color: white;
+
+    box-shadow: 0 15px 35px rgba(0, 0, 0, .08);
+}
+
+
+/* =========================================================
+   SUMMARY TOP
+========================================================= */
+
+.summary-top {
+    padding-bottom: 22px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.summary-top > span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #c6a365;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+.summary-top h2 {
+    margin: 0;
+
+    color: #fff;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   SUMMARY SERVICE
+========================================================= */
+
+.summary-service {
+    padding: 22px 0;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+
+    font-size: 11px;
+}
+
+.summary-service > div {
+    min-width: 0;
+}
+
+.summary-service div span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #999;
+
+    font-size: 10px;
+}
+
+.summary-service div strong {
+    display: block;
+
+    color: #eee;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+.summary-service > span {
+    color: #d4b274;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   SUMMARY LINE
+========================================================= */
+
+.summary-line {
+    padding: 15px 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #999;
+
+    font-size: 11px;
+}
+
+.summary-line strong {
+    color: #ddd;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.summary-divider {
+    height: 1px;
+
+    background: rgba(255, 255, 255, .15);
+
+    margin: 4px 0 18px;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.summary-total span {
+    color: #aaa;
+
+    font-size: 11px;
+}
+
+.summary-total strong {
+    color: #d4b274;
+
+    font-size: 22px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.summary-actions {
+    margin-top: 28px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+}
+
+.summary-actions button {
+    width: 100%;
+    min-height: 45px;
+
+    border: none;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 1.4px;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+}
+
+
+/* CANCEL */
+
+.cancel-button {
+    background: transparent;
+
+    border: 1px solid #4a4a4a !important;
+
+    color: #bbb;
+}
+
+.cancel-button:hover {
+    border-color: #a65a50 !important;
+
+    color: #e08d82;
+}
+
+.cancel-button:disabled {
+    opacity: .5;
+
+    cursor: not-allowed;
+}
+
+
+/* PRIMARY */
+
+.primary-action {
+    background: #c09a58;
+
+    color: #171717;
+}
+
+.primary-action:hover {
+    background: #d0ad6d;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   HELP
+========================================================= */
+
+.summary-help {
+    margin-top: 28px;
+    padding-top: 20px;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 11px;
+
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+
+.help-symbol {
+    width: 23px;
+    height: 23px;
+
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #665537;
+
+    border-radius: 50%;
+
+    color: #c9a867;
+
+    font-size: 11px;
+}
+
+.summary-help strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #ddd;
+
+    font-size: 11px;
+}
+
+.summary-help p {
+    margin: 0;
+
+    color: #888;
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.appointment-loading {
+    min-height: 420px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+
+    color: #888;
+
+    font-size: 12px;
+}
+
+.loading-spinner {
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid #ddd;
+    border-top-color: #a17a42;
+
+    border-radius: 50%;
+
+    animation: appointmentSpin .8s linear infinite;
+}
+
+@keyframes appointmentSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   ERROR PAGE
+========================================================= */
+
+.appointment-error {
+    min-height: 420px;
+
+    background: white;
+
+    border: 1px solid #e8e3db;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 40px;
+}
+
+.error-icon {
+    width: 45px;
+    height: 45px;
+
+    margin-bottom: 18px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #f7e9e6;
+
+    color: #a65a50;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.appointment-error h2 {
+    margin: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 25px;
+    font-weight: 400;
+}
+
+.appointment-error p {
+    max-width: 450px;
+
+    margin: 10px 0 22px;
+
+    color: #888;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+.back-button {
+    padding: 11px 20px;
+
+    border: 1px solid #d4c5ae;
+
+    background: white;
+
+    color: #a17a42;
+
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background: #a17a42;
+
+    color: white;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .appointment-content {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-summary {
+        width: 100%;
+    }
+
+    .summary-actions {
+        flex-direction: row;
+    }
+
+    .summary-actions button {
+        flex: 1;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .appointment-detail-page {
+        padding: 35px 0 60px;
+    }
+
+    .appointment-detail-container {
+        width: calc(100% - 30px);
+    }
+
+    .appointment-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 28px;
+    }
+
+    .appointment-page-header h1 {
+        font-size: 32px;
+    }
+
+    .appointment-status {
+        min-width: auto;
+    }
+
+    .detail-row {
+        padding: 24px 20px;
+    }
+
+    .service-content {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+    .service-amount {
+        margin-left: 65px;
+    }
+
+    .appointment-datetime {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-summary {
+        padding: 25px 20px;
+    }
+
+    .summary-actions {
+        flex-direction: column;
+    }
+
+    .summary-actions button {
+        flex: none;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .appointment-detail-container {
+        width: calc(100% - 24px);
+    }
+
+    .appointment-page-header h1 {
+        font-size: 20px;
+    }
+
+    .detail-row {
+        padding: 21px 17px;
+    }
+
+    .service-text h2 {
+        font-size: 15px;
+    }
+
+    .datetime-box {
+        padding: 13px;
+    }
+
+    .summary-total strong {
+        font-size: 19px;
+    }
+}

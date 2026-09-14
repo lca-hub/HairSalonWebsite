@@ -12,6 +12,13 @@ public class ProductSpecification {
         return (root, query, cb) -> cb.isTrue(root.get("isActive"));
     }
 
+    public static Specification<Product> isActive(Boolean isActive) {
+        if (isActive == null) {
+            return null;
+        }
+
+        return (root, query, cb) -> cb.equal(root.get("isActive"), isActive);
+    }
     public static Specification<Product> keyword(String keyword) {
 
         if (keyword == null || keyword.isBlank()) {

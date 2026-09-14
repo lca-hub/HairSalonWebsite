@@ -1,5 +1,6 @@
 package com.lca.dtos.response;
 
+import com.lca.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,4 +13,6 @@ public class CategoryResponseDTO {
     private String name;
 
     private String description;
+
+    private CategoryType type;
 }

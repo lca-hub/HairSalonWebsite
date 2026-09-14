@@ -1,0 +1,153 @@
+.register-page {
+    min-height: 100vh;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 560px;
+    padding: 30px 20px;
+}
+
+.register-brand {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.register-brand h1 {
+    margin: 0;
+    color: #070909;
+    font-size: 30px;
+    letter-spacing: 2px;
+}
+
+.register-brand span {
+    display: block;
+    margin-top: 8px;
+    color: #b4913f;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.register-card {
+    background: #fff;
+    border: 1px solid #d9d9d9;
+    padding: 38px;
+}
+
+.register-card h2 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 600;
+    color: #000;
+}
+
+.register-description {
+    margin: 8px 0 28px;
+    color: #777;
+    font-size: 13px;
+}
+
+.register-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    height: 46px;
+    padding: 0 13px;
+    border: 1px solid #d9d9d9;
+    outline: none;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    border-color: #b4913f;
+}
+
+.register-button {
+    width: 100%;
+    height: 46px;
+    border: none;
+    background: #070909;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.register-button:hover {
+    background: #b4913f;
+}
+
+.register-button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+.register-error,
+.register-success {
+    margin-bottom: 18px;
+    padding: 11px 12px;
+    font-size: 13px;
+}
+
+.register-error {
+    background: #faf6ee;
+    border: 1px solid #e2d2b2;
+    color: #8a6b31;
+}
+
+.register-success {
+    background: #f3f7f3;
+    border: 1px solid #cddccd;
+    color: #477047;
+}
+
+.register-footer {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+}
+
+.register-footer button {
+    margin-left: 5px;
+    border: none;
+    background: transparent;
+    color: #b4913f;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .register-card {
+        padding: 25px 20px;
+    }
+
+    .register-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

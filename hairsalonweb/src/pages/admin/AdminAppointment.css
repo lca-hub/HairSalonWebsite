@@ -1,0 +1,139 @@
+.admin-appointment-filters {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1.4fr auto;
+    align-items: end;
+    gap: 13px;
+}
+
+
+/* Match AdminUsers button sizing exactly */
+.admin-appointment-filters .admin-filter-reset {
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    line-height: 1;
+}
+
+.admin-table-top .admin-refresh-btn {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    line-height: 1;
+}
+
+.admin-action-row {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.admin-action-row button {
+    min-height: 29px;
+    padding: 0 8px;
+    border: 1px solid #d6d0c8;
+    border-radius: 0;
+    background: #fff;
+    color: #5e5851;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .45px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.admin-action-row button:hover {
+    border-color: #ad8144;
+    background: #fbfaf7;
+    color: #ad8144;
+}
+
+.admin-action-row button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.admin-appointment-status,
+.admin-schedule-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 0 9px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .35px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.admin-appointment-status {
+    background: #f1eee8;
+    color: #655f57;
+}
+
+.admin-appointment-status.status-pending_payment {
+    background: #f8f1e4;
+    color: #8b672f;
+}
+
+.admin-appointment-status.status-confirmed {
+    background: #f0f6ed;
+    color: #557448;
+}
+
+.admin-appointment-status.status-in_service {
+    background: #f2f0f8;
+    color: #665486;
+}
+
+.admin-appointment-status.status-completed {
+    background: #edf5f0;
+    color: #527360;
+}
+
+.admin-appointment-status.status-cancelled,
+.admin-appointment-status.status-no_show,
+.admin-appointment-status.status-expired {
+    background: #f7eeee;
+    color: #945b52;
+}
+
+@media (max-width: 900px) {
+    .admin-appointment-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-appointment-filters .admin-filter-reset {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 680px) {
+    .admin-appointment-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-appointment-filters .admin-filter-reset {
+        grid-column: auto;
+    }
+
+    .admin-action-row {
+        justify-content: flex-start;
+    }
+}
+
+
+
+.admin-appointment-filters > label {
+    margin-bottom: 0;
+}
+
+.admin-appointment-filters > label > span {
+    display: block;
+    margin-bottom: 7px;
+}

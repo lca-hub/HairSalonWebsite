@@ -96,31 +96,33 @@ CREATE TABLE attendance (
 
 CREATE TABLE category (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+    
     name VARCHAR(255) NOT NULL UNIQUE,
-
-    description TEXT
+    
+    description TEXT,
+    
+    type VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE service (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+    
     service_code VARCHAR(30) UNIQUE,
-
+    
     category_id BIGINT NOT NULL,
-
+    
     name VARCHAR(255) NOT NULL,
-
+    
     description TEXT,
-
+    
     price DECIMAL(12,2) NOT NULL,
-
+    
     duration_minutes INT NOT NULL,
-
+    
     image_url VARCHAR(500),
-
+    
     is_active BOOLEAN DEFAULT TRUE,
-
+    
     FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
@@ -138,24 +140,28 @@ CREATE TABLE supplier (
 
 CREATE TABLE product (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+    
     product_code VARCHAR(30) UNIQUE,
-
+    
     supplier_id BIGINT,
-
+    
     name VARCHAR(255) NOT NULL,
-
+    
     price DECIMAL(12,2) NOT NULL,
-
+    
+    category_id BIGINT,
+    
     stock_quantity INT DEFAULT 0,
-
+    
     min_stock_alert INT DEFAULT 5,
-
+    
     image_url VARCHAR(500),
-
+    
     is_active BOOLEAN DEFAULT TRUE,
-
-    FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE SET NULL
+    
+    FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE SET NULL,
+    
+    FOREIGN KEY (category_id) REFERENCES category(id) ON DELETE SET NULL
 );
 
 CREATE TABLE purchase_order (
@@ -168,6 +174,8 @@ CREATE TABLE purchase_order (
     total_amount DECIMAL(12,2) DEFAULT 0,
 
     note VARCHAR(500),
+
+    is_received BOOLEAN DEFAULT FALSE,
 
     FOREIGN KEY (supplier_id) REFERENCES supplier(id)
 );

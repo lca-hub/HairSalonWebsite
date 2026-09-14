@@ -3,17 +3,45 @@ services:
     image: mysql:8.4
     container_name: hair-salon-mysql
     restart: unless-stopped
-
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
-      - "${DB_PORT}:3306"
-
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./database/salondb.sql:/docker-entrypoint-initdb.d/salondb.sql:ro
+      - ./database/salondb.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./database/sample-data.sql:/docker-entrypoint-initdb.d/02-sample-data.sql:ro
+    networks:
+      - hair-salon-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: hair-salon-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - hair-salon-network
+
+  backend:
+    build:
+      context: ./HairSalonApp
+      dockerfile: Dockerfile
+    container_name: hair-salon-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "8080:8080"
+    networks:
+      - hair-salon-network
+
+networks:
+  hair-salon-network:
 
 volumes:
   mysql_data:

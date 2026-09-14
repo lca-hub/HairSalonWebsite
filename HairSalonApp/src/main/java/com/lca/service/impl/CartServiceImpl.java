@@ -2,14 +2,12 @@ package com.lca.service.impl;
 
 import com.lca.dtos.request.CartItemRequestDTO;
 import com.lca.dtos.response.CartResponseDTO;
-import com.lca.entity.Cart;
-import com.lca.entity.CartItem;
-import com.lca.entity.Customer;
-import com.lca.entity.Product;
+import com.lca.entity.*;
 import com.lca.mapper.CartMapper;
 import com.lca.repository.CartItemRepository;
 import com.lca.repository.CartRepository;
 import com.lca.repository.CustomerRepository;
+import com.lca.repository.UserRepository;
 import com.lca.repository.ProductRepository;
 import com.lca.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +24,19 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public CartResponseDTO getCart(Long customerId) {
-        return CartMapper.toResponse(getOrCreateCart(customerId));
+    public CartResponseDTO getCart(String email) {
+        return CartMapper.toResponse(getOrCreateCart(getCustomerByEmail(email).getId()));
     }
 
     @Override
-    public CartResponseDTO addItem(Long customerId, CartItemRequestDTO request) {
+    public CartResponseDTO addItem(String email, CartItemRequestDTO request) {
 
-        Cart cart = getOrCreateCart(customerId);
+        Cart cart = getOrCreateCart(getCustomerByEmail(email).getId());
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
@@ -86,12 +85,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponseDTO updateItem(Long customerId, Long productId, CartItemRequestDTO request) {
+    public CartResponseDTO updateItem(String email, Long productId, CartItemRequestDTO request) {
 
-        Cart cart = getOrCreateCart(customerId);
+        Cart cart = getOrCreateCart(getCustomerByEmail(email).getId());
 
-        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không có trong giỏ hàng"));
+        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId).orElseThrow(
+                () -> new RuntimeException("Sản phẩm không có trong giỏ hàng"));
 
         Product product = item.getProduct();
 
@@ -99,25 +98,31 @@ public class CartServiceImpl implements CartService {
             throw new RuntimeException("Sản phẩm đã ngừng kinh doanh");
         }
 
-        if (request.getQuantity() > product.getStockQuantity()) {
+        if (request.getQuantity() <= 0) {
+            throw new RuntimeException("Số lượng phải lớn hơn 0");
+        }
+
+        if (product.getStockQuantity() == null || request.getQuantity() > product.getStockQuantity()) {
             throw new RuntimeException("Số lượng vượt quá tồn kho");
         }
 
         item.setQuantity(request.getQuantity());
+
         cart.setUpdatedAt(LocalDateTime.now());
+
+        cartItemRepository.save(item);
+        cartRepository.save(cart);
 
         return CartMapper.toResponse(cart);
     }
 
     @Override
-    public void removeItem(Long customerId, Long productId) {
+    public void removeItem(String email, Long productId) {
 
-        Cart cart = getOrCreateCart(customerId);
+        Cart cart = getOrCreateCart(getCustomerByEmail(email).getId());
 
-        CartItem item = cartItemRepository
-                .findByCartIdAndProductId(cart.getId(), productId)
-                .orElseThrow(() ->
-                        new RuntimeException("Sản phẩm không có trong giỏ hàng"));
+        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không có trong giỏ hàng"));
 
         cart.getItems().remove(item);
         cart.setUpdatedAt(LocalDateTime.now());
@@ -126,9 +131,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(Long customerId) {
+    public void clearCart(String email) {
 
-        Cart cart = getOrCreateCart(customerId);
+        Cart cart = getOrCreateCart(getCustomerByEmail(email).getId());
 
         cart.getItems().clear();
         cart.setUpdatedAt(LocalDateTime.now());
@@ -136,11 +141,18 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
+    private Customer getCustomerByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        return customerRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+    }
+
     private Cart getOrCreateCart(Long customerId) {
 
         return cartRepository.findByCustomerId(customerId)
                 .orElseGet(() -> {Customer customer = customerRepository.findById(customerId)
-                            .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
 
                     Cart cart = new Cart();
                     cart.setCustomer(customer);

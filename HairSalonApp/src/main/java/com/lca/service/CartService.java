@@ -5,13 +5,13 @@ import com.lca.dtos.response.CartResponseDTO;
 
 public interface CartService {
 
-    CartResponseDTO getCart(Long customerId);
+    CartResponseDTO getCart(String email);
 
-    CartResponseDTO addItem(Long customerId, CartItemRequestDTO request);
+    CartResponseDTO addItem(String email, CartItemRequestDTO request);
 
-    CartResponseDTO updateItem(Long customerId, Long productId, CartItemRequestDTO request);
+    CartResponseDTO updateItem(String email, Long productId, CartItemRequestDTO request);
 
-    void removeItem(Long customerId, Long productId);
+    void removeItem(String email, Long productId);
 
-    void clearCart(Long customerId);
+    void clearCart(String email);
 }

@@ -1,0 +1,85 @@
+.session-expired-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(35, 31, 26, 0.58);
+}
+
+.session-expired-modal {
+    width: min(460px, 100%);
+    padding: 30px;
+    border: 1px solid #ddd6cd;
+    background: #fff;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.session-expired-icon {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 16px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #e3cfc9;
+    background: #fff8f5;
+    color: #9b5148;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.session-expired-content {
+    margin-bottom: 22px;
+}
+
+.session-expired-eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: #ad8144;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.session-expired-content h2 {
+    margin: 0 0 10px;
+    color: #231f1a;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 23px;
+    font-weight: 400;
+}
+
+.session-expired-content p {
+    margin: 0;
+    color: #6f675e;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.session-expired-login {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #2a2621;
+    background: #2a2621;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.session-expired-login:hover {
+    border-color: #ad8144;
+    background: #ad8144;
+}
+
+@media (max-width: 480px) {
+    .session-expired-modal {
+        padding: 24px 18px;
+    }
+}

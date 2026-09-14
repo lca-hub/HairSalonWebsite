@@ -1,0 +1,275 @@
+/* AdminSchedules-specific styles. Shared admin UI lives in AdminCommon.css. */
+
+.admin-schedule-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 13px;
+}
+
+.admin-schedule-filters > label {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.admin-schedule-filters > label > span {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.admin-schedule-filters .admin-filter-reset {
+    height: 42px;
+    min-height: 42px;
+    align-self: end;
+    white-space: nowrap;
+}
+
+.admin-user-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.admin-user-actions .admin-action-btn {
+    min-height: 29px;
+    padding: 0 8px;
+}
+
+.admin-action-btn.delete:hover {
+    border-color: #9b5148;
+    color: #9b5148;
+    background: #fff9f8;
+}
+
+.admin-schedule-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 0 9px;
+    background: #f0f6ed;
+    color: #557448;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .35px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.admin-schedule-status.off {
+    background: #f7eeee;
+    color: #945b52;
+}
+
+/* Bulk week picker */
+.admin-schedule-week-summary {
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #d7d1c8;
+    background: #fbfaf7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.admin-schedule-week-summary span {
+    color: #706a62;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .65px;
+    text-transform: uppercase;
+}
+
+.admin-schedule-week-summary strong {
+    color: #2d2924;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-week-picker {
+    padding: 16px;
+    border: 1px solid #ded7ce;
+    background: #fbfaf7;
+}
+
+.admin-week-picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 13px;
+}
+
+.admin-week-picker-head > div:first-child > span {
+    display: block;
+    color: #2d2924;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-week-picker-head small {
+    display: block;
+    margin-top: 4px;
+    color: #928b83;
+    font-size: 10px;
+}
+
+.admin-week-picker-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-week-picker-actions button,
+.admin-week-shortcuts button {
+    border: 1px solid #d6d0c8;
+    border-radius: 0;
+    background: #fff;
+    color: #5e5851;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.admin-week-picker-actions button {
+    width: 31px;
+    height: 31px;
+    font-size: 14px;
+}
+
+.admin-week-picker-actions button:hover,
+.admin-week-shortcuts button:hover {
+    border-color: #ad8144;
+    color: #ad8144;
+}
+
+.admin-week-picker-actions strong {
+    min-width: 150px;
+    text-align: center;
+    color: #5d5750;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.admin-week-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+}
+
+.admin-week-shortcuts button {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .35px;
+    text-transform: uppercase;
+}
+
+.admin-week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.admin-week-day {
+    min-height: 78px;
+    padding: 10px 7px;
+    border: 1px solid #d8d2c9;
+    border-radius: 0;
+    background: #fff;
+    color: #5d5750;
+    text-align: center;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.admin-week-day span {
+    display: block;
+    color: #7e776e;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+}
+
+.admin-week-day strong {
+    display: block;
+    margin-top: 6px;
+    color: #2d2924;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.admin-week-day small {
+    display: block;
+    margin-top: 5px;
+    color: #aaa39a;
+    font-size: 9px;
+}
+
+.admin-week-day:hover {
+    border-color: #ad8144;
+    background: #fbf7ef;
+}
+
+.admin-week-day.selected {
+    border-color: #2a2621;
+    background: #2a2621;
+    color: #fff;
+}
+
+.admin-week-day.selected span,
+.admin-week-day.selected strong,
+.admin-week-day.selected small {
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .admin-schedule-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-schedule-filters .admin-filter-reset {
+        grid-column: 1 / -1;
+    }
+
+    .admin-week-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .admin-schedule-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-schedule-filters .admin-filter-reset {
+        grid-column: auto;
+    }
+
+    .admin-user-actions {
+        justify-content: flex-start;
+    }
+
+    .admin-week-picker-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-week-picker-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .admin-week-picker-actions strong {
+        min-width: auto;
+    }
+
+    .admin-week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

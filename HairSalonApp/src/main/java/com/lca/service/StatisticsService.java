@@ -1,5 +1,10 @@
 package com.lca.service;
 
-public class StatisticsService {
+import com.lca.dtos.response.StatisticsResponseDTO;
 
+public interface StatisticsService {
+
+    StatisticsResponseDTO getDashboard();
+
+    StatisticsResponseDTO getStats(String statsType, int year, Integer month);
 }

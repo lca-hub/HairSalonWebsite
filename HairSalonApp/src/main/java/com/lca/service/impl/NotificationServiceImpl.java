@@ -11,13 +11,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public Page<NotificationResponseDTO> getMyNotifications(String email, Pageable pageable) {
@@ -37,8 +41,9 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationResponseDTO markAsRead(String email, Long notificationId) {
         User user = getUserByEmail(email);
 
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy thông báo"));
+        Notification notification =
+                notificationRepository.findById(notificationId).orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy thông báo"));
 
         if (notification.getUser() == null || !notification.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Thông báo không thuộc về người dùng");
@@ -53,7 +58,8 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAllAsRead(String email) {
         User user = getUserByEmail(email);
 
-        notificationRepository.findByUserIdAndIsReadFalseOrderByCreatedAtDesc(user.getId(), Pageable.unpaged())
+        notificationRepository
+                .findByUserIdAndIsReadFalseOrderByCreatedAtDesc(user.getId(), Pageable.unpaged())
                 .forEach(notification -> notification.setIsRead(true));
 
         notificationRepository.flush();
@@ -80,8 +86,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationResponseDTO create(Long userId, String title, String message) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
         Notification notification = new Notification();
 
@@ -91,13 +96,13 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setCreatedAt(java.time.LocalDateTime.now());
 
-        return NotificationMapper.toResponse(notificationRepository.save(notification));
+        NotificationResponseDTO response = NotificationMapper.toResponse(notificationRepository.save(notification));
+        messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/notifications", response);
+
+        return response;
     }
 
     private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy người dùng")
-                );
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
     }
 }

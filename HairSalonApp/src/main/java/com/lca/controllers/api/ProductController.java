@@ -19,20 +19,15 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> getAll(
-
             @RequestParam(required = false) String keyword,
-
             @RequestParam(required = false) Long categoryId,
-
             @RequestParam(required = false) Long supplierId,
-
             @RequestParam(defaultValue = "0") int page,
-
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PaginationUtil.create(page, size);
 
-        return ResponseEntity.ok(productService.search(keyword, categoryId, supplierId, pageable));
+        return ResponseEntity.ok(productService.search(keyword, categoryId, supplierId, true, pageable));
     }
 
     @GetMapping("/{id}")

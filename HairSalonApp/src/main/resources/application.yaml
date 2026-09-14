@@ -35,5 +35,8 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
 
+app:
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:5173}
+
 server:
   port: 8080

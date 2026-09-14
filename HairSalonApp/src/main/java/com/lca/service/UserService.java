@@ -7,6 +7,7 @@ import com.lca.entity.User;
 import com.lca.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,7 +19,11 @@ public interface UserService {
 
     UserResponseDTO createByAdmin(UserCreateRequestDTO request);
 
+    UserResponseDTO createByAdmin(UserCreateRequestDTO request, MultipartFile avatar);
+
     UserResponseDTO updateByAdmin(Long id, UserUpdateRequestDTO request);
+
+    UserResponseDTO updateByAdmin(Long id, UserUpdateRequestDTO request, MultipartFile avatar);
 
     UserResponseDTO updateStatus(Long id, Boolean isActive);
 

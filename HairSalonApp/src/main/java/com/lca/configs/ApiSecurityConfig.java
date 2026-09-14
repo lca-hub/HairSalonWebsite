@@ -73,6 +73,7 @@ public class ApiSecurityConfig {
                                 "/api/admin/payment-transactions/**"
                         ).hasRole("ADMIN")
                         .requestMatchers(
+                                "/api/cart/**",
                                 "/api/customers/me/**",
                                 "/api/appointments/**",
                                 "/api/invoices/my",
