@@ -188,9 +188,6 @@ function Header({ role: dashboardRole, title }) {
                   </div>
                 </div>
                 <Link to={profilePath} onClick={() => setOpen(false)}>Thông tin cá nhân</Link>
-                <Link to={isCustomer ? "/customer" : `/${role.toLowerCase()}`} onClick={() => setOpen(false)}>
-                  Khu vực của tôi
-                </Link>
                 {isCustomer && (
                   <Link to="/customer/cart" onClick={() => setOpen(false)}>Giỏ hàng</Link>
                 )}

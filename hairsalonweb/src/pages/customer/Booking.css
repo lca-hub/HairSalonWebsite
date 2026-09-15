@@ -412,3 +412,114 @@
         margin-right: 16px;
     }
 }
+/* =========================================================
+   BACK BUTTON
+========================================================= */
+
+.booking-back-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 22px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #777;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.booking-back-button:hover {
+    color: #af8848;
+
+    transform: translateX(-2px);
+}
+
+.booking-back-button span:first-child {
+    font-size: 18px;
+
+    line-height: 1;
+}
+
+.booking-back-button span:last-child {
+    line-height: 1;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.booking-loading {
+    min-height: 400px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    color: #888;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 12px;
+}
+
+.booking-loading-spinner {
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid #ddd8d0;
+
+    border-top-color: #af8848;
+
+    border-radius: 50%;
+
+    animation: bookingLoadingSpin .8s linear infinite;
+}
+
+@keyframes bookingLoadingSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+
+    .booking-back-button {
+        margin-bottom: 18px;
+    }
+
+    .booking-back-button span:first-child {
+        font-size: 17px;
+    }
+}

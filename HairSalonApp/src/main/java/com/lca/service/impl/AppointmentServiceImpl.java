@@ -20,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -79,7 +76,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setRefundAmount(BigDecimal.ZERO);
         appointment.setAppointmentCode(generateAppointmentCode());
 
-        LocalDateTime now = LocalDateTime.now();
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
 
         appointment.setCreatedAt(now);
         appointment.setPaymentDeadline(now.plusMinutes(10));
@@ -138,6 +136,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         AppointmentStatus status = appointment.getStatus();
 
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
+
         if (status == AppointmentStatus.CANCELLED) {
             throw new RuntimeException("Appointment đã bị hủy");
         }
@@ -161,17 +162,15 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setStatus(AppointmentStatus.CANCELLED);
 
             appointmentRepo.save(appointment);
-            notificationService.create(
-                    customer.getUser().getId(),
-                    "Hủy lịch hẹn",
-                    "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy."
-            );
+
+            notificationService.create(customer.getUser().getId(), "Hủy lịch hẹn", "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy.");
+
             return;
         }
 
         LocalDateTime appointmentTime = LocalDateTime.of(appointment.getAppointmentDate(), appointment.getStartTime());
 
-        Duration remaining = Duration.between(LocalDateTime.now(), appointmentTime);
+        Duration remaining = Duration.between(now, appointmentTime);
 
         boolean canRefund = !remaining.isNegative() && remaining.compareTo(Duration.ofHours(24)) >= 0;
 
@@ -184,7 +183,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setRefundAmount(refundAmount);
 
             invoice.setRefundAmount(refundAmount);
-            invoice.setRefundTime(LocalDateTime.now());
+            invoice.setRefundTime(now);
             invoice.setPaymentStatus(PaymentStatus.REFUNDED);
 
             invoiceRepo.save(invoice);
@@ -192,9 +191,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             paymentTransactionRepo
                     .findByInvoiceId(invoice.getId())
                     .stream()
-                    .filter(transaction -> transaction.getPaymentStatus() == PaymentStatus.PAID)
+                    .filter(transaction ->
+                            transaction.getPaymentStatus() == PaymentStatus.PAID)
                     .findFirst()
-                    .ifPresent(transaction -> {transaction.setPaymentStatus(PaymentStatus.REFUNDED);
+                    .ifPresent(transaction -> {
+                        transaction.setPaymentStatus(PaymentStatus.REFUNDED);
                         paymentTransactionRepo.save(transaction);
                     });
 
@@ -207,11 +208,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         releaseSlots(appointment.getId());
 
         appointmentRepo.save(appointment);
+
         notificationService.create(
                 customer.getUser().getId(),
                 "Hủy lịch hẹn",
-                "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy." +
-                        (appointment.getRefundAmount().signum() > 0 ? " Số tiền hoàn: " + appointment.getRefundAmount() : " Không có hoàn tiền.")
+                "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy."
+                        + (appointment.getRefundAmount().signum() > 0
+                        ? " Số tiền hoàn: " + appointment.getRefundAmount()
+                        : " Không có hoàn tiền.")
         );
     }
 
@@ -377,10 +381,15 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ lịch hẹn ở trạng thái CHỜ THANH TOÁN mới được xác nhận.");
         }
 
-        if (appointment.getPaymentDeadline() != null && LocalDateTime.now().isAfter(appointment.getPaymentDeadline())) {
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
+
+        if (appointment.getPaymentDeadline() != null && now.isAfter(appointment.getPaymentDeadline())) {
 
             releaseSlots(appointment.getId());
+
             appointment.setStatus(AppointmentStatus.EXPIRED);
+
             appointmentRepo.saveAndFlush(appointment);
 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian thanh toán đã hết. Lịch hẹn đã chuyển sang EXPIRED, vui lòng tạo lịch mới.");

@@ -85,6 +85,11 @@ public class ApiSecurityConfig {
                         .requestMatchers("/api/notifications/**").authenticated()
 
                         .requestMatchers(
+                                "/api/payments/vnpay/return",
+                                "/api/payments/vnpay/ipn"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 "/api/payments/**",
                                 "/api/payment-transactions/**"
                         ).authenticated()

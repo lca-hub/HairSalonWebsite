@@ -179,8 +179,7 @@ export const endpoints = {
 
     payAtStore: `/admin/invoices/pay-at-store`,
 
-    // vnpayCreate:
-    //     `/payments/vnpay/create`,
+    vnpayCreate: "/payments/vnpay/create",
 
     // momoCreate:
     //     `/payments/momo/create`,

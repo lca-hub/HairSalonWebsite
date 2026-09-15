@@ -348,3 +348,57 @@
         font-size: 28px;
     }
 }
+
+/* =========================================================
+   CUSTOMER ACCOUNT WRAPPER
+========================================================= */
+
+.customer-appointments-page {
+    min-height: calc(100vh - 82px);
+    background: #f7f5f1;
+    color: #1d1d1d;
+}
+
+.customer-appointments-page *,
+.customer-appointments-page *::before,
+.customer-appointments-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BACK LINK
+========================================================= */
+
+.appointments-back-link {
+    display: inline-flex;
+    align-items: center;
+
+    margin-bottom: 28px;
+
+    color: #777;
+
+    font-size: 12px;
+    letter-spacing: .4px;
+
+    text-decoration: none;
+
+    transition: color .2s ease;
+}
+
+.appointments-back-link:hover {
+    color: #a17a42;
+}
+
+
+
+.appointment-status.status-pending-payment {
+    background: #fff0d8;
+    color: #a17a42;
+}
+
+
+.appointment-status.status-pending {
+    background: #f5ead6;
+    color: #a17a42;
+}

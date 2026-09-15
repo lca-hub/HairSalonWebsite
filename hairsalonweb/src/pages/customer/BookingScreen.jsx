@@ -31,6 +31,19 @@ function BookingScreen() {
   const [success, setSuccess] = useState("");
 
   // =====================================================
+  // BACK
+  // =====================================================
+
+  const handleBack = () => {
+    if (queryStylistId) {
+      navigate(`/stylists/${queryStylistId}`);
+      return;
+    }
+
+    navigate("/customer/appointments");
+  };
+
+  // =====================================================
   // LOAD STYLIST + SERVICES
   // =====================================================
 
@@ -57,6 +70,7 @@ function BookingScreen() {
         // =========================================
         // Nếu đã có stylistId từ trang Stylist
         // =========================================
+
         if (queryStylistId) {
           const currentStylist = stylistList.find(
             (item) => String(item.id) === String(queryStylistId),
@@ -85,13 +99,16 @@ function BookingScreen() {
           // =========================================
           // Nếu vào trực tiếp từ ĐẶT LỊCH
           // =========================================
+
           setStylist(null);
           setServices([]);
         }
       } catch (err) {
         console.error("LOAD BOOKING DATA ERROR:", err);
 
-        setError(err.message || "Không thể tải dữ liệu đặt lịch.");
+        setError(
+          err.message || "Không thể tải dữ liệu đặt lịch.",
+        );
       } finally {
         setLoading(false);
       }
@@ -112,6 +129,7 @@ function BookingScreen() {
         setSelectedService("");
         setSlots([]);
         setSelectedSlot("");
+
         return;
       }
 
@@ -126,12 +144,15 @@ function BookingScreen() {
       try {
         setError("");
 
-        const [stylistResponse, serviceResponse] = await Promise.all([
-          fetch(`http://localhost:8080/api/stylists/${selectedStylist}`),
-          fetch(
-            `http://localhost:8080/api/stylists/${selectedStylist}/services?page=0&size=50`,
-          ),
-        ]);
+        const [stylistResponse, serviceResponse] =
+          await Promise.all([
+            fetch(
+              `http://localhost:8080/api/stylists/${selectedStylist}`,
+            ),
+            fetch(
+              `http://localhost:8080/api/stylists/${selectedStylist}/services?page=0&size=50`,
+            ),
+          ]);
 
         if (!stylistResponse.ok || !serviceResponse.ok) {
           throw new Error("Không thể tải thông tin stylist");
@@ -152,7 +173,9 @@ function BookingScreen() {
       } catch (err) {
         console.error("LOAD STYLIST ERROR:", err);
 
-        setError(err.message || "Không thể tải stylist.");
+        setError(
+          err.message || "Không thể tải stylist.",
+        );
       }
     };
 
@@ -168,6 +191,7 @@ function BookingScreen() {
       if (!selectedStylist || !selectedService || !date) {
         setSlots([]);
         setSelectedSlot("");
+
         return;
       }
 
@@ -192,7 +216,10 @@ function BookingScreen() {
 
         setSlots([]);
 
-        setError(err.response?.data?.message || "Không thể tải khung giờ.");
+        setError(
+          err.response?.data?.message ||
+          "Không thể tải khung giờ.",
+        );
       } finally {
         setSlotLoading(false);
       }
@@ -217,35 +244,66 @@ function BookingScreen() {
     }
 
     if (!selectedService || !date || !selectedSlot) {
-      setError("Vui lòng chọn đầy đủ dịch vụ, ngày và giờ.");
+      setError(
+        "Vui lòng chọn đầy đủ dịch vụ, ngày và giờ.",
+      );
+
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const response = await authApis().post(endpoints.appointments, {
-        stylistId: Number(selectedStylist),
-        serviceId: Number(selectedService),
-        appointmentDate: date,
-        startTime: selectedSlot,
-        customerNote: note || null,
-      });
+      const response = await authApis().post(
+        endpoints.appointments,
+        {
+          stylistId: Number(selectedStylist),
+          serviceId: Number(selectedService),
+          appointmentDate: date,
+          startTime: selectedSlot,
+          customerNote: note || null,
+        },
+      );
 
-      setSuccess(`Đặt lịch thành công: ${response.data.appointmentCode}`);
+      const appointment = response.data;
 
-      setTimeout(() => {
-        navigate("/customer");
-      }, 900);
+      setSuccess(
+        "Tạo lịch hẹn thành công. Đang chuyển đến thanh toán...",
+      );
+
+      const paymentResponse = await authApis().post(
+        endpoints.vnpayCreate,
+        null,
+        {
+          params: {
+            appointmentId: appointment.id,
+          },
+        },
+      );
+
+      if (!paymentResponse.data?.paymentUrl) {
+        throw new Error(
+          "Không nhận được đường dẫn thanh toán VNPay.",
+        );
+      }
+
+      window.location.href =
+        paymentResponse.data.paymentUrl;
     } catch (err) {
-      console.error("CREATE APPOINTMENT ERROR:", err);
+      console.error(
+        "CREATE APPOINTMENT ERROR:",
+        err,
+      );
 
       if (err.response?.status === 401) {
         navigate("/login");
         return;
       }
 
-      setError(err.response?.data?.message || "Đặt lịch thất bại.");
+      setError(
+        err.response?.data?.message ||
+        "Đặt lịch thất bại.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -258,7 +316,12 @@ function BookingScreen() {
   if (loading) {
     return (
       <div className="booking-page">
-        <div className="booking-container">Đang tải...</div>
+        <div className="booking-container">
+          <div className="booking-loading">
+            <div className="booking-loading-spinner"></div>
+            <p>Đang tải...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -270,34 +333,74 @@ function BookingScreen() {
   return (
     <div className="booking-page">
       <div className="booking-container">
+
+        {/* ================= BACK ================= */}
+
+        <button
+          type="button"
+          className="booking-back-button"
+          onClick={handleBack}
+        >
+          <span>←</span>
+          <span>QUAY LẠI</span>
+        </button>
+
+        {/* ================= TITLE ================= */}
+
         <div className="booking-title">
-          <p className="page-label">BOOK APPOINTMENT</p>
+          <p className="page-label">
+            BOOK APPOINTMENT
+          </p>
 
           <h1>
             {stylist
-              ? `Đặt lịch với ${stylist.firstName || ""} ${stylist.lastName || ""}`.trim()
+              ? `Đặt lịch với ${stylist.firstName || ""
+                } ${stylist.lastName || ""
+                }`.trim()
               : "Đặt lịch hẹn"}
           </h1>
         </div>
 
-        {error && <div className="booking-alert error">{error}</div>}
+        {error && (
+          <div className="booking-alert error">
+            {error}
+          </div>
+        )}
 
-        {success && <div className="booking-alert success">{success}</div>}
+        {success && (
+          <div className="booking-alert success">
+            {success}
+          </div>
+        )}
 
-        <form className="booking-form" onSubmit={handleSubmit}>
+        <form
+          className="booking-form"
+          onSubmit={handleSubmit}
+        >
+
+          {/* ================= STYLIST ================= */}
+
           <div className="booking-field">
             <label>Stylist</label>
 
             <select
               value={selectedStylist}
-              onChange={(e) => setSelectedStylist(e.target.value)}
+              onChange={(e) =>
+                setSelectedStylist(e.target.value)
+              }
               required
             >
-              <option value="">-- Chọn stylist --</option>
+              <option value="">
+                -- Chọn stylist --
+              </option>
 
               {stylists.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.firstName || ""} {item.lastName || ""}
+                <option
+                  key={item.id}
+                  value={item.id}
+                >
+                  {item.firstName || ""}{" "}
+                  {item.lastName || ""}
                 </option>
               ))}
             </select>
@@ -310,16 +413,26 @@ function BookingScreen() {
 
             <select
               value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
+              onChange={(e) =>
+                setSelectedService(e.target.value)
+              }
               required
               disabled={!selectedStylist}
             >
-              <option value="">-- Chọn dịch vụ --</option>
+              <option value="">
+                -- Chọn dịch vụ --
+              </option>
 
               {services.map((service) => (
-                <option key={service.id} value={service.id}>
+                <option
+                  key={service.id}
+                  value={service.id}
+                >
                   {service.name} -{" "}
-                  {Number(service.price || 0).toLocaleString("vi-VN")}đ
+                  {Number(
+                    service.price || 0,
+                  ).toLocaleString("vi-VN")}
+                  đ
                 </option>
               ))}
             </select>
@@ -333,8 +446,14 @@ function BookingScreen() {
             <input
               type="date"
               value={date}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) => setDate(e.target.value)}
+              min={
+                new Date()
+                  .toISOString()
+                  .split("T")[0]
+              }
+              onChange={(e) =>
+                setDate(e.target.value)
+              }
               disabled={!selectedService}
               required
             />
@@ -360,10 +479,13 @@ function BookingScreen() {
                     <button
                       type="button"
                       key={slot}
-                      className={`slot-button ${
-                        selectedSlot === slot ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedSlot(slot)}
+                      className={`slot-button ${selectedSlot === slot
+                          ? "selected"
+                          : ""
+                        }`}
+                      onClick={() =>
+                        setSelectedSlot(slot)
+                      }
                     >
                       {slot}
                     </button>
@@ -380,7 +502,9 @@ function BookingScreen() {
 
             <textarea
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={(e) =>
+                setNote(e.target.value)
+              }
               placeholder="Ví dụ: muốn cắt ngắn hơn, không dùng sản phẩm tạo kiểu..."
               rows="4"
             />
@@ -393,8 +517,11 @@ function BookingScreen() {
             type="submit"
             disabled={submitting}
           >
-            {submitting ? "ĐANG ĐẶT LỊCH..." : "XÁC NHẬN ĐẶT LỊCH"}
+            {submitting
+              ? "ĐANG ĐẶT LỊCH..."
+              : "XÁC NHẬN ĐẶT LỊCH"}
           </button>
+
         </form>
       </div>
     </div>

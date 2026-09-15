@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -38,45 +39,63 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public AttendanceResponseDTO checkIn(String email) {
-        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist"));
-        StylistSchedule schedule = stylistScheduleRepository.findFirstByStylistIdAndWorkDate(stylist.getId(), LocalDate.now()).orElseThrow(
-                () -> new RuntimeException("Hôm nay stylist không có lịch làm việc"));
-        if (Boolean.TRUE.equals(schedule.getIsOff()))
+
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDate today = LocalDate.now(vietnamZone);
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
+
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist"));
+
+        StylistSchedule schedule = stylistScheduleRepository.findFirstByStylistIdAndWorkDate(stylist.getId(), today)
+                        .orElseThrow(() -> new RuntimeException("Hôm nay stylist không có lịch làm việc"));
+
+        if (Boolean.TRUE.equals(schedule.getIsOff())) {
             throw new RuntimeException("Hôm nay là ngày nghỉ");
-        if (attendanceRepository.findByScheduleId(schedule.getId()).isPresent())
+        }
+
+        if (attendanceRepository.findByScheduleId(schedule.getId()).isPresent()) {
+
             throw new RuntimeException("Stylist đã check-in hôm nay");
+        }
 
         Attendance attendance = new Attendance();
+
         attendance.setStylist(stylist);
         attendance.setSchedule(schedule);
-
-        LocalDateTime now = LocalDateTime.now();
-
         attendance.setCheckInTime(now);
 
-        attendance.setAttendanceStatus(
-                now.toLocalTime().isAfter(schedule.getStartTime())
+        attendance.setAttendanceStatus(now.toLocalTime().isAfter(schedule.getStartTime())
                         ? AttendanceStatus.LATE
                         : AttendanceStatus.PRESENT
         );
+
         return AttendanceMapper.toResponse(attendanceRepository.save(attendance));
     }
 
     @Override
     public AttendanceResponseDTO checkOut(String email) {
-        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist"));
-        Attendance attendance = attendanceRepository.findByStylistIdAndScheduleWorkDate(stylist.getId(), LocalDate.now()).orElseThrow(
-                () -> new RuntimeException("Stylist chưa check-in hôm nay"));
-        if (attendance.getCheckOutTime() != null)
-            throw new RuntimeException("Stylist đã check-out");
 
-        LocalDateTime checkOutTime = LocalDateTime.now();
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDate today = LocalDate.now(vietnamZone);
+        LocalDateTime checkOutTime = LocalDateTime.now(vietnamZone);
+
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist"));
+
+        Attendance attendance = attendanceRepository.findByStylistIdAndScheduleWorkDate(stylist.getId(), today)
+                        .orElseThrow(() -> new RuntimeException("Stylist chưa check-in hôm nay"));
+
+        if (attendance.getCheckOutTime() != null) {
+            throw new RuntimeException("Stylist đã check-out");
+        }
+
         attendance.setCheckOutTime(checkOutTime);
 
         long minutes = Duration.between(attendance.getCheckInTime(), checkOutTime).toMinutes();
+
         attendance.setTotalHours(BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP));
+
         attendance.setAttendanceStatus(AttendanceStatus.COMPLETED);
 
         return AttendanceMapper.toResponse(attendanceRepository.save(attendance));
@@ -94,12 +113,13 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional(readOnly = true)
     public AttendanceResponseDTO getToday(String email) {
 
-        Stylist stylist = stylistRepository
-                .findByUserId(getUserByEmail(email).getId())
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDate today = LocalDate.now(vietnamZone);
+
+        Stylist stylist = stylistRepository.findByUserId(getUserByEmail(email).getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist"));
 
-        return attendanceRepository
-                .findByStylistIdAndScheduleWorkDate(stylist.getId(), LocalDate.now())
+        return attendanceRepository.findByStylistIdAndScheduleWorkDate(stylist.getId(), today)
                 .map(AttendanceMapper::toResponse).orElse(null);
     }
 

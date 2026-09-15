@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/api/Apis";
+import Header from "../../components/Header";
 import "./CustomerAppointments.css";
 
 function CustomerAppointments() {
@@ -20,51 +21,53 @@ function CustomerAppointments() {
       setLoading(true);
       setError("");
 
-      const response = await authApis().get(endpoints.myAppointments);
+      const response = await authApis().get(
+        endpoints.myAppointments,
+        {
+          params: {
+            page: 0,
+            size: 10,
+          },
+        },
+      );
 
-      console.log("MY APPOINTMENTS RESPONSE:", response.data);
-
-      /*
-       * Backend có thể trả về:
-       *
-       * 1. [ ... ]
-       *
-       * 2. { data: [ ... ] }
-       *
-       * 3. { result: [ ... ] }
-       *
-       * 4. { content: [ ... ] }
-       *
-       * nên xử lý tất cả.
-       */
+      console.log(
+        "MY APPOINTMENTS RESPONSE:",
+        response.data,
+      );
 
       let data = response.data;
 
       if (Array.isArray(data)) {
-        // Trường hợp 1
         setAppointments(data);
       } else if (Array.isArray(data?.data)) {
-        // Trường hợp 2
         setAppointments(data.data);
       } else if (Array.isArray(data?.result)) {
-        // Trường hợp 3
         setAppointments(data.result);
       } else if (Array.isArray(data?.content)) {
-        // Trường hợp 4 - thường gặp nếu Spring trả Page
         setAppointments(data.content);
       } else {
-        console.error("API appointments không trả về Array:", response.data);
+        console.error(
+          "API appointments không trả về Array:",
+          response.data,
+        );
 
         setAppointments([]);
-        setError("Dữ liệu lịch hẹn không đúng định dạng.");
+        setError(
+          "Dữ liệu lịch hẹn không đúng định dạng.",
+        );
       }
     } catch (err) {
-      console.error("LOAD APPOINTMENTS ERROR:", err);
+      console.error(
+        "LOAD APPOINTMENTS ERROR:",
+        err,
+      );
 
       setAppointments([]);
 
       setError(
-        err.response?.data?.message || "Không thể tải danh sách lịch hẹn.",
+        err.response?.data?.message ||
+        "Không thể tải danh sách lịch hẹn.",
       );
     } finally {
       setLoading(false);
@@ -76,6 +79,9 @@ function CustomerAppointments() {
   // =========================================
   const getStatusLabel = (status) => {
     switch (status) {
+      case "PENDING":
+        return "Chờ xử lý";
+
       case "PENDING_PAYMENT":
         return "Chờ thanh toán";
 
@@ -107,8 +113,11 @@ function CustomerAppointments() {
   // =========================================
   const getStatusClass = (status) => {
     switch (status) {
-      case "PENDING_PAYMENT":
+      case "PENDING":
         return "status-pending";
+
+      case "PENDING_PAYMENT":
+        return "status-pending-payment";
 
       case "CONFIRMED":
         return "status-confirmed";
@@ -138,9 +147,9 @@ function CustomerAppointments() {
   // =========================================
   const getStylistName = (appointment) => {
     if (appointment?.stylist) {
-      const fullName = `${appointment.stylist.firstName || ""} ${
-        appointment.stylist.lastName || ""
-      }`.trim();
+      const fullName =
+        `${appointment.stylist.firstName || ""} ${appointment.stylist.lastName || ""
+          }`.trim();
 
       return fullName || "Stylist";
     }
@@ -163,14 +172,22 @@ function CustomerAppointments() {
   // SERVICE PRICE
   // =========================================
   const getServicePrice = (appointment) => {
-    return appointment?.service?.price || appointment?.servicePrice || 0;
+    return (
+      appointment?.service?.price ||
+      appointment?.servicePrice ||
+      appointment?.bookingAmount ||
+      0
+    );
   };
 
   // =========================================
   // FORMAT MONEY
   // =========================================
   const formatMoney = (value) => {
-    return Number(value || 0).toLocaleString("vi-VN") + "đ";
+    return (
+      Number(value || 0).toLocaleString("vi-VN") +
+      "đ"
+    );
   };
 
   // =========================================
@@ -200,14 +217,20 @@ function CustomerAppointments() {
   // =========================================
   if (loading) {
     return (
-      <div className="customer-appointments-page">
-        <div className="appointments-container">
-          <div className="appointments-loading">
-            <div className="loading-spinner"></div>
+      <div className="customer-page">
+        <Header />
 
-            <p>Đang tải lịch hẹn...</p>
+        <main className="customer-account">
+          <div className="customer-shell">
+            <div className="appointments-loading">
+              <div className="loading-spinner"></div>
+
+              <p>
+                Đang tải lịch hẹn...
+              </p>
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -217,24 +240,61 @@ function CustomerAppointments() {
   // =========================================
   if (error) {
     return (
-      <div className="customer-appointments-page">
-        <div className="appointments-container">
-          <div className="appointments-error">
-            <div className="error-icon">!</div>
+      <div className="customer-page">
+        <Header />
 
-            <h2>Không thể tải lịch hẹn</h2>
+        <main className="customer-account">
+          <div className="customer-shell">
 
-            <p>{error}</p>
+            <div className="customer-breadcrumb">
+              <Link to="/">
+                Trang chủ
+              </Link>
 
-            <button
-              type="button"
-              className="retry-button"
-              onClick={loadAppointments}
+              <span>/</span>
+
+              <Link to="/customer/profile">
+                Tài khoản
+              </Link>
+
+              <span>/</span>
+
+              <span>
+                Lịch hẹn
+              </span>
+            </div>
+
+            <Link
+              className="appointments-back-link"
+              to="/customer/profile"
             >
-              Thử lại
-            </button>
+              ← Quay lại tài khoản
+            </Link>
+
+            <div className="appointments-error">
+              <div className="error-icon">
+                !
+              </div>
+
+              <h2>
+                Không thể tải lịch hẹn
+              </h2>
+
+              <p>
+                {error}
+              </p>
+
+              <button
+                type="button"
+                className="retry-button"
+                onClick={loadAppointments}
+              >
+                Thử lại
+              </button>
+            </div>
+
           </div>
-        </div>
+        </main>
       </div>
     );
   }
@@ -243,129 +303,219 @@ function CustomerAppointments() {
   // RENDER
   // =========================================
   return (
-    <div className="customer-appointments-page">
-      <div className="appointments-container">
-        {/* =====================================
-            HEADER
-        ===================================== */}
+    <div className="customer-page">
+      <Header />
 
-        <div className="appointments-header">
-          <div>
-            <p className="appointments-label">MY APPOINTMENTS</p>
+      <main className="customer-account">
+        <div className="customer-shell">
 
-            <h1>Lịch hẹn của tôi</h1>
+          {/* =====================================
+              BREADCRUMB
+          ===================================== */}
 
-            <p className="appointments-description">
-              Theo dõi và quản lý những lịch hẹn làm tóc của bạn.
-            </p>
+          <div className="customer-breadcrumb">
+            <Link to="/">
+              Trang chủ
+            </Link>
+
+            <span>/</span>
+
+            <Link to="/customer/profile">
+              Tài khoản
+            </Link>
+
+            <span>/</span>
+
+            <span>
+              Lịch hẹn
+            </span>
           </div>
 
-          <Link to="/appointments/book" className="book-appointment-btn">
-            + Đặt lịch mới
+          {/* =====================================
+              BACK
+          ===================================== */}
+
+          <Link
+            className="appointments-back-link"
+            to="/customer/profile"
+          >
+            ← Quay lại tài khoản
           </Link>
-        </div>
 
-        {/* =====================================
-            EMPTY
-        ===================================== */}
+          {/* =====================================
+              PAGE HEADER
+          ===================================== */}
 
-        {appointments.length === 0 ? (
-          <div className="appointments-empty">
-            <div className="empty-icon">♡</div>
+          <div className="appointments-header">
+            <div>
+              <p className="appointments-label">
+                MY APPOINTMENTS
+              </p>
 
-            <h2>Chưa có lịch hẹn</h2>
+              <h1>
+                Lịch hẹn của tôi
+              </h1>
 
-            <p>
-              Bạn chưa có lịch hẹn nào. Hãy đặt lịch để trải nghiệm dịch vụ của
-              chúng tôi.
-            </p>
+              <p className="appointments-description">
+                Theo dõi và quản lý những lịch hẹn
+                làm tóc của bạn.
+              </p>
+            </div>
 
-            <Link to="/appointments/book" className="empty-book-btn">
-              ĐẶT LỊCH NGAY
+            <Link
+              to="/appointments/book"
+              className="book-appointment-btn"
+            >
+              + Đặt lịch mới
             </Link>
           </div>
-        ) : (
-          /* =====================================
-              APPOINTMENT LIST
-          ===================================== */
 
-          <div className="appointments-list">
-            {appointments.map((appointment) => {
-              const serviceName = getServiceName(appointment);
+          {/* =====================================
+              EMPTY
+          ===================================== */}
 
-              const stylistName = getStylistName(appointment);
+          {appointments.length === 0 ? (
+            <div className="appointments-empty">
+              <div className="empty-icon">
+                ♡
+              </div>
 
-              const servicePrice = getServicePrice(appointment);
+              <h2>
+                Chưa có lịch hẹn
+              </h2>
 
-              return (
-                <Link
-                  key={appointment.id}
-                  to={`/appointments/${appointment.id}`}
-                  className="appointment-card"
-                >
-                  {/* DATE */}
+              <p>
+                Bạn chưa có lịch hẹn nào.
+                Hãy đặt lịch để trải nghiệm
+                dịch vụ của chúng tôi.
+              </p>
 
-                  <div className="appointment-date">
-                    <span className="date-day">
-                      {appointment.appointmentDate
-                        ? new Date(appointment.appointmentDate).getDate()
-                        : "--"}
-                    </span>
+              <Link
+                to="/appointments/book"
+                className="empty-book-btn"
+              >
+                ĐẶT LỊCH NGAY
+              </Link>
+            </div>
+          ) : (
 
-                    <span className="date-month">
-                      {appointment.appointmentDate
-                        ? new Date(
+            /* =====================================
+                APPOINTMENT LIST
+            ===================================== */
+
+            <div className="appointments-list">
+              {appointments.map((appointment) => {
+
+                const serviceName =
+                  getServiceName(appointment);
+
+                const stylistName =
+                  getStylistName(appointment);
+
+                const servicePrice =
+                  getServicePrice(appointment);
+
+                return (
+                  <Link
+                    key={appointment.id}
+                    to={`/customer/appointments/${appointment.id}`}
+                    className="appointment-card"
+                  >
+
+                    {/* DATE */}
+
+                    <div className="appointment-date">
+                      <span className="date-day">
+                        {appointment.appointmentDate
+                          ? new Date(
                             appointment.appointmentDate,
-                          ).toLocaleDateString("vi-VN", {
-                            month: "short",
-                          })
-                        : ""}
-                    </span>
-                  </div>
-
-                  {/* INFO */}
-
-                  <div className="appointment-info">
-                    <div className="appointment-top">
-                      <span className="appointment-code">
-                        {appointment.appointmentCode
-                          ? appointment.appointmentCode
-                          : `#${appointment.id}`}
+                          ).getDate()
+                          : "--"}
                       </span>
 
-                      <span
-                        className={`appointment-status ${getStatusClass(
-                          appointment.status,
-                        )}`}
-                      >
-                        {getStatusLabel(appointment.status)}
+                      <span className="date-month">
+                        {appointment.appointmentDate
+                          ? new Date(
+                            appointment.appointmentDate,
+                          ).toLocaleDateString(
+                            "vi-VN",
+                            {
+                              month: "short",
+                            },
+                          )
+                          : ""}
                       </span>
                     </div>
 
-                    <h2>{serviceName}</h2>
+                    {/* INFO */}
 
-                    <p className="appointment-stylist">
-                      Stylist: <strong>{stylistName}</strong>
-                    </p>
+                    <div className="appointment-info">
+                      <div className="appointment-top">
 
-                    <div className="appointment-time">
-                      <span> {formatDate(appointment.appointmentDate)}</span>
+                        <span className="appointment-code">
+                          {appointment.appointmentCode
+                            ? appointment.appointmentCode
+                            : `#${appointment.id}`}
+                        </span>
 
-                      <span> {appointment.startTime || "--:--"}</span>
+                        <span
+                          className={`appointment-status ${getStatusClass(
+                            appointment.status,
+                          )}`}
+                        >
+                          {getStatusLabel(
+                            appointment.status,
+                          )}
+                        </span>
 
-                      <span>{formatMoney(servicePrice)}</span>
+                      </div>
+
+                      <h2>
+                        {serviceName}
+                      </h2>
+
+                      <p className="appointment-stylist">
+                        Stylist:{" "}
+                        <strong>
+                          {stylistName}
+                        </strong>
+                      </p>
+
+                      <div className="appointment-time">
+                        <span>
+                          {formatDate(
+                            appointment.appointmentDate,
+                          )}
+                        </span>
+
+                        <span>
+                          {appointment.startTime ||
+                            "--:--"}
+                        </span>
+
+                        <span>
+                          {formatMoney(
+                            servicePrice,
+                          )}
+                        </span>
+                      </div>
+
                     </div>
-                  </div>
 
-                  {/* ARROW */}
+                    {/* ARROW */}
 
-                  <div className="appointment-arrow">→</div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                    <div className="appointment-arrow">
+                      →
+                    </div>
+
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+        </div>
+      </main>
     </div>
   );
 }

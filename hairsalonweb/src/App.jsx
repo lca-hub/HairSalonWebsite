@@ -22,6 +22,8 @@ import SessionExpiredModal from "./components/SessionExpiredModal";
 import AdminPurchaseOrders from "./pages/admin/AdminPurchaseOrders";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminStatistics from "./pages/admin/AdminStatistics";
+import PaymentVnpayReturn from "./pages/customer/PaymentVnpayReturn";
+import ServiceList from "./pages/customer/ServiceList";
 
 function App() {
   return (
@@ -33,25 +35,22 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/stylists" element={<StylistList />} />
         <Route path="/stylists/:id" element={<StylistDetail />} />
-
+        <Route path="/services" element={<ServiceList />} />
+        <Route path="/payment/vnpay/return" element={<PaymentVnpayReturn />} />
 
         {/* =========================
             CUSTOMER
         ========================= */}
         <Route element={<ProtectedRoute roles={["CUSTOMER"]} />}>
-
-          <Route path="/customer" element={<CustomerHome />} />
           <Route path="/customer/profile" element={<CustomerHome />} />
           <Route path="/customer/appointments" element={<CustomerHome />} />
           <Route path="/customer/appointments/:id" element={<CustomerHome />} />
           <Route path="/appointments/book" element={<BookingScreen />} />
-          <Route path="/services" element={<ComingSoon title="Dịch vụ" role="CUSTOMER" />} />
           <Route path="/products" element={<ComingSoon title="Sản phẩm & cửa hàng" role="CUSTOMER" />} />
           <Route path="/customer/cart" element={<ComingSoon title="Giỏ hàng" role="CUSTOMER" />} />
           <Route path="/customer/orders" element={<ComingSoon title="Đơn hàng" role="CUSTOMER" />} />
           <Route path="/customer/invoices" element={<ComingSoon title="Hóa đơn" role="CUSTOMER" />} />
           <Route path="/customer/notifications" element={<ComingSoon title="Thông báo" role="CUSTOMER" />} />
-
         </Route>
 
 

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -32,6 +33,8 @@ public class AppointmentResponseDTO {
     private BigDecimal bookingAmount;
 
     private AppointmentStatus status;
+
+    private LocalDateTime paymentDeadline;
 
     private String customerNote;
 

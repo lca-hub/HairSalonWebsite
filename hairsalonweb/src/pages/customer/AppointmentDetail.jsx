@@ -11,6 +11,8 @@ function AppointmentDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
 
   // ==============================
   // LOAD DETAIL
@@ -32,7 +34,8 @@ function AppointmentDetail() {
         console.error("LOAD APPOINTMENT DETAIL ERROR:", err);
 
         setError(
-          err.response?.data?.message || "Không thể tải thông tin lịch hẹn.",
+          err.response?.data?.message ||
+          "Không thể tải thông tin lịch hẹn.",
         );
       } finally {
         setLoading(false);
@@ -43,28 +46,157 @@ function AppointmentDetail() {
   }, [id]);
 
   // ==============================
+  // PAYMENT COUNTDOWN
+  // ==============================
+  useEffect(() => {
+    if (!appointment) {
+      return;
+    }
+
+    const status = String(
+      appointment.status || "",
+    )
+      .trim()
+      .toUpperCase();
+
+    if (
+      status !== "PENDING_PAYMENT" ||
+      !appointment.paymentDeadline
+    ) {
+      setRemainingSeconds(null);
+      return;
+    }
+
+    const calculateRemaining = () => {
+      const deadline = new Date(
+        appointment.paymentDeadline,
+      ).getTime();
+
+      const now = Date.now();
+
+      const seconds = Math.max(
+        0,
+        Math.floor((deadline - now) / 1000),
+      );
+
+      setRemainingSeconds(seconds);
+    };
+
+    calculateRemaining();
+
+    const timer = setInterval(
+      calculateRemaining,
+      1000,
+    );
+
+    return () => clearInterval(timer);
+  }, [appointment]);
+
+  // ==============================
   // CANCEL
   // ==============================
   const handleCancel = async () => {
-    const confirmed = window.confirm("Bạn có chắc muốn hủy lịch hẹn này?");
+    const confirmed = window.confirm(
+      "Bạn có chắc muốn hủy lịch hẹn này?",
+    );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     try {
       setCancelling(true);
       setError("");
 
-      await authApis().post(endpoints.cancelAppointment(id));
+      await authApis().post(
+        endpoints.cancelAppointment(id),
+      );
 
-      const response = await authApis().get(endpoints.myAppointmentDetail(id));
+      const response = await authApis().get(
+        endpoints.myAppointmentDetail(id),
+      );
 
       setAppointment(response.data);
     } catch (err) {
-      console.error("CANCEL APPOINTMENT ERROR:", err);
+      console.error(
+        "CANCEL APPOINTMENT ERROR:",
+        err,
+      );
 
-      setError(err.response?.data?.message || "Không thể hủy lịch hẹn.");
+      setError(
+        err.response?.data?.message ||
+        "Không thể hủy lịch hẹn.",
+      );
     } finally {
       setCancelling(false);
+    }
+  };
+
+  // ==============================
+  // RETRY PAYMENT
+  // ==============================
+  const handleRetryPayment = async () => {
+    if (!appointment) {
+      return;
+    }
+
+    const status = String(
+      appointment.status || "",
+    )
+      .trim()
+      .toUpperCase();
+
+    if (status !== "PENDING_PAYMENT") {
+      setError(
+        "Lịch hẹn này không còn ở trạng thái chờ thanh toán.",
+      );
+      return;
+    }
+
+    if (
+      remainingSeconds === null ||
+      remainingSeconds <= 0
+    ) {
+      setError(
+        "Thời gian thanh toán đã hết. Vui lòng đặt lại lịch hẹn để tiếp tục.",
+      );
+      return;
+    }
+
+    try {
+      setPaying(true);
+      setError("");
+
+      const response = await authApis().post(
+        endpoints.vnpayCreate,
+        null,
+        {
+          params: {
+            appointmentId: Number(id),
+          },
+        },
+      );
+
+      if (!response.data?.paymentUrl) {
+        throw new Error(
+          "Không nhận được đường dẫn thanh toán VNPay.",
+        );
+      }
+
+      window.location.href =
+        response.data.paymentUrl;
+    } catch (err) {
+      console.error(
+        "RETRY PAYMENT ERROR:",
+        err,
+      );
+
+      setError(
+        err.response?.data?.message ||
+        "Không thể mở thanh toán VNPay.",
+      );
+    } finally {
+      setPaying(false);
     }
   };
 
@@ -72,7 +204,9 @@ function AppointmentDetail() {
   // FORMAT DATE
   // ==============================
   const formatDate = (value) => {
-    if (!value) return "--";
+    if (!value) {
+      return "--";
+    }
 
     const date = new Date(value);
 
@@ -80,19 +214,49 @@ function AppointmentDetail() {
       return value;
     }
 
-    return date.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    return date.toLocaleDateString(
+      "vi-VN",
+      {
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      },
+    );
   };
 
   // ==============================
   // FORMAT MONEY
   // ==============================
   const formatMoney = (value) => {
-    return Number(value || 0).toLocaleString("vi-VN") + "đ";
+    return (
+      Number(value || 0).toLocaleString(
+        "vi-VN",
+      ) + "đ"
+    );
+  };
+
+  // ==============================
+  // FORMAT COUNTDOWN
+  // ==============================
+  const formatCountdown = (seconds) => {
+    if (
+      seconds === null ||
+      seconds < 0
+    ) {
+      return "--:--";
+    }
+
+    const minutes = Math.floor(
+      seconds / 60,
+    );
+
+    const remaining = seconds % 60;
+
+    return `${String(minutes).padStart(
+      2,
+      "0",
+    )}:${String(remaining).padStart(2, "0")}`;
   };
 
   // ==============================
@@ -101,10 +265,15 @@ function AppointmentDetail() {
   const getStatusInfo = (status) => {
     switch (status) {
       case "PENDING":
+        return {
+          label: "Chờ xử lý",
+          className: "pending",
+        };
+
       case "PENDING_PAYMENT":
         return {
-          label: "Chờ xác nhận",
-          className: "pending",
+          label: "Chờ thanh toán",
+          className: "pending-payment",
         };
 
       case "CONFIRMED":
@@ -160,7 +329,10 @@ function AppointmentDetail() {
         <div className="appointment-detail-container">
           <div className="appointment-loading">
             <div className="loading-spinner"></div>
-            <p>Đang tải thông tin lịch hẹn...</p>
+
+            <p>
+              Đang tải thông tin lịch hẹn...
+            </p>
           </div>
         </div>
       </div>
@@ -175,16 +347,26 @@ function AppointmentDetail() {
       <div className="appointment-detail-page">
         <div className="appointment-detail-container">
           <div className="appointment-error">
-            <div className="error-icon">!</div>
+            <div className="error-icon">
+              !
+            </div>
 
-            <h2>Không thể tải lịch hẹn</h2>
+            <h2>
+              Không thể tải lịch hẹn
+            </h2>
 
-            <p>{error}</p>
+            <p>
+              {error}
+            </p>
 
             <button
               type="button"
               className="back-button"
-              onClick={() => navigate("/customer/appointments")}
+              onClick={() =>
+                navigate(
+                  "/customer/appointments",
+                )
+              }
             >
               ← Quay lại lịch hẹn
             </button>
@@ -197,33 +379,63 @@ function AppointmentDetail() {
   // ==============================
   // DATA
   // ==============================
+  const normalizedStatus = String(
+    appointment?.status || "",
+  )
+    .trim()
+    .toUpperCase();
 
-  const status = getStatusInfo(appointment?.status);
+  const status =
+    getStatusInfo(normalizedStatus);
 
   const stylistName =
-    `${appointment?.stylist?.firstName || ""} ${
-      appointment?.stylist?.lastName || ""
-    }`.trim() || "Stylist";
+    appointment?.stylistName ||
+    `${appointment?.stylist?.firstName || ""} ${appointment?.stylist?.lastName || ""
+      }`.trim() ||
+    "Stylist";
 
   const serviceName =
-    appointment?.service?.name || appointment?.serviceName || "Dịch vụ làm tóc";
+    appointment?.serviceName ||
+    appointment?.service?.name ||
+    "Dịch vụ làm tóc";
 
-  const servicePrice =
-    appointment?.service?.price || appointment?.servicePrice || 0;
-
-  const totalAmount = appointment?.totalAmount || servicePrice;
-
-  const isCancelled = ["CANCELLED", "COMPLETED", "NO_SHOW", "EXPIRED"].includes(
-    appointment?.status,
+  // LẤY GIÁ TRỰC TIẾP TỪ BACKEND
+  // bookingAmount là giá được backend lưu cho appointment.
+  const servicePrice = Number(
+    appointment?.bookingAmount ??
+    appointment?.service?.price ??
+    appointment?.servicePrice ??
+    0,
   );
+
+  // Tổng tiền của appointment hiện tại chính là bookingAmount.
+  const totalAmount = Number(
+    appointment?.bookingAmount ??
+    appointment?.totalAmount ??
+    servicePrice ??
+    0,
+  );
+
+  const isCancelled = [
+    "CANCELLED",
+    "COMPLETED",
+    "NO_SHOW",
+    "EXPIRED",
+  ].includes(normalizedStatus);
+
+  const canRetryPayment =
+    normalizedStatus ===
+    "PENDING_PAYMENT" &&
+    remainingSeconds !== null &&
+    remainingSeconds > 0;
 
   // ==============================
   // RENDER
   // ==============================
-
   return (
     <div className="appointment-detail-page">
       <div className="appointment-detail-container">
+
         {/* ==============================
             BACK
         ============================== */}
@@ -231,10 +443,17 @@ function AppointmentDetail() {
         <button
           type="button"
           className="appointment-back"
-          onClick={() => navigate("/customer/appointments")}
+          onClick={() =>
+            navigate(
+              "/customer/appointments",
+            )
+          }
         >
           <span>←</span>
-          <span>Lịch hẹn của tôi</span>
+
+          <span>
+            Lịch hẹn của tôi
+          </span>
         </button>
 
         {/* ==============================
@@ -243,18 +462,28 @@ function AppointmentDetail() {
 
         <div className="appointment-page-header">
           <div className="header-left">
-            <span className="appointment-eyebrow">APPOINTMENT</span>
+            <span className="appointment-eyebrow">
+              APPOINTMENT
+            </span>
 
-            <h1>Chi tiết lịch hẹn</h1>
+            <h1>
+              Chi tiết lịch hẹn
+            </h1>
 
             <p>
               Mã lịch hẹn{" "}
-              <strong>{appointment?.appointmentCode || `#${id}`}</strong>
+              <strong>
+                {appointment?.appointmentCode ||
+                  `#${id}`}
+              </strong>
             </p>
           </div>
 
-          <div className={`appointment-status ${status.className}`}>
+          <div
+            className={`appointment-status ${status.className}`}
+          >
             <span className="status-dot"></span>
+
             {status.label}
           </div>
         </div>
@@ -263,38 +492,99 @@ function AppointmentDetail() {
             ERROR ALERT
         ============================== */}
 
-        {error && <div className="appointment-alert">{error}</div>}
+        {error && (
+          <div className="appointment-alert">
+            {error}
+          </div>
+        )}
+
+        {/* ==============================
+            PAYMENT WARNING
+        ============================== */}
+
+        {normalizedStatus ===
+          "PENDING_PAYMENT" && (
+            <div
+              className={
+                canRetryPayment
+                  ? "payment-warning"
+                  : "payment-warning payment-warning-expired"
+              }
+            >
+              <div className="payment-warning-icon">
+                !
+              </div>
+
+              <div className="payment-warning-content">
+                <strong>
+                  {canRetryPayment
+                    ? "Lịch hẹn đang chờ thanh toán"
+                    : "Đã hết thời gian thanh toán"}
+                </strong>
+
+                <p>
+                  {canRetryPayment
+                    ? `Vui lòng hoàn tất thanh toán trong ${formatCountdown(
+                      remainingSeconds,
+                    )} để giữ lịch hẹn.`
+                    : "Thời gian thanh toán 10 phút đã hết. Vui lòng đặt lại lịch hẹn để tiếp tục."}
+                </p>
+              </div>
+
+              {canRetryPayment && (
+                <div className="payment-countdown">
+                  {formatCountdown(
+                    remainingSeconds,
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
         {/* ==============================
             CONTENT
         ============================== */}
 
         <div className="appointment-content">
+
           {/* =====================================
               MAIN CARD
           ===================================== */}
 
           <div className="appointment-main-card">
+
             {/* SERVICE */}
 
             <div className="detail-row service-row">
               <div className="detail-label">
-                <span className="detail-number">01</span>
+                <span className="detail-number">
+                  01
+                </span>
 
-                <span>Dịch vụ</span>
+                <span>
+                  Dịch vụ
+                </span>
               </div>
 
               <div className="service-content">
-                <div className="service-symbol">✂</div>
+                <div className="service-symbol">
+                  ✂
+                </div>
 
                 <div className="service-text">
-                  <h2>{serviceName}</h2>
+                  <h2>
+                    {serviceName}
+                  </h2>
 
-                  <p>Dịch vụ làm tóc</p>
+                  <p>
+                    Dịch vụ làm tóc
+                  </p>
                 </div>
 
                 <strong className="service-amount">
-                  {formatMoney(servicePrice)}
+                  {formatMoney(
+                    servicePrice,
+                  )}
                 </strong>
               </div>
             </div>
@@ -303,25 +593,43 @@ function AppointmentDetail() {
 
             <div className="detail-row">
               <div className="detail-label">
-                <span className="detail-number">02</span>
+                <span className="detail-number">
+                  02
+                </span>
 
-                <span>Stylist</span>
+                <span>
+                  Stylist
+                </span>
               </div>
 
               <div className="stylist-content">
                 <div className="stylist-avatar-large">
                   {appointment?.stylist?.avatar ? (
-                    <img src={appointment.stylist.avatar} alt={stylistName} />
+                    <img
+                      src={
+                        appointment.stylist
+                          .avatar
+                      }
+                      alt={stylistName}
+                    />
                   ) : (
-                    <span>{stylistName.charAt(0).toUpperCase()}</span>
+                    <span>
+                      {stylistName
+                        .charAt(0)
+                        .toUpperCase()}
+                    </span>
                   )}
                 </div>
 
                 <div className="stylist-text">
-                  <h2>{stylistName}</h2>
+                  <h2>
+                    {stylistName}
+                  </h2>
 
                   <p>
-                    {appointment?.stylist?.specialization || "Hair Designer"}
+                    {appointment?.stylist
+                      ?.specialization ||
+                      "Hair Designer"}
                   </p>
                 </div>
               </div>
@@ -331,29 +639,48 @@ function AppointmentDetail() {
 
             <div className="detail-row">
               <div className="detail-label">
-                <span className="detail-number">03</span>
+                <span className="detail-number">
+                  03
+                </span>
 
-                <span>Thời gian</span>
+                <span>
+                  Thời gian
+                </span>
               </div>
 
               <div className="appointment-datetime">
                 <div className="datetime-box">
-                  <span className="datetime-icon">◷</span>
+                  <span className="datetime-icon">
+                    ◷
+                  </span>
 
                   <div>
-                    <small>NGÀY HẸN</small>
+                    <small>
+                      NGÀY HẸN
+                    </small>
 
-                    <strong>{formatDate(appointment?.appointmentDate)}</strong>
+                    <strong>
+                      {formatDate(
+                        appointment?.appointmentDate,
+                      )}
+                    </strong>
                   </div>
                 </div>
 
                 <div className="datetime-box">
-                  <span className="datetime-icon">◷</span>
+                  <span className="datetime-icon">
+                    ◷
+                  </span>
 
                   <div>
-                    <small>GIỜ HẸN</small>
+                    <small>
+                      GIỜ HẸN
+                    </small>
 
-                    <strong>{appointment?.startTime || "--:--"}</strong>
+                    <strong>
+                      {appointment?.startTime ||
+                        "--:--"}
+                    </strong>
                   </div>
                 </div>
               </div>
@@ -364,14 +691,21 @@ function AppointmentDetail() {
             {appointment?.customerNote && (
               <div className="detail-row">
                 <div className="detail-label">
-                  <span className="detail-number">04</span>
+                  <span className="detail-number">
+                    04
+                  </span>
 
-                  <span>Ghi chú</span>
+                  <span>
+                    Ghi chú
+                  </span>
                 </div>
 
-                <div className="note-box">{appointment.customerNote}</div>
+                <div className="note-box">
+                  {appointment.customerNote}
+                </div>
               </div>
             )}
+
           </div>
 
           {/* =====================================
@@ -379,68 +713,136 @@ function AppointmentDetail() {
           ===================================== */}
 
           <aside className="appointment-summary">
-            <div className="summary-top">
-              <span>BOOKING SUMMARY</span>
 
-              <h2>Tổng quan</h2>
+            <div className="summary-top">
+              <span>
+                BOOKING SUMMARY
+              </span>
+
+              <h2>
+                Tổng quan
+              </h2>
             </div>
 
             <div className="summary-service">
               <div>
-                <span>Dịch vụ</span>
-                <strong>{serviceName}</strong>
+                <span>
+                  Dịch vụ
+                </span>
+
+                <strong>
+                  {serviceName}
+                </strong>
               </div>
 
-              <span>{formatMoney(servicePrice)}</span>
+              <span>
+                {formatMoney(
+                  servicePrice,
+                )}
+              </span>
             </div>
 
             <div className="summary-line">
-              <span>Phí dịch vụ</span>
-              <strong>0đ</strong>
+              <span>
+                Phí dịch vụ
+              </span>
+
+              <strong>
+                0đ
+              </strong>
             </div>
 
             <div className="summary-divider"></div>
 
             <div className="summary-total">
-              <span>Tổng cộng</span>
+              <span>
+                Tổng cộng
+              </span>
 
-              <strong>{formatMoney(totalAmount)}</strong>
+              <strong>
+                {formatMoney(
+                  totalAmount,
+                )}
+              </strong>
             </div>
 
             {/* ACTION */}
 
             <div className="summary-actions">
+
+              {normalizedStatus ===
+                "PENDING_PAYMENT" && (
+                  <button
+                    type="button"
+                    className="payment-button"
+                    onClick={
+                      handleRetryPayment
+                    }
+                    disabled={
+                      !canRetryPayment ||
+                      paying
+                    }
+                  >
+                    {paying
+                      ? "ĐANG CHUYỂN ĐẾN THANH TOÁN..."
+                      : canRetryPayment
+                        ? "THANH TOÁN LẠI"
+                        : "ĐÃ HẾT THỜI GIAN THANH TOÁN"}
+                  </button>
+                )}
+
               {!isCancelled && (
                 <button
                   type="button"
                   className="cancel-button"
-                  onClick={handleCancel}
-                  disabled={cancelling}
+                  onClick={
+                    handleCancel
+                  }
+                  disabled={
+                    cancelling ||
+                    paying
+                  }
                 >
-                  {cancelling ? "ĐANG HỦY..." : "HỦY LỊCH HẸN"}
+                  {cancelling
+                    ? "ĐANG HỦY..."
+                    : "HỦY LỊCH HẸN"}
                 </button>
               )}
 
               <button
                 type="button"
                 className="primary-action"
-                onClick={() => navigate("/appointments/book")}
+                onClick={() =>
+                  navigate(
+                    "/appointments/book",
+                  )
+                }
+                disabled={paying}
               >
                 ĐẶT LỊCH MỚI
               </button>
+
             </div>
 
             {/* HELP */}
 
             <div className="summary-help">
-              <div className="help-symbol">?</div>
+              <div className="help-symbol">
+                ?
+              </div>
 
               <div>
-                <strong>Cần hỗ trợ?</strong>
+                <strong>
+                  Cần hỗ trợ?
+                </strong>
 
-                <p>Liên hệ salon nếu bạn cần thay đổi lịch hẹn.</p>
+                <p>
+                  Liên hệ salon nếu bạn
+                  cần thay đổi lịch hẹn.
+                </p>
               </div>
             </div>
+
           </aside>
         </div>
       </div>

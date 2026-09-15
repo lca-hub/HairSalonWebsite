@@ -37,6 +37,8 @@ public class AppointmentMapper {
 
         dto.setStatus(appointment.getStatus());
 
+        dto.setPaymentDeadline(appointment.getPaymentDeadline());
+
         dto.setCustomerNote(appointment.getCustomerNote());
 
         dto.setStylistNote(appointment.getStylistNote());
@@ -58,7 +60,6 @@ public class AppointmentMapper {
                 var user = appointment.getStylist().getUser();
 
                 dto.setStylistName((user.getFirstName() + " " + user.getLastName()).trim());
-
             }
         }
 
