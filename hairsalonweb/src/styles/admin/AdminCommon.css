@@ -103,17 +103,18 @@
 }
 
 .admin-primary-button {
-    min-height: 42px;
-    padding: 0 18px;
+    min-height: 28px;
+    height: 28px;
+    padding: 0 9px;
     border: 1px solid #2a2621;
     background: #2a2621;
     color: #fff;
-    font-size: 10px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .8px;
+    letter-spacing: .4px;
+    line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
-    transition: .2s ease;
 }
 
 .admin-primary-button:hover {
@@ -136,16 +137,17 @@
 }
 
 .admin-secondary-button {
-    min-height: 42px;
-    padding: 0 18px;
+    min-height: 28px;
+    height: 28px;
+    padding: 0 9px;
     border: 1px solid #cfc8bf;
     background: #fff;
     color: #2a2621;
-    font-size: 10px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .8px;
+    letter-spacing: .4px;
+    line-height: 1;
     text-transform: uppercase;
-    transition: .2s ease;
 }
 
 .admin-secondary-button:hover {
@@ -155,16 +157,17 @@
 }
 
 .admin-refresh-btn {
-    min-height: 34px;
-    padding: 0 12px;
+    min-height: 26px;
+    height: 26px;
+    padding: 0 8px;
     border: 1px solid #d7d1c8;
     background: #fff;
     color: #5d5750;
-    font-size: 10px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .6px;
+    letter-spacing: .35px;
+    line-height: 1;
     text-transform: uppercase;
-    transition: .2s ease;
 }
 
 .admin-refresh-btn:hover {
@@ -173,16 +176,17 @@
 }
 
 .admin-filter-reset {
-    min-height: 42px;
-    padding: 0 14px;
+    min-height: 28px;
+    height: 28px;
+    padding: 0 8px;
     border: 1px solid #d7d1c8;
     background: #fff;
     color: #5d5750;
-    font-size: 10px;
+    font-size: 7px;
     font-weight: 700;
+    letter-spacing: .35px;
+    line-height: 1;
     text-transform: uppercase;
-    letter-spacing: .6px;
-    transition: .2s ease;
 }
 
 .admin-filter-reset:hover {
@@ -192,16 +196,17 @@
 }
 
 .admin-action-btn {
-    min-height: 29px;
-    padding: 0 8px;
+    min-height: 25px;
+    height: 25px;
+    padding: 0 7px;
     border: 1px solid #d6d0c8;
     background: #fff;
     color: #5e5851;
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .45px;
+    letter-spacing: .3px;
+    line-height: 1;
     text-transform: uppercase;
-    transition: .2s ease;
 }
 
 .admin-action-btn:hover {
@@ -228,18 +233,20 @@
     display: inline-flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 5px;
+    gap: 4px;
 }
 
 .admin-user-actions button {
-    min-height: 29px;
-    padding: 0 8px;
+    min-height: 25px;
+    height: 25px;
+    padding: 0 7px;
     border: 1px solid #d6d0c8;
     background: #fff;
     color: #5e5851;
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .45px;
+    letter-spacing: .3px;
+    line-height: 1;
     text-transform: uppercase;
     cursor: pointer;
     transition: .2s ease;
@@ -468,19 +475,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 16px;
+    gap: 8px;
+    padding: 14px;
 }
 
 .admin-pagination button {
-    min-height: 34px;
-    padding: 0 12px;
+    min-height: 27px;
+    height: 27px;
+    padding: 0 8px;
     border: 1px solid #d6d0c8;
     background: #fff;
     color: #5d5750;
-    font-size: 9px;
+    font-size: 7px;
     font-weight: 700;
-    letter-spacing: .5px;
+    letter-spacing: .4px;
     text-transform: uppercase;
     transition: .2s ease;
 }
@@ -540,12 +548,14 @@
 }
 
 .admin-modal-close {
-    width: 34px;
-    height: 34px;
+    width: 29px;
+    height: 29px;
+    min-height: 29px;
+    padding: 0;
     border: 1px solid #d8d2c9;
     background: #fff;
     color: #5c564e;
-    font-size: 20px;
+    font-size: 17px;
 }
 
 .admin-modal-close:hover {
@@ -615,8 +625,8 @@
 .admin-modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 9px;
-    padding: 16px 22px;
+    gap: 8px;
+    padding: 14px 22px;
     border-top: 1px solid #e7e1d9;
     background: var(--admin-panel-soft);
 }

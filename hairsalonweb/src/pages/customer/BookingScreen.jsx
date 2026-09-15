@@ -7,15 +7,15 @@ function BookingScreen() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Nếu đi từ trang stylist thì có stylistId
   const queryStylistId = searchParams.get("stylistId");
+  const queryServiceId = searchParams.get("serviceId");
 
   const [stylists, setStylists] = useState([]);
   const [selectedStylist, setSelectedStylist] = useState(queryStylistId || "");
 
   const [stylist, setStylist] = useState(null);
   const [services, setServices] = useState([]);
-  const [selectedService, setSelectedService] = useState("");
+  const [selectedService, setSelectedService] = useState(queryServiceId || "");
 
   const [date, setDate] = useState("");
   const [slots, setSlots] = useState([]);
@@ -37,6 +37,11 @@ function BookingScreen() {
   const handleBack = () => {
     if (queryStylistId) {
       navigate(`/stylists/${queryStylistId}`);
+      return;
+    }
+
+    if (queryServiceId) {
+      navigate("/services");
       return;
     }
 
@@ -68,7 +73,7 @@ function BookingScreen() {
         setStylists(stylistList);
 
         // =========================================
-        // Nếu đã có stylistId từ trang Stylist
+        // CÓ STYLIST ID
         // =========================================
 
         if (queryStylistId) {
@@ -81,7 +86,6 @@ function BookingScreen() {
           }
 
           setSelectedStylist(String(currentStylist.id));
-
           setStylist(currentStylist);
 
           const serviceResponse = await fetch(
@@ -94,15 +98,58 @@ function BookingScreen() {
 
           const serviceData = await serviceResponse.json();
 
-          setServices(serviceData.content || []);
-        } else {
-          // =========================================
-          // Nếu vào trực tiếp từ ĐẶT LỊCH
-          // =========================================
+          const serviceList = serviceData.content || [];
+
+          setServices(serviceList);
+
+          // Nếu URL có serviceId thì chọn sẵn
+          if (queryServiceId) {
+            const currentService = serviceList.find(
+              (service) =>
+                String(service.id) === String(queryServiceId),
+            );
+
+            if (currentService) {
+              setSelectedService(String(currentService.id));
+            } else {
+              setSelectedService("");
+            }
+          } else {
+            setSelectedService("");
+          }
+
+          return;
+        }
+
+        // =========================================
+        // CHỈ CÓ SERVICE ID
+        // =========================================
+
+        if (queryServiceId) {
+          const serviceResponse = await fetch(
+            `http://localhost:8080/api/services/${queryServiceId}`,
+          );
+
+          if (!serviceResponse.ok) {
+            throw new Error("Không tìm thấy dịch vụ");
+          }
+
+          const serviceData = await serviceResponse.json();
 
           setStylist(null);
-          setServices([]);
+          setServices([serviceData]);
+          setSelectedService(String(serviceData.id));
+
+          return;
         }
+
+        // =========================================
+        // VÀO TRỰC TIẾP
+        // =========================================
+
+        setStylist(null);
+        setServices([]);
+        setSelectedService("");
       } catch (err) {
         console.error("LOAD BOOKING DATA ERROR:", err);
 
@@ -115,7 +162,7 @@ function BookingScreen() {
     };
 
     loadData();
-  }, [queryStylistId]);
+  }, [queryStylistId, queryServiceId]);
 
   // =====================================================
   // KHI CHỌN STYLIST
@@ -125,15 +172,19 @@ function BookingScreen() {
     const loadStylistData = async () => {
       if (!selectedStylist) {
         setStylist(null);
-        setServices([]);
-        setSelectedService("");
+
+        if (!queryServiceId) {
+          setServices([]);
+          setSelectedService("");
+        }
+
         setSlots([]);
         setSelectedSlot("");
 
         return;
       }
 
-      // Nếu đã load stylist từ query rồi
+      // Nếu stylist đã được load từ query
       if (
         queryStylistId &&
         String(selectedStylist) === String(queryStylistId)
@@ -159,14 +210,29 @@ function BookingScreen() {
         }
 
         const stylistData = await stylistResponse.json();
-
         const serviceData = await serviceResponse.json();
 
-        setStylist(stylistData);
-        setServices(serviceData.content || []);
+        const serviceList = serviceData.content || [];
 
-        // Khi đổi stylist thì reset dịch vụ/giờ
-        setSelectedService("");
+        setStylist(stylistData);
+        setServices(serviceList);
+
+        // Nếu có serviceId trên URL thì giữ lại nếu stylist cung cấp service đó
+        if (queryServiceId) {
+          const currentService = serviceList.find(
+            (service) =>
+              String(service.id) === String(queryServiceId),
+          );
+
+          if (currentService) {
+            setSelectedService(String(currentService.id));
+          } else {
+            setSelectedService("");
+          }
+        } else {
+          setSelectedService("");
+        }
+
         setDate("");
         setSlots([]);
         setSelectedSlot("");
@@ -180,7 +246,7 @@ function BookingScreen() {
     };
 
     loadStylistData();
-  }, [selectedStylist, queryStylistId]);
+  }, [selectedStylist, queryStylistId, queryServiceId]);
 
   // =====================================================
   // LOAD AVAILABLE SLOTS
@@ -465,7 +531,9 @@ function BookingScreen() {
             <label>Khung giờ</label>
 
             {slotLoading ? (
-              <p>Đang tải khung giờ...</p>
+              <p>
+                Đang tải khung giờ...
+              </p>
             ) : (
               <div className="slot-grid">
                 {slots.length === 0 ? (

@@ -1,7 +1,8 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import cookies from "react-cookies";
 import { clearSession, decodeToken, getRoleFromToken } from "./ProtectedRoute";
+import { authApis, endpoints } from "../configs/api/Apis";
 import "./Header.css";
 
 const roleNames = {
@@ -37,9 +38,6 @@ const dashboardMenus = {
     ["Tổng quan", "/stylist"],
     ["Lịch hẹn", "/stylist/appointments"],
     ["Lịch của tôi", "/stylist/schedule"],
-    ["Chấm công", "/stylist/attendance"],
-    ["Khách hàng", "/stylist/customers"],
-    ["Doanh thu", "/stylist/revenue"],
   ],
 };
 
@@ -62,9 +60,19 @@ function CartIcon({ size = 20 }) {
   );
 }
 
+function NotificationIcon({ size = 20 }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" aria-hidden="true">
+      <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 21h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Header({ role: dashboardRole, title }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const token = cookies.load("accessToken");
   const payload = token ? decodeToken(token) : null;
@@ -72,11 +80,30 @@ function Header({ role: dashboardRole, title }) {
   const role = dashboardRole || tokenRole;
   const email = payload?.email || payload?.sub || "";
   const isCustomer = role === "CUSTOMER";
-  const isDashboard = ["ADMIN", "RECEPTIONIST", "STYLIST"].includes(dashboardRole);
+  const isDashboard = ["ADMIN", "RECEPTIONIST", "STYLIST"].includes(role);
+
+  useEffect(() => {
+    if (!isCustomer || !token) {
+      setUnreadCount(0);
+      return;
+    }
+
+    const loadUnreadCount = async () => {
+      try {
+        const response = await authApis().get("/notifications/unread/count");
+        setUnreadCount(Number(response.data || 0));
+      } catch (err) {
+        console.error("LOAD UNREAD NOTIFICATION COUNT ERROR:", err);
+      }
+    };
+
+    loadUnreadCount();
+  }, [isCustomer, token]);
 
   const logout = () => {
     clearSession();
     setOpen(false);
+    setUnreadCount(0);
     navigate("/", { replace: true });
   };
 
@@ -98,12 +125,7 @@ function Header({ role: dashboardRole, title }) {
           <nav className="dashboard-nav">
             <div className="dashboard-menu-label">MENU</div>
             {menus.map(([label, path]) => (
-              <NavLink
-                key={path}
-                to={path}
-                end={path === home}
-                className={({ isActive }) => `dashboard-nav-link ${isActive ? "active" : ""}`}
-              >
+              <NavLink key={path} to={path} end={path === home} className={({ isActive }) => `dashboard-nav-link ${isActive ? "active" : ""}`}>
                 {label}
               </NavLink>
             ))}
@@ -117,6 +139,7 @@ function Header({ role: dashboardRole, title }) {
                 <small>{email}</small>
               </span>
             </Link>
+
             <button className="dashboard-logout" type="button" onClick={logout}>
               Đăng xuất
             </button>
@@ -128,6 +151,7 @@ function Header({ role: dashboardRole, title }) {
             <span>HAIR SALON MANAGEMENT</span>
             <strong>{title || roleNames[role]}</strong>
           </div>
+
           <Link to={`/${role.toLowerCase()}/profile`} className="dashboard-topbar-user">
             <UserIcon size={19} />
             <span>{email || "Tài khoản"}</span>
@@ -142,6 +166,7 @@ function Header({ role: dashboardRole, title }) {
   return (
     <header className="site-header">
       <div className="site-header-inner">
+
         <Link to="/" className="site-logo">
           <span className="site-logo-main">HAIR SALON</span>
           <span className="site-logo-sub">BEAUTY &amp; STYLE</span>
@@ -156,51 +181,72 @@ function Header({ role: dashboardRole, title }) {
         </nav>
 
         <div className="site-actions">
+
           {isCustomer && (
-            <Link to="/customer/cart" className="header-action-icon" title="Giỏ hàng">
-              <CartIcon />
-            </Link>
+            <>
+              <Link to="/customer/cart" className="header-action-icon" title="Giỏ hàng">
+                <CartIcon />
+              </Link>
+
+              <Link to="/customer/notifications" className="header-action-icon header-notification-icon" title="Thông báo">
+                <NotificationIcon />
+                {unreadCount > 0 && <span className="header-notification-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+              </Link>
+            </>
           )}
 
           <div className="header-account">
-            <button
-              type="button"
-              className="header-action-icon"
-              onClick={() => {
-                if (!token) {
-                  navigate("/login");
-                  return;
-                }
-                setOpen((value) => !value);
-              }}
-              title="Tài khoản"
-            >
+
+            <button type="button" className="header-action-icon" onClick={() => {
+              if (!token) {
+                navigate("/login");
+                return;
+              }
+
+              setOpen((value) => !value);
+            }} title="Tài khoản">
               <UserIcon />
             </button>
 
             {token && role && open && (
               <div className="header-dropdown">
+
                 <div className="header-dropdown-user">
-                  <div className="header-dropdown-icon"><UserIcon size={21} /></div>
+                  <div className="header-dropdown-icon">
+                    <UserIcon size={21} />
+                  </div>
+
                   <div>
                     <strong>{email || "Tài khoản"}</strong>
                     <span>{roleNames[role] || role}</span>
                   </div>
                 </div>
+
                 <Link to={profilePath} onClick={() => setOpen(false)}>Thông tin cá nhân</Link>
+
                 {isCustomer && (
-                  <Link to="/customer/cart" onClick={() => setOpen(false)}>Giỏ hàng</Link>
+                  <>
+                    <Link to="/customer/cart" onClick={() => setOpen(false)}>Giỏ hàng</Link>
+                    <Link to="/customer/notifications" onClick={() => setOpen(false)}>Thông báo</Link>
+                    <Link to="/customer/orders" onClick={() => setOpen(false)}>Đơn hàng</Link>
+                  </>
                 )}
-                <button type="button" onClick={logout}>Đăng xuất</button>
+
+                <button type="button" onClick={logout}>
+                  Đăng xuất
+                </button>
+
               </div>
             )}
 
             {!token && (
               <Link to="/login" className="header-login-text">ĐĂNG NHẬP</Link>
             )}
+
           </div>
 
           <Link to="/appointments/book" className="header-book">ĐẶT LỊCH</Link>
+
         </div>
       </div>
     </header>

@@ -2,26 +2,31 @@ package com.lca.service.impl;
 
 import com.lca.dtos.response.PaymentUrlResponseDTO;
 import com.lca.entity.Appointment;
+import com.lca.entity.Customer;
 import com.lca.entity.Invoice;
 import com.lca.entity.InvoiceItem;
 import com.lca.entity.PaymentTransaction;
-import com.lca.entity.Customer;
+import com.lca.entity.ProductOrder;
+import com.lca.entity.ProductOrderItem;
 import com.lca.entity.User;
 import com.lca.enums.AppointmentStatus;
 import com.lca.enums.PaymentMethod;
 import com.lca.enums.PaymentStatus;
 import com.lca.repository.AppointmentRepository;
+import com.lca.repository.AppointmentSlotRepository;
 import com.lca.repository.CustomerRepository;
 import com.lca.repository.InvoiceRepository;
 import com.lca.repository.PaymentTransactionRepository;
+import com.lca.repository.ProductOrderRepository;
 import com.lca.repository.UserRepository;
+import com.lca.service.EmailService;
 import com.lca.service.NotificationService;
 import com.lca.service.PaymentService;
+import com.lca.service.ProductOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -42,11 +47,15 @@ public class PaymentServiceImpl implements PaymentService {
     private static final DateTimeFormatter VNPAY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final AppointmentRepository appointmentRepo;
+    private final AppointmentSlotRepository appointmentSlotRepo;
     private final InvoiceRepository invoiceRepo;
     private final PaymentTransactionRepository paymentTransactionRepo;
+    private final ProductOrderRepository productOrderRepo;
     private final CustomerRepository customerRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
+    private final ProductOrderService productOrderService;
+    private final EmailService emailService;
 
     @Value("${vnpay.pay-url}")
     private String vnpayPayUrl;
@@ -68,7 +77,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentUrlResponseDTO createVnpayPayment(String email, Long appointmentId, String clientIp) {
-
         Customer customer = getCustomerByEmail(email);
 
         Appointment appointment = appointmentRepo.findById(appointmentId)
@@ -90,11 +98,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (now.isAfter(appointment.getPaymentDeadline())) {
-
-            appointment.setStatus(AppointmentStatus.EXPIRED);
-            appointmentRepo.saveAndFlush(appointment);
-
-            throw new RuntimeException("Thời gian thanh toán đã hết. Vui lòng đặt lịch mới.");
+            cancelExpiredPayment(appointment);
+            throw new RuntimeException("Thời gian thanh toán đã hết. Lịch hẹn đã tự động hủy. Vui lòng đặt lịch mới.");
         }
 
         BigDecimal amount = appointment.getBookingAmount();
@@ -103,8 +108,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Số tiền thanh toán không hợp lệ");
         }
 
-        Invoice invoice = invoiceRepo
-                .findByAppointmentId(appointment.getId())
+        Invoice invoice = invoiceRepo.findByAppointmentId(appointment.getId())
                 .orElseGet(() -> createPendingInvoice(appointment, customer));
 
         if (invoice.getPaymentStatus() == PaymentStatus.PAID) {
@@ -115,7 +119,6 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setPaymentStatus(PaymentStatus.PENDING);
 
         if (invoice.getTotalAmount() == null || invoice.getTotalAmount().signum() <= 0) {
-
             invoice.setSubTotal(amount);
             invoice.setDiscountAmount(BigDecimal.ZERO);
             invoice.setTotalAmount(amount);
@@ -129,11 +132,9 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentTransaction transaction = getOrCreatePendingTransaction(savedInvoice, amount);
 
         String txnRef = transaction.getTransactionNo();
-
         LocalDateTime expireDate = appointment.getPaymentDeadline();
 
         SortedMap<String, String> params = new TreeMap<>();
-
         params.put("vnp_Version", "2.1.0");
         params.put("vnp_Command", "pay");
         params.put("vnp_TmnCode", vnpayTmnCode);
@@ -149,27 +150,111 @@ public class PaymentServiceImpl implements PaymentService {
         params.put("vnp_ExpireDate", VNPAY_DATE_FORMAT.format(expireDate));
 
         String hashData = buildHashData(params);
-
         String secureHash = hmacSHA512(vnpayHashSecret, hashData);
-
         String queryString = buildQueryString(params);
 
-        String paymentUrl =
-                vnpayPayUrl
-                        + "?"
-                        + queryString
-                        + "&vnp_SecureHash="
-                        + URLEncoder.encode(
-                        secureHash,
-                        StandardCharsets.UTF_8
-                );
+        String paymentUrl = vnpayPayUrl
+                + "?"
+                + queryString
+                + "&vnp_SecureHash="
+                + URLEncoder.encode(secureHash, StandardCharsets.UTF_8);
 
-        return new PaymentUrlResponseDTO(appointment.getId(), savedInvoice.getId(), transaction.getTransactionNo(), paymentUrl);
+        return new PaymentUrlResponseDTO(
+                appointment.getId(),
+                null,
+                savedInvoice.getId(),
+                transaction.getTransactionNo(),
+                paymentUrl
+        );
+    }
+
+    public PaymentUrlResponseDTO createVnpayProductOrderPayment(String email, Long orderId, String clientIp) {
+        Customer customer = getCustomerByEmail(email);
+
+        ProductOrder order = productOrderRepo.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy product order"));
+
+        if (!order.getCustomer().getId().equals(customer.getId())) {
+            throw new RuntimeException("Đơn hàng không thuộc customer này");
+        }
+
+        if (order.getOrderStatus() == null) {
+            throw new RuntimeException("Trạng thái đơn hàng không hợp lệ");
+        }
+
+        if (order.getOrderStatus().name().equals("CANCELLED")) {
+            throw new RuntimeException("Đơn hàng đã bị hủy");
+        }
+
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new RuntimeException("Đơn hàng đã được thanh toán");
+        }
+
+        if (order.getTotalAmount() == null || order.getTotalAmount().signum() <= 0) {
+            throw new RuntimeException("Số tiền thanh toán không hợp lệ");
+        }
+
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
+        LocalDateTime expireDate = now.plusMinutes(10);
+
+        Invoice invoice = invoiceRepo.findByProductOrderId(order.getId())
+                .orElseGet(() -> createPendingProductOrderInvoice(order, customer));
+
+        if (invoice.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new RuntimeException("Đơn hàng đã được thanh toán");
+        }
+
+        invoice.setPaymentMethod(PaymentMethod.VNPAY);
+        invoice.setPaymentStatus(PaymentStatus.PENDING);
+        invoice.setSubTotal(order.getSubTotal());
+        invoice.setDiscountAmount(order.getDiscountAmount());
+        invoice.setTotalAmount(order.getTotalAmount());
+        invoice.setRefundAmount(BigDecimal.ZERO);
+        invoice.setCreatedAt(invoice.getCreatedAt() == null ? now : invoice.getCreatedAt());
+
+        Invoice savedInvoice = invoiceRepo.saveAndFlush(invoice);
+
+        PaymentTransaction transaction = getOrCreatePendingTransaction(savedInvoice, order.getTotalAmount());
+
+        String txnRef = transaction.getTransactionNo();
+
+        SortedMap<String, String> params = new TreeMap<>();
+        params.put("vnp_Version", "2.1.0");
+        params.put("vnp_Command", "pay");
+        params.put("vnp_TmnCode", vnpayTmnCode);
+        params.put("vnp_Amount", order.getTotalAmount().multiply(BigDecimal.valueOf(100)).longValueExact() + "");
+        params.put("vnp_CurrCode", "VND");
+        params.put("vnp_TxnRef", txnRef);
+        params.put("vnp_OrderInfo", "Thanh toan don hang " + order.getOrderCode());
+        params.put("vnp_OrderType", "other");
+        params.put("vnp_Locale", "vn");
+        params.put("vnp_ReturnUrl", vnpayReturnUrl);
+        params.put("vnp_IpAddr", normalizeIp(clientIp));
+        params.put("vnp_CreateDate", VNPAY_DATE_FORMAT.format(now));
+        params.put("vnp_ExpireDate", VNPAY_DATE_FORMAT.format(expireDate));
+
+        String hashData = buildHashData(params);
+        String secureHash = hmacSHA512(vnpayHashSecret, hashData);
+        String queryString = buildQueryString(params);
+
+        String paymentUrl = vnpayPayUrl
+                + "?"
+                + queryString
+                + "&vnp_SecureHash="
+                + URLEncoder.encode(secureHash, StandardCharsets.UTF_8);
+
+        return new PaymentUrlResponseDTO(
+                null,
+                order.getId(),
+                savedInvoice.getId(),
+                transaction.getTransactionNo(),
+                paymentUrl
+        );
     }
 
     @Override
     public String handleVnpayReturn(Map<String, String> params) {
-
         boolean valid = verifySignature(params);
 
         String txnRef = params.get("vnp_TxnRef");
@@ -193,14 +278,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String handleVnpayIpn(Map<String, String> params) {
-
         if (!verifySignature(params)) {
             return "{\"RspCode\":\"97\",\"Message\":\"Invalid signature\"}";
         }
 
         String txnRef = params.get("vnp_TxnRef");
 
-        PaymentTransaction transaction = paymentTransactionRepo.findByTransactionNo(txnRef).orElse(null);
+        PaymentTransaction transaction = paymentTransactionRepo.findByTransactionNo(txnRef)
+                .orElse(null);
 
         if (transaction == null) {
             return "{\"RspCode\":\"01\",\"Message\":\"Transaction not found\"}";
@@ -219,9 +304,7 @@ public class PaymentServiceImpl implements PaymentService {
         String responseCode = params.get("vnp_ResponseCode");
         String transactionStatus = params.get("vnp_TransactionStatus");
 
-        boolean success =
-                "00".equals(responseCode)
-                        && "00".equals(transactionStatus);
+        boolean success = "00".equals(responseCode) && "00".equals(transactionStatus);
 
         if (success) {
             processSuccessfulPayment(params);
@@ -233,19 +316,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private Invoice createPendingInvoice(Appointment appointment, Customer customer) {
-
         Invoice invoice = new Invoice();
 
         invoice.setAppointment(appointment);
+        invoice.setProductOrder(null);
         invoice.setCustomer(customer);
-
-        invoice.setInvoiceCode(
-                "INV-"
-                        + UUID.randomUUID()
-                        .toString()
-                        .substring(0, 8)
-                        .toUpperCase()
-        );
+        invoice.setInvoiceCode("INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 
         BigDecimal amount = appointment.getBookingAmount();
 
@@ -253,14 +329,11 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setDiscountAmount(BigDecimal.ZERO);
         invoice.setTotalAmount(amount);
         invoice.setRefundAmount(BigDecimal.ZERO);
-
         invoice.setPaymentMethod(PaymentMethod.VNPAY);
         invoice.setPaymentStatus(PaymentStatus.PENDING);
-
         invoice.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         InvoiceItem item = new InvoiceItem();
-
         item.setInvoice(invoice);
         item.setService(appointment.getService());
         item.setQuantity(1);
@@ -272,33 +345,53 @@ public class PaymentServiceImpl implements PaymentService {
         return invoice;
     }
 
-    private PaymentTransaction getOrCreatePendingTransaction(Invoice invoice, BigDecimal amount) {
+    private Invoice createPendingProductOrderInvoice(ProductOrder order, Customer customer) {
+        Invoice invoice = new Invoice();
 
-        return paymentTransactionRepo
-                .findByInvoiceId(invoice.getId())
+        invoice.setAppointment(null);
+        invoice.setProductOrder(order);
+        invoice.setCustomer(customer);
+        invoice.setInvoiceCode("INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+
+        invoice.setSubTotal(order.getSubTotal());
+        invoice.setDiscountAmount(order.getDiscountAmount());
+        invoice.setTotalAmount(order.getTotalAmount());
+        invoice.setRefundAmount(BigDecimal.ZERO);
+        invoice.setPaymentMethod(PaymentMethod.VNPAY);
+        invoice.setPaymentStatus(PaymentStatus.PENDING);
+        invoice.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+
+        if (order.getItems() != null) {
+            for (ProductOrderItem orderItem : order.getItems()) {
+                InvoiceItem invoiceItem = new InvoiceItem();
+
+                invoiceItem.setInvoice(invoice);
+                invoiceItem.setProduct(orderItem.getProduct());
+                invoiceItem.setService(null);
+                invoiceItem.setQuantity(orderItem.getQuantity());
+                invoiceItem.setUnitPrice(orderItem.getUnitPrice());
+                invoiceItem.setTotalPrice(orderItem.getTotalPrice());
+
+                invoice.getItems().add(invoiceItem);
+            }
+        }
+
+        return invoice;
+    }
+
+    private PaymentTransaction getOrCreatePendingTransaction(Invoice invoice, BigDecimal amount) {
+        return paymentTransactionRepo.findByInvoiceId(invoice.getId())
                 .stream()
                 .filter(transaction -> transaction.getPaymentStatus() == PaymentStatus.PENDING)
                 .findFirst()
                 .orElseGet(() -> {
-
                     PaymentTransaction transaction = new PaymentTransaction();
 
                     transaction.setInvoice(invoice);
-
-                    transaction.setTransactionNo(
-                            "TXN-"
-                                    + UUID.randomUUID()
-                                    .toString()
-                                    .substring(0, 8)
-                                    .toUpperCase()
-                    );
-
+                    transaction.setTransactionNo("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
                     transaction.setAmount(amount);
-
                     transaction.setPaymentMethod(PaymentMethod.VNPAY);
-
                     transaction.setPaymentStatus(PaymentStatus.PENDING);
-
                     transaction.setTransactionTime(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
                     return paymentTransactionRepo.saveAndFlush(transaction);
@@ -306,21 +399,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void processSuccessfulPayment(Map<String, String> params) {
-
         String txnRef = params.get("vnp_TxnRef");
 
-        PaymentTransaction transaction = paymentTransactionRepo
-                        .findByTransactionNo(txnRef)
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy payment transaction"));
+        PaymentTransaction transaction = paymentTransactionRepo.findByTransactionNo(txnRef)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy payment transaction"));
 
         Invoice invoice = transaction.getInvoice();
-
-        Appointment appointment = invoice.getAppointment();
 
         BigDecimal receivedAmount = parseVnpayAmount(params.get("vnp_Amount"));
 
         if (receivedAmount == null || transaction.getAmount().compareTo(receivedAmount) != 0) {
-
             throw new RuntimeException("Số tiền giao dịch không hợp lệ");
         }
 
@@ -329,33 +417,46 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (invoice.getPaymentStatus() == PaymentStatus.PAID) {
-
             transaction.setPaymentStatus(PaymentStatus.PAID);
-
             paymentTransactionRepo.save(transaction);
-
             return;
         }
 
         ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
         LocalDateTime now = LocalDateTime.now(vietnamZone);
 
-        if (appointment.getStatus() == AppointmentStatus.CANCELLED || appointment.getStatus() == AppointmentStatus.EXPIRED) {
+        if (invoice.getAppointment() != null) {
+            processSuccessfulAppointmentPayment(transaction, invoice, now);
+            return;
+        }
 
+        if (invoice.getProductOrder() != null) {
+            processSuccessfulProductOrderPayment(transaction, invoice, now);
+            return;
+        }
+
+        throw new RuntimeException("Invoice không liên kết với appointment hoặc product order");
+    }
+
+    private void processSuccessfulAppointmentPayment(
+            PaymentTransaction transaction,
+            Invoice invoice,
+            LocalDateTime now
+    ) {
+        Appointment appointment = invoice.getAppointment();
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED
+                || appointment.getStatus() == AppointmentStatus.EXPIRED) {
             throw new RuntimeException("Appointment không còn hợp lệ để xác nhận thanh toán");
         }
 
-        if (appointment.getPaymentDeadline() != null && now.isAfter(appointment.getPaymentDeadline())) {
-
-            appointment.setStatus(AppointmentStatus.EXPIRED);
-
-            appointmentRepo.saveAndFlush(appointment);
-
-            throw new RuntimeException("Thời gian thanh toán đã hết. Lịch hẹn không thể xác nhận.");
+        if (appointment.getPaymentDeadline() != null
+                && now.isAfter(appointment.getPaymentDeadline())) {
+            cancelExpiredPayment(appointment);
+            throw new RuntimeException("Thời gian thanh toán đã hết. Lịch hẹn đã tự động hủy.");
         }
 
         transaction.setPaymentStatus(PaymentStatus.PAID);
-        transaction.setTransactionNo(txnRef);
         transaction.setTransactionTime(now);
 
         invoice.setPaymentMethod(PaymentMethod.VNPAY);
@@ -371,8 +472,38 @@ public class PaymentServiceImpl implements PaymentService {
         notifyPaymentSuccess(appointment);
     }
 
-    private void processFailedPayment(Map<String, String> params) {
+    private void processSuccessfulProductOrderPayment(PaymentTransaction transaction, Invoice invoice, LocalDateTime now) {
+        ProductOrder order = invoice.getProductOrder();
 
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            transaction.setPaymentStatus(PaymentStatus.PAID);
+            transaction.setTransactionTime(now);
+            paymentTransactionRepo.save(transaction);
+            return;
+        }
+
+        if (order.getOrderStatus().name().equals("CANCELLED")) {
+            throw new RuntimeException("Đơn hàng đã bị hủy");
+        }
+
+        productOrderService.deductStock(order.getId());
+
+        transaction.setPaymentStatus(PaymentStatus.PAID);
+        transaction.setTransactionTime(now);
+
+        invoice.setPaymentMethod(PaymentMethod.VNPAY);
+        invoice.setPaymentStatus(PaymentStatus.PAID);
+
+        order.setPaymentStatus(PaymentStatus.PAID);
+
+        paymentTransactionRepo.save(transaction);
+        invoiceRepo.save(invoice);
+        productOrderRepo.save(order);
+
+        notifyProductOrderPaymentSuccess(order);
+    }
+
+    private void processFailedPayment(Map<String, String> params) {
         String txnRef = params.get("vnp_TxnRef");
 
         PaymentTransaction transaction = paymentTransactionRepo.findByTransactionNo(txnRef).orElse(null);
@@ -396,26 +527,73 @@ public class PaymentServiceImpl implements PaymentService {
         Invoice invoice = transaction.getInvoice();
 
         if (invoice != null && invoice.getPaymentStatus() != PaymentStatus.PAID && invoice.getPaymentStatus() != PaymentStatus.REFUNDED) {
-
             invoice.setPaymentStatus(PaymentStatus.FAILED);
-
             invoiceRepo.save(invoice);
         }
     }
 
-    private void notifyPaymentSuccess(Appointment appointment) {
+    private void cancelExpiredPayment(Appointment appointment) {
+        appointmentSlotRepo.deleteByAppointmentId(appointment.getId());
 
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+        appointment.setRefundAmount(BigDecimal.ZERO);
+
+        appointmentRepo.saveAndFlush(appointment);
+
+        try {
+            notificationService.create(
+                    appointment.getCustomer().getUser().getId(),
+                    "Lịch hẹn đã bị hủy",
+                    "Lịch hẹn " + appointment.getAppointmentCode()
+                            + " đã tự động hủy vì quá thời gian thanh toán."
+            );
+        } catch (Exception e) {
+            System.err.println("Không thể tạo notification cho appointment " + appointment.getId());
+        }
+    }
+
+    private void notifyPaymentSuccess(Appointment appointment) {
         try {
             User user = appointment.getCustomer().getUser();
 
-            notificationService.create(user.getId(), "Thanh toán thành công", "Lịch hẹn " + appointment.getAppointmentCode() + " đã được thanh toán và xác nhận.");
+            String title = "Đặt lịch thành công";
+            String message = "Lịch hẹn " + appointment.getAppointmentCode()
+                    + " đã được thanh toán và xác nhận.\n\n"
+                    + "Dịch vụ: " + appointment.getService().getName() + "\n"
+                    + "Ngày hẹn: " + appointment.getAppointmentDate() + "\n"
+                    + "Thời gian: " + appointment.getStartTime() + " - " + appointment.getEndTime() + "\n"
+                    + "Cảm ơn bạn đã sử dụng dịch vụ tại Hair Salon.";
 
-        } catch (Exception ignored) {
+            notificationService.create(user.getId(), title, message);
+
+            emailService.sendSimpleEmail(user.getEmail(), title, message);
+        } catch (Exception e) {
+            System.err.println("Không thể gửi thông báo thanh toán thành công cho appointment " + appointment.getId());
+            e.printStackTrace();
+        }
+    }
+
+    private void notifyProductOrderPaymentSuccess(ProductOrder order) {
+        try {
+            User user = order.getCustomer().getUser();
+
+            String title = "Thanh toán đơn hàng thành công";
+            String message = "Đơn hàng " + order.getOrderCode()
+                    + " đã được thanh toán thành công.\n\n"
+                    + "Tổng tiền: " + order.getTotalAmount() + " VND\n"
+                    + "Phương thức thanh toán: " + order.getPaymentMethod() + "\n\n"
+                    + "Cảm ơn bạn đã mua sắm tại Hair Salon.";
+
+            notificationService.create(user.getId(), title, message);
+
+            emailService.sendSimpleEmail(user.getEmail(), title, message);
+        } catch (Exception e) {
+            System.err.println("Không thể gửi thông báo thanh toán cho product order " + order.getId());
+            e.printStackTrace();
         }
     }
 
     private boolean verifySignature(Map<String, String> params) {
-
         String secureHash = params.get("vnp_SecureHash");
 
         if (secureHash == null || secureHash.isBlank()) {
@@ -425,38 +603,32 @@ public class PaymentServiceImpl implements PaymentService {
         SortedMap<String, String> filtered = new TreeMap<>();
 
         params.forEach((key, value) -> {
-
             if (key.startsWith("vnp_")
                     && !key.equals("vnp_SecureHash")
                     && !key.equals("vnp_SecureHashType")
                     && value != null
-                    && !value.isBlank()) {
-
+                    && !value.isBlank()
+            ) {
                 filtered.put(key, value);
             }
         });
 
         String hashData = buildHashData(filtered);
-
         String calculatedHash = hmacSHA512(vnpayHashSecret, hashData);
 
         return calculatedHash.equalsIgnoreCase(secureHash);
     }
 
     private String buildHashData(SortedMap<String, String> params) {
-
         StringBuilder builder = new StringBuilder();
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
-
             if (!builder.isEmpty()) {
                 builder.append("&");
             }
 
             builder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-
             builder.append("=");
-
             builder.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
         }
 
@@ -464,19 +636,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String buildQueryString(SortedMap<String, String> params) {
-
         StringBuilder builder = new StringBuilder();
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
-
             if (!builder.isEmpty()) {
                 builder.append("&");
             }
 
             builder.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-
             builder.append("=");
-
             builder.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
         }
 
@@ -484,12 +652,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String hmacSHA512(String secret, String data) {
-
         try {
-
             javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA512");
 
-            javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
+            javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(
+                    secret.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
 
             mac.init(secretKey);
 
@@ -509,22 +676,18 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private BigDecimal parseVnpayAmount(String value) {
-
         try {
-
             if (value == null || value.isBlank()) {
                 return null;
             }
 
             return new BigDecimal(value).divide(BigDecimal.valueOf(100));
-
         } catch (Exception e) {
             return null;
         }
     }
 
     private String normalizeIp(String ip) {
-
         if (ip == null || ip.isBlank()) {
             return "127.0.0.1";
         }
@@ -537,42 +700,47 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String buildFrontendRedirect(boolean success, String status, String txnRef) {
-
         Long appointmentId = null;
+        Long productOrderId = null;
 
         if (txnRef != null && !txnRef.isBlank()) {
-            appointmentId = paymentTransactionRepo
-                    .findByTransactionNo(txnRef)
-                    .map(transaction -> transaction.getInvoice())
-                    .map(invoice -> invoice.getAppointment())
-                    .map(appointment -> appointment.getId())
-                    .orElse(null);
+            PaymentTransaction transaction = paymentTransactionRepo.findByTransactionNo(txnRef).orElse(null);
+
+            if (transaction != null && transaction.getInvoice() != null) {
+                Invoice invoice = transaction.getInvoice();
+
+                if (invoice.getAppointment() != null) {
+                    appointmentId = invoice.getAppointment().getId();
+                }
+
+                if (invoice.getProductOrder() != null) {
+                    productOrderId = invoice.getProductOrder().getId();
+                }
+            }
         }
 
-        return "redirect:"
+        String redirectUrl = "redirect:"
                 + frontendUrl
                 + "/payment/vnpay/return"
                 + "?status="
-                + URLEncoder.encode(
-                status,
-                StandardCharsets.UTF_8
-        )
+                + URLEncoder.encode(status, StandardCharsets.UTF_8)
                 + "&txnRef="
-                + URLEncoder.encode(
-                txnRef == null ? "" : txnRef,
-                StandardCharsets.UTF_8
-        )
-                + (appointmentId != null
-                ? "&appointmentId=" + appointmentId
-                : "");
+                + URLEncoder.encode(txnRef == null ? "" : txnRef, StandardCharsets.UTF_8);
+
+        if (appointmentId != null) {
+            redirectUrl += "&appointmentId=" + appointmentId;
+        }
+
+        if (productOrderId != null) {
+            redirectUrl += "&productOrderId=" + productOrderId;
+        }
+
+        return redirectUrl;
     }
 
     private Customer getCustomerByEmail(String email) {
+        User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
 
-        User user = userRepo.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
-
-        return customerRepo.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+        return customerRepo.findByUserId(user.getId()).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
     }
 }

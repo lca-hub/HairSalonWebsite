@@ -7,4 +7,7 @@ public interface StatisticsService {
     StatisticsResponseDTO getDashboard();
 
     StatisticsResponseDTO getStats(String statsType, int year, Integer month);
+
+    StatisticsResponseDTO getStylistStats(String email, String statsType, int year, Integer month);
+
 }

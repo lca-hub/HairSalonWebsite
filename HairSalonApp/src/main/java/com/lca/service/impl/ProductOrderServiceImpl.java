@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,6 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         Cart cart = cartRepo.findByCustomerId(customer.getId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy giỏ hàng"));
 
-
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Giỏ hàng đang trống");
         }
@@ -46,14 +46,12 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
         order.setCustomer(customer);
         order.setOrderCode(generateOrderCode());
-
         order.setPaymentStatus(PaymentStatus.PENDING);
         order.setOrderStatus(ProductOrderStatus.PENDING);
 
         BigDecimal subTotal = BigDecimal.ZERO;
 
         for (CartItem cartItem : cart.getItems()) {
-
             Product product = productRepo.findById(cartItem.getProduct().getId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + cartItem.getProduct().getId()));
 
@@ -70,11 +68,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             }
 
             BigDecimal unitPrice = product.getPrice();
-
             BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
             ProductOrderItem item = new ProductOrderItem();
-
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(cartItem.getQuantity());
@@ -83,17 +79,11 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             item.setProductName(product.getName());
 
             order.getItems().add(item);
-
             subTotal = subTotal.add(totalPrice);
-
-            product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
-
-            productRepo.save(product);
         }
 
         BigDecimal discountAmount = BigDecimal.ZERO;
         BigDecimal shippingFee = BigDecimal.ZERO;
-
         BigDecimal totalAmount = subTotal.subtract(discountAmount).add(shippingFee);
 
         order.setSubTotal(subTotal);
@@ -101,7 +91,8 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         order.setShippingFee(shippingFee);
         order.setTotalAmount(totalAmount);
 
-        LocalDateTime now = LocalDateTime.now();
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
 
         order.setCreatedAt(now);
         order.setUpdatedAt(now);
@@ -141,20 +132,12 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             throw new RuntimeException("Chỉ có thể hủy đơn hàng đang ở trạng thái PENDING");
         }
 
-        for (ProductOrderItem item : order.getItems()) {
-
-            if (item.getProduct() != null) {
-
-                Product product = item.getProduct();
-
-                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-
-                productRepo.save(product);
-            }
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            restoreStock(order);
         }
 
         order.setOrderStatus(ProductOrderStatus.CANCELLED);
-        order.setUpdatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         productOrderRepo.save(order);
     }
@@ -177,23 +160,22 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductOrderResponseDTO> getAll(Pageable pageable) {
-
         return productOrderRepo.findAll(pageable).map(ProductOrderMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProductOrderResponseDTO getById(Long id) {
-
-        ProductOrder order = productOrderRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+        ProductOrder order = productOrderRepo.findById(id).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         return ProductOrderMapper.toResponse(order);
     }
 
     @Override
     public ProductOrderResponseDTO updateStatus(Long id, ProductOrderStatus status) {
-
-        ProductOrder order = productOrderRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+        ProductOrder order = productOrderRepo.findById(id).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy đơn hàng"));
 
         ProductOrderStatus currentStatus = order.getOrderStatus();
 
@@ -209,29 +191,69 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             throw new RuntimeException("Trạng thái đơn hàng không được để trống");
         }
 
-        if (status == ProductOrderStatus.CANCELLED) {
-
-            for (ProductOrderItem item : order.getItems()) {
-
-                if (item.getProduct() != null) {
-
-                    Product product = item.getProduct();
-
-                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-
-                    productRepo.save(product);
-                }
-            }
+        if (status == ProductOrderStatus.CANCELLED && order.getPaymentStatus() == PaymentStatus.PAID) {
+            restoreStock(order);
         }
 
         order.setOrderStatus(status);
-        order.setUpdatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
 
         return ProductOrderMapper.toResponse(productOrderRepo.save(order));
     }
 
-    private String generateOrderCode() {
+    @Override
+    public void deductStock(Long orderId) {
+        ProductOrder order = productOrderRepo.findById(orderId).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy đơn hàng"));
 
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            return;
+        }
+
+        if (order.getOrderStatus() == ProductOrderStatus.CANCELLED) {
+            throw new RuntimeException("Đơn hàng đã bị hủy");
+        }
+
+        for (ProductOrderItem item : order.getItems()) {
+            if (item.getProduct() == null) {
+                continue;
+            }
+
+            Product product = productRepo.findById(item.getProduct().getId()).orElseThrow(
+                    () -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + item.getProduct().getId()));
+
+            if (!Boolean.TRUE.equals(product.getIsActive())) {
+                throw new RuntimeException("Sản phẩm '" + product.getName() + "' hiện không hoạt động");
+            }
+
+            if (product.getStockQuantity() < item.getQuantity()) {
+                throw new RuntimeException("Sản phẩm '" + product.getName() + "' không đủ tồn kho");
+            }
+
+            product.setStockQuantity(product.getStockQuantity() - item.getQuantity());
+            productRepo.save(product);
+        }
+
+        order.setPaymentStatus(PaymentStatus.PAID);
+        order.setUpdatedAt(LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+        productOrderRepo.save(order);
+    }
+
+    private void restoreStock(ProductOrder order) {
+        for (ProductOrderItem item : order.getItems()) {
+            if (item.getProduct() == null) {
+                continue;
+            }
+
+            Product product = productRepo.findById(item.getProduct().getId()).orElseThrow(
+                    () -> new RuntimeException("Không tìm thấy sản phẩm với ID: " + item.getProduct().getId()));
+
+            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            productRepo.save(product);
+        }
+    }
+
+    private String generateOrderCode() {
         return "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 

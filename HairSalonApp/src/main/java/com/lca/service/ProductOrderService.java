@@ -20,4 +20,6 @@ public interface ProductOrderService {
     ProductOrderResponseDTO getMyOrderById(String email, Long orderId);
 
     void cancel(String email, Long orderId);
+
+    void deductStock(Long orderId);
 }

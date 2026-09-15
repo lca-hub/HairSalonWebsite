@@ -11,6 +11,8 @@ public class PaymentUrlResponseDTO {
 
     private Long appointmentId;
 
+    private Long orderId;
+
     private Long invoiceId;
 
     private String transactionNo;

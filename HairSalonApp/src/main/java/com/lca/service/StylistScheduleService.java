@@ -14,6 +14,8 @@ public interface StylistScheduleService {
 
     List<String> getAvailableSlots(Long stylistId, LocalDate workDate, Long serviceId);
 
+    List<StylistScheduleResponseDTO> getMySchedule(String email);
+
     StylistScheduleResponseDTO create(StylistScheduleRequestDTO request);
 
     List<StylistScheduleResponseDTO> getAll();

@@ -4,11 +4,10 @@ import Login from "./pages/home/Login";
 import Register from "./pages/home/Register";
 import Home from "./pages/home/Home";
 
-import StylistList from "./pages/customer/StylistList";
-import StylistDetail from "./pages/customer/StylistDetail";
+import StylistList from "./pages/dashboard/StylistList";
+import StylistDetail from "./pages/dashboard/StylistDetail";
 import BookingScreen from "./pages/customer/BookingScreen";
 import CustomerHome from "./pages/customer/CustomerHome";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import ComingSoon from "./pages/common/ComingSoon";
 import AccountPage from "./pages/common/AccountPage";
@@ -23,7 +22,16 @@ import AdminPurchaseOrders from "./pages/admin/AdminPurchaseOrders";
 import AdminInvoices from "./pages/admin/AdminInvoices";
 import AdminStatistics from "./pages/admin/AdminStatistics";
 import PaymentVnpayReturn from "./pages/customer/PaymentVnpayReturn";
-import ServiceList from "./pages/customer/ServiceList";
+import ServiceList from "./pages/dashboard/ServiceList";
+import CartPage from "./pages/customer/CartPage";
+import ProductList from "./pages/dashboard/ProductList";
+import OrderPaymentPage from "./pages/customer/OrderPaymentPage";
+import OrderListPage from "./pages/customer/OrderListPage";
+import OrderDetailPage from "./pages/customer/OrderDetailPage";
+import NotificationPage from "./pages/customer/NotificationPage";
+import StylistDashboard from "./pages/stylist/StylistDashboard";
+import StylistAppointments from "./pages/stylist/StylistAppointments";
+import StylistSchedule from "./pages/stylist/StylistSchedule";
 
 function App() {
   return (
@@ -37,6 +45,7 @@ function App() {
         <Route path="/stylists/:id" element={<StylistDetail />} />
         <Route path="/services" element={<ServiceList />} />
         <Route path="/payment/vnpay/return" element={<PaymentVnpayReturn />} />
+        <Route path="/products" element={<ProductList />} />
 
         {/* =========================
             CUSTOMER
@@ -46,11 +55,12 @@ function App() {
           <Route path="/customer/appointments" element={<CustomerHome />} />
           <Route path="/customer/appointments/:id" element={<CustomerHome />} />
           <Route path="/appointments/book" element={<BookingScreen />} />
-          <Route path="/products" element={<ComingSoon title="Sản phẩm & cửa hàng" role="CUSTOMER" />} />
-          <Route path="/customer/cart" element={<ComingSoon title="Giỏ hàng" role="CUSTOMER" />} />
-          <Route path="/customer/orders" element={<ComingSoon title="Đơn hàng" role="CUSTOMER" />} />
+          <Route path="/customer/cart" element={<CartPage />} />
+          <Route path="/customer/order-payment" element={<OrderPaymentPage />} />
+          <Route path="/customer/orders" element={<OrderListPage />} />
+          <Route path="/customer/orders/:id" element={<OrderDetailPage />} />
           <Route path="/customer/invoices" element={<ComingSoon title="Hóa đơn" role="CUSTOMER" />} />
-          <Route path="/customer/notifications" element={<ComingSoon title="Thông báo" role="CUSTOMER" />} />
+          <Route path="/customer/notifications" element={<NotificationPage />} />
         </Route>
 
 
@@ -92,7 +102,9 @@ function App() {
         ========================= */}
         <Route element={<ProtectedRoute roles={["STYLIST"]} />}>
 
-          <Route path="/stylist" element={<ComingSoon title="Khu vực stylist" role="STYLIST" />} />
+          <Route path="/stylist" element={<StylistDashboard />} />
+          <Route path="/stylist/appointments" element={<StylistAppointments />} />
+          <Route path="/stylist/schedule" element={<StylistSchedule />} />
           <Route path="/stylist/profile" element={<AccountPage />} />
           <Route path="/stylist/*" element={<ComingSoon title="Chức năng stylist" role="STYLIST" />} />
 

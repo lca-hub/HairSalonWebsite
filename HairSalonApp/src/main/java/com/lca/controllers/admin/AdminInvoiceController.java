@@ -2,9 +2,12 @@ package com.lca.controllers.admin;
 
 import com.lca.dtos.request.InvoiceRequestDTO;
 import com.lca.dtos.response.InvoiceResponseDTO;
+import com.lca.dtos.response.ProductOrderResponseDTO;
 import com.lca.enums.PaymentMethod;
 import com.lca.enums.PaymentStatus;
+import com.lca.enums.ProductOrderStatus;
 import com.lca.service.InvoiceService;
+import com.lca.service.ProductOrderService;
 import com.lca.utils.PaginationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +26,10 @@ import java.time.LocalDateTime;
 public class AdminInvoiceController {
 
     private final InvoiceService invoiceService;
+    private final ProductOrderService productOrderService;
 
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceResponseDTO> getById(@PathVariable Long id) {
-
         return ResponseEntity.ok(invoiceService.getById(id));
     }
 
@@ -40,12 +43,22 @@ public class AdminInvoiceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
         Pageable pageable = PaginationUtil.create(page, size);
+
         return ResponseEntity.ok(invoiceService.search(keyword, customerId, paymentStatus, paymentMethod, from, to, pageable));
     }
+
     @PostMapping("/pay-at-store")
     public ResponseEntity<InvoiceResponseDTO> payAtStore(@Valid @RequestBody InvoiceRequestDTO request) {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.createAndPayAtStore(request));
+    }
+
+    @PutMapping("/order/{orderId}/status")
+    public ResponseEntity<ProductOrderResponseDTO> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam ProductOrderStatus status) {
+
+        return ResponseEntity.ok(productOrderService.updateStatus(orderId, status));
     }
 }

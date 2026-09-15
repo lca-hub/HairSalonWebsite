@@ -1,0 +1,428 @@
+.stylist-schedule-page {
+    min-height: 100vh;
+}
+
+.stylist-schedule-main {
+    padding-bottom: 70px;
+}
+
+.stylist-schedule-heading {
+    margin-bottom: 18px;
+}
+
+.stylist-schedule-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+    padding: 10px 13px;
+    border: 1px solid #dfc3bf;
+    background: #fff8f6;
+    color: #7e4b45;
+    font-size: 10px;
+}
+
+.stylist-schedule-error button {
+    min-height: 27px;
+    height: 27px;
+    padding: 0 10px;
+    border: 1px solid #cdb7b2;
+    background: #fff;
+    color: #68443f;
+    font-size: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.stylist-schedule-error button:hover {
+    background: #68443f;
+    border-color: #68443f;
+    color: #fff;
+}
+
+/* =========================
+   CALENDAR
+   ========================= */
+
+.stylist-schedule-card {
+    border: 1px solid #ddd7cf;
+    background: #fff;
+}
+
+.stylist-schedule-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e7e1d9;
+}
+
+.stylist-schedule-month-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stylist-schedule-month-title h2 {
+    margin: 0;
+    color: #2d2924;
+    font-size: 19px;
+    font-weight: 400;
+    text-transform: capitalize;
+}
+
+.stylist-schedule-nav-button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid #d6d0c8;
+    background: #fff;
+    color: #4f4942;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.stylist-schedule-nav-button:hover {
+    border-color: #ad8144;
+    background: #ad8144;
+    color: #fff;
+}
+
+.stylist-schedule-today-button {
+    min-height: 25px;
+    height: 25px;
+    padding: 0 8px;
+    border: 1px solid #ddd5ca;
+    background: #fbfaf7;
+    color: #7a6954;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.stylist-schedule-today-button:hover {
+    border-color: #ad8144;
+    color: #ad8144;
+}
+
+.stylist-schedule-calendar {
+    padding: 12px 14px 14px;
+}
+
+.stylist-schedule-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border-bottom: 1px solid #e9e4dd;
+}
+
+.stylist-schedule-weekday {
+    padding: 8px 4px;
+    color: #817a72;
+    font-size: 8px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.stylist-schedule-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+    padding-top: 6px;
+}
+
+.stylist-schedule-day {
+    position: relative;
+    min-height: 72px;
+    padding: 8px;
+    border: 1px solid transparent;
+    background: #fff;
+    color: #4d4740;
+    text-align: left;
+    cursor: pointer;
+    transition: .16s ease;
+}
+
+.stylist-schedule-day:hover {
+    border-color: #d5cabd;
+    background: #fbfaf7;
+}
+
+.stylist-schedule-day-empty {
+    cursor: default;
+    background: transparent;
+}
+
+.stylist-schedule-day-empty:hover {
+    border-color: transparent;
+    background: transparent;
+}
+
+.stylist-schedule-day-number {
+    display: block;
+    color: #5f5951;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.stylist-schedule-day.working {
+    border-color: #d8ccb9;
+    background: #fbf7ef;
+}
+
+.stylist-schedule-day.working .stylist-schedule-day-number {
+    color: #8d6a39;
+}
+
+.stylist-schedule-day.today {
+    border-color: #b18a52;
+}
+
+.stylist-schedule-day.today .stylist-schedule-day-number {
+    color: #a06f2f;
+    font-weight: 700;
+}
+
+.stylist-schedule-day.selected {
+    border-color: #2f2a25;
+    box-shadow: inset 0 0 0 1px #2f2a25;
+}
+
+.stylist-schedule-day-work {
+    display: block;
+    margin-top: 10px;
+    color: #847158;
+    font-size: 7px;
+    font-weight: 700;
+}
+
+.stylist-schedule-day-dot {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ad8144;
+}
+
+.stylist-schedule-legend {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 14px 14px;
+    color: #807970;
+    font-size: 8px;
+}
+
+.stylist-schedule-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stylist-schedule-legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ad8144;
+}
+
+.stylist-schedule-legend-today {
+    width: 9px;
+    height: 9px;
+    border: 1px solid #b18a52;
+    background: #fff;
+}
+
+/* =========================
+   DETAIL
+   ========================= */
+
+.stylist-schedule-detail-card {
+    margin-top: 18px;
+    border: 1px solid #ddd7cf;
+    background: #fff;
+}
+
+.stylist-schedule-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e7e1d9;
+}
+
+.stylist-schedule-detail-header h2 {
+    margin: 5px 0 0;
+    color: #2d2924;
+    font-size: 17px;
+    font-weight: 400;
+    text-transform: capitalize;
+}
+
+.stylist-schedule-today-badge {
+    padding: 5px 8px;
+    border: 1px solid #d8ccb9;
+    background: #fbf7ef;
+    color: #99713d;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.stylist-schedule-shifts {
+    display: flex;
+    flex-direction: column;
+}
+
+.stylist-schedule-shift {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    border-bottom: 1px solid #f0ece6;
+}
+
+.stylist-schedule-shift:last-child {
+    border-bottom: 0;
+}
+
+.stylist-schedule-shift-icon {
+    width: 29px;
+    height: 29px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ddd5ca;
+    background: #fbfaf7;
+    color: #9b753e;
+    font-size: 12px;
+}
+
+.stylist-schedule-shift-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+
+.stylist-schedule-shift-info span {
+    color: #918a82;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.stylist-schedule-shift-info strong {
+    color: #332f2a;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.stylist-schedule-shift-status {
+    padding: 5px 8px;
+    border: 1px solid #cad8c7;
+    background: #f4faf3;
+    color: #557050;
+    font-size: 7px;
+    font-weight: 700;
+}
+
+.stylist-schedule-empty {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: #8b857d;
+    text-align: center;
+}
+
+.stylist-schedule-empty strong {
+    color: #554f48;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stylist-schedule-empty span {
+    font-size: 9px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 760px) {
+    .stylist-schedule-calendar-header {
+        padding: 13px;
+    }
+
+    .stylist-schedule-month-title h2 {
+        font-size: 16px;
+    }
+
+    .stylist-schedule-calendar {
+        padding: 8px;
+    }
+
+    .stylist-schedule-days {
+        gap: 3px;
+    }
+
+    .stylist-schedule-day {
+        min-height: 58px;
+        padding: 6px;
+    }
+
+    .stylist-schedule-day-work {
+        margin-top: 7px;
+        font-size: 6px;
+    }
+
+    .stylist-schedule-day-dot {
+        right: 5px;
+        bottom: 5px;
+    }
+}
+
+@media (max-width: 520px) {
+    .stylist-schedule-month-title {
+        gap: 6px;
+    }
+
+    .stylist-schedule-month-title h2 {
+        font-size: 14px;
+    }
+
+    .stylist-schedule-today-button {
+        display: none;
+    }
+
+    .stylist-schedule-weekday {
+        padding: 6px 2px;
+        font-size: 7px;
+    }
+
+    .stylist-schedule-day {
+        min-height: 50px;
+    }
+
+    .stylist-schedule-day-number {
+        font-size: 9px;
+    }
+
+    .stylist-schedule-day-work {
+        display: none;
+    }
+
+    .stylist-schedule-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

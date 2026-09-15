@@ -278,7 +278,7 @@ function AppointmentDetail() {
 
       case "CONFIRMED":
         return {
-          label: "Đã xác nhận",
+          label: "Đã thanh toán",
           className: "confirmed",
         };
 

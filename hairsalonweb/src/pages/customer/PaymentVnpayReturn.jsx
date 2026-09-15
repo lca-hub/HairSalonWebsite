@@ -96,7 +96,7 @@ export default function PaymentVnpayReturn() {
                     <button
                         type="button"
                         className="payment-result-button"
-                        onClick={() => navigate("/customer")}
+                        onClick={() => navigate("/customer/appointments")}
                     >
                         VỀ TRANG KHÁCH HÀNG
                     </button>
@@ -116,7 +116,7 @@ export default function PaymentVnpayReturn() {
                         <button
                             type="button"
                             className="payment-result-secondary-button"
-                            onClick={() => navigate("/customer")}
+                            onClick={() => navigate("/customer/appointments")}
                         >
                             VỀ TRANG KHÁCH HÀNG
                         </button>

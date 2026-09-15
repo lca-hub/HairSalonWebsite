@@ -2,6 +2,7 @@ package com.lca.controllers.api;
 
 import com.lca.dtos.request.ProductOrderRequestDTO;
 import com.lca.dtos.response.ProductOrderResponseDTO;
+import com.lca.enums.ProductOrderStatus;
 import com.lca.service.ProductOrderService;
 import com.lca.utils.PaginationUtil;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,4 +52,9 @@ public class ProductOrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductOrderResponseDTO> updateStatus(@PathVariable Long id, @RequestParam ProductOrderStatus status) {
+        return ResponseEntity.ok(productOrderService.updateStatus(id, status));
+    }
 }

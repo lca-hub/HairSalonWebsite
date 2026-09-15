@@ -109,6 +109,22 @@ public class StylistScheduleServiceImpl implements StylistScheduleService {
         return availableSlots;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<StylistScheduleResponseDTO> getMySchedule(String email) {
+
+        Stylist stylist = stylistRepository.findAll().stream()
+                .filter(item -> item.getUser() != null && item.getUser().getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist với email: " + email));
+
+        return scheduleRepository.findByStylistId(stylist.getId()).stream()
+                .sorted(Comparator.comparing(StylistSchedule::getWorkDate))
+                .map(StylistScheduleMapper::toResponse)
+                .toList();
+    }
+
+
     private boolean isOverlapping(LocalTime slotStart, LocalTime slotEnd, Appointment appointment) {
 
         AppointmentStatus status = appointment.getStatus();

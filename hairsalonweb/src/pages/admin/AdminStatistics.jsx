@@ -40,7 +40,7 @@ function formatNumber(value) {
 function getStatusLabel(status) {
     const labels = {
         PENDING_PAYMENT: "Chờ thanh toán",
-        CONFIRMED: "Đã xác nhận",
+        CONFIRMED: "Đã thanh toán",
         IN_SERVICE: "Đang phục vụ",
         COMPLETED: "Hoàn thành",
         CANCELLED: "Đã hủy",
@@ -220,7 +220,7 @@ export default function AdminStatistics() {
                                 </div>
 
                                 <div className="admin-statistics-card">
-                                    <span className="admin-statistics-card-label">Đã xác nhận</span>
+                                    <span className="admin-statistics-card-label">Đã thanh toán</span>
                                     <strong>{formatNumber(activeStats?.confirmedAppointments)}</strong>
                                 </div>
 

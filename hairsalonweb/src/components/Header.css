@@ -538,3 +538,59 @@
         height: 38px;
     }
 }
+
+.header-notification-icon {
+    position: relative;
+}
+
+.header-notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 1px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    background: #a65a50;
+    border: 2px solid #fff;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 7px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.dashboard-avatar {
+    width: 33px;
+    height: 33px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #ebe5d9;
+    color: #9a7439;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.dashboard-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dashboard-topbar-avatar {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: #ebe5d9;
+    color: #9a7439;
+}
+
+.dashboard-topbar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

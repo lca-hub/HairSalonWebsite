@@ -21,4 +21,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>, JpaSpec
     boolean existsByInvoiceCode(String invoiceCode);
 
     List<Invoice> findByPaymentStatusAndCreatedAtBetween(PaymentStatus paymentStatus, LocalDateTime from, LocalDateTime to);
+
+    Optional<Invoice> findByProductOrderId(Long productOrderId);
 }

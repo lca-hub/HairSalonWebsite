@@ -86,7 +86,7 @@ function CustomerAppointments() {
         return "Chờ thanh toán";
 
       case "CONFIRMED":
-        return "Đã xác nhận";
+        return "Đã thanh toán";
 
       case "IN_SERVICE":
         return "Đang phục vụ";

@@ -20,6 +20,15 @@ const PAYMENT_STATUS_LABELS = {
     REFUNDED: "Đã hoàn tiền",
 };
 
+const ORDER_STATUS_LABELS = {
+    PENDING: "Chờ xử lý",
+    CONFIRMED: "Đã xác nhận",
+    PROCESSING: "Đang xử lý",
+    SHIPPING: "Đang giao hàng",
+    DELIVERED: "Đã giao hàng",
+    CANCELLED: "Đã hủy",
+};
+
 function normalizeContent(data) {
     if (Array.isArray(data)) {
         return data;
@@ -71,6 +80,14 @@ function getPaymentStatusLabel(value) {
     return PAYMENT_STATUS_LABELS[value] || value || "-";
 }
 
+function getOrderStatusLabel(value) {
+    return ORDER_STATUS_LABELS[value] || value || "-";
+}
+
+function getOrderStatusClass(value) {
+    return String(value || "").toLowerCase();
+}
+
 function AdminInvoices() {
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -88,6 +105,9 @@ function AdminInvoices() {
 
     const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
+
+    const [orderStatus, setOrderStatus] = useState("");
+    const [updatingOrderStatus, setUpdatingOrderStatus] = useState(false);
 
     const displayTotalPages = Math.max(totalPages, 1);
 
@@ -153,12 +173,14 @@ function AdminInvoices() {
         try {
             setDetailLoading(true);
             setSelectedInvoice(invoice);
+            setOrderStatus(invoice.orderStatus || "");
 
             const response = await authApis().get(
                 endpoints.adminInvoiceDetail(invoice.id)
             );
 
             setSelectedInvoice(response.data);
+            setOrderStatus(response.data?.orderStatus || "");
         } catch (err) {
             console.error("LOAD ADMIN INVOICE DETAIL ERROR:", err);
 
@@ -169,15 +191,83 @@ function AdminInvoices() {
             );
 
             setSelectedInvoice(null);
+            setOrderStatus("");
         } finally {
             setDetailLoading(false);
         }
     };
 
     const closeDetail = () => {
-        if (detailLoading) return;
+        if (detailLoading || updatingOrderStatus) return;
 
         setSelectedInvoice(null);
+        setOrderStatus("");
+    };
+
+    const handleUpdateOrderStatus = async () => {
+        if (!selectedInvoice?.productOrderId || !orderStatus) {
+            return;
+        }
+
+        const currentStatus = String(
+            selectedInvoice.orderStatus || ""
+        ).toUpperCase();
+
+        if (currentStatus === orderStatus) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Bạn có chắc muốn cập nhật trạng thái đơn hàng thành "${getOrderStatusLabel(orderStatus)}"?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            setUpdatingOrderStatus(true);
+
+            const response = await authApis().put(
+                endpoints.adminOrderStatus(selectedInvoice.productOrderId),
+                null,
+                {
+                    params: {
+                        status: orderStatus,
+                    },
+                }
+            );
+
+            const updatedStatus = response.data?.orderStatus || orderStatus;
+
+            setSelectedInvoice((current) => ({
+                ...current,
+                orderStatus: updatedStatus,
+            }));
+
+            setOrderStatus(updatedStatus);
+
+            setInvoices((current) =>
+                current.map((invoice) =>
+                    invoice.id === selectedInvoice.id
+                        ? {
+                            ...invoice,
+                            orderStatus: updatedStatus,
+                        }
+                        : invoice
+                )
+            );
+        } catch (err) {
+            console.error("UPDATE ORDER STATUS ERROR:", err);
+
+            alert(
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Không thể cập nhật trạng thái đơn hàng."
+            );
+        } finally {
+            setUpdatingOrderStatus(false);
+        }
     };
 
     const resetFilters = () => {
@@ -206,7 +296,7 @@ function AdminInvoices() {
                         <div>
                             <span className="admin-section-eyebrow">BILLING MANAGEMENT</span>
                             <h1>Hóa đơn</h1>
-                            <p>Quản lý hóa đơn và theo dõi trạng thái thanh toán của khách hàng.</p>
+                            <p>Quản lý hóa đơn, đơn hàng sản phẩm và theo dõi trạng thái thanh toán của khách hàng.</p>
                         </div>
                     </section>
 
@@ -223,7 +313,7 @@ function AdminInvoices() {
                             </div>
 
                             <div className="admin-form-group">
-                                <label htmlFor="invoice-status">Trạng thái</label>
+                                <label htmlFor="invoice-status">Trạng thái thanh toán</label>
                                 <select id="invoice-status" className="admin-form-select" value={paymentStatus} onChange={(event) => { setPaymentStatus(event.target.value); setPage(0); }}>
                                     <option value="">Tất cả trạng thái</option>
                                     <option value="PENDING">Chờ thanh toán</option>
@@ -255,9 +345,7 @@ function AdminInvoices() {
                             </div>
 
                             <div className="admin-filter-actions">
-                                <button type="button" className="admin-secondary-button" onClick={resetFilters}>
-                                    Xóa lọc
-                                </button>
+                                <button type="button" className="admin-secondary-button" onClick={resetFilters}>Xóa lọc</button>
                             </div>
                         </div>
                     </section>
@@ -265,9 +353,7 @@ function AdminInvoices() {
                     {error && (
                         <div className="admin-invoices-error" role="alert">
                             <span>{error}</span>
-                            <button type="button" onClick={loadInvoices}>
-                                Thử lại
-                            </button>
+                            <button type="button" onClick={loadInvoices}>Thử lại</button>
                         </div>
                     )}
 
@@ -294,7 +380,8 @@ function AdminInvoices() {
                                         <th>Giảm giá</th>
                                         <th>Tổng tiền</th>
                                         <th>Thanh toán</th>
-                                        <th>Trạng thái</th>
+                                        <th>Trạng thái thanh toán</th>
+                                        <th>Trạng thái đơn hàng</th>
                                         <th>Thao tác</th>
                                     </tr>
                                 </thead>
@@ -302,15 +389,11 @@ function AdminInvoices() {
                                 <tbody>
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="9" className="admin-table-empty">
-                                                Đang tải dữ liệu...
-                                            </td>
+                                            <td colSpan="10" className="admin-table-empty">Đang tải dữ liệu...</td>
                                         </tr>
                                     ) : invoices.length === 0 ? (
                                         <tr>
-                                            <td colSpan="9" className="admin-table-empty">
-                                                Không có hóa đơn phù hợp.
-                                            </td>
+                                            <td colSpan="10" className="admin-table-empty">Không có hóa đơn phù hợp.</td>
                                         </tr>
                                     ) : (
                                         invoices.map((invoice) => (
@@ -346,10 +429,23 @@ function AdminInvoices() {
                                                     {getPaymentMethodLabel(invoice.paymentMethod)}
                                                 </td>
 
-                                                <td data-label="Trạng thái">
+                                                <td data-label="Trạng thái thanh toán">
                                                     <span className={`admin-invoice-status admin-invoice-status-${String(invoice.paymentStatus || "").toLowerCase()}`}>
                                                         {getPaymentStatusLabel(invoice.paymentStatus)}
                                                     </span>
+                                                </td>
+
+                                                <td data-label="Trạng thái đơn hàng">
+                                                    {invoice.productOrderId ? (
+                                                        <div className="admin-invoice-order-status-cell">
+                                                            <span className={`admin-order-status admin-order-status-${getOrderStatusClass(invoice.orderStatus)}`}>
+                                                                {getOrderStatusLabel(invoice.orderStatus)}
+                                                            </span>
+                                                            <span className="admin-invoice-order-id">Đơn #{invoice.productOrderId}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="admin-invoice-no-order">-</span>
+                                                    )}
                                                 </td>
 
                                                 <td data-label="Thao tác">
@@ -365,53 +461,19 @@ function AdminInvoices() {
                         </div>
 
                         <div className="admin-pagination">
-                            <button
-                                type="button"
-                                className="admin-page-button"
-                                disabled={page === 0 || loading}
-                                onClick={() => handlePageChange(0)}
-                            >
-                                ⏮
-                            </button>
+                            <button type="button" className="admin-page-button" disabled={page === 0 || loading} onClick={() => handlePageChange(0)}>⏮</button>
 
-                            <button
-                                type="button"
-                                className="admin-page-button"
-                                disabled={page === 0 || loading}
-                                onClick={() => handlePageChange(page - 1)}
-                            >
-                                ←
-                            </button>
+                            <button type="button" className="admin-page-button" disabled={page === 0 || loading} onClick={() => handlePageChange(page - 1)}>←</button>
 
                             {Array.from({ length: displayTotalPages }, (_, index) => index).map((pageNumber) => (
-                                <button
-                                    key={pageNumber}
-                                    type="button"
-                                    className={`admin-page-button ${pageNumber === page ? "active" : ""}`}
-                                    disabled={loading}
-                                    onClick={() => handlePageChange(pageNumber)}
-                                >
+                                <button key={pageNumber} type="button" className={`admin-page-button ${pageNumber === page ? "active" : ""}`} disabled={loading} onClick={() => handlePageChange(pageNumber)}>
                                     {pageNumber + 1}
                                 </button>
                             ))}
 
-                            <button
-                                type="button"
-                                className="admin-page-button"
-                                disabled={page >= displayTotalPages - 1 || loading}
-                                onClick={() => handlePageChange(page + 1)}
-                            >
-                                →
-                            </button>
+                            <button type="button" className="admin-page-button" disabled={page >= displayTotalPages - 1 || loading} onClick={() => handlePageChange(page + 1)}>→</button>
 
-                            <button
-                                type="button"
-                                className="admin-page-button"
-                                disabled={page >= displayTotalPages - 1 || loading}
-                                onClick={() => handlePageChange(displayTotalPages - 1)}
-                            >
-                                ⏭
-                            </button>
+                            <button type="button" className="admin-page-button" disabled={page >= displayTotalPages - 1 || loading} onClick={() => handlePageChange(displayTotalPages - 1)}>⏭</button>
                         </div>
                     </section>
                 </div>
@@ -420,13 +482,14 @@ function AdminInvoices() {
             {selectedInvoice && (
                 <div className="admin-modal-overlay" onMouseDown={closeDetail}>
                     <div className="admin-modal admin-invoice-detail-modal" onMouseDown={(event) => event.stopPropagation()}>
+
                         <div className="admin-modal-header">
                             <div>
                                 <span className="admin-section-eyebrow">INVOICE DETAIL</span>
                                 <h2>{selectedInvoice.invoiceCode || `Hóa đơn #${selectedInvoice.id}`}</h2>
                             </div>
 
-                            <button type="button" className="admin-modal-close" onClick={closeDetail} disabled={detailLoading}>
+                            <button type="button" className="admin-modal-close" onClick={closeDetail} disabled={detailLoading || updatingOrderStatus}>
                                 ×
                             </button>
                         </div>
@@ -453,6 +516,13 @@ function AdminInvoices() {
                                         <strong>{selectedInvoice.appointmentId || "-"}</strong>
                                     </div>
 
+                                    {selectedInvoice.productOrderId && (
+                                        <div>
+                                            <span>Mã đơn hàng</span>
+                                            <strong>#{selectedInvoice.productOrderId}</strong>
+                                        </div>
+                                    )}
+
                                     <div>
                                         <span>Ngày tạo</span>
                                         <strong>{formatDateTime(selectedInvoice.createdAt)}</strong>
@@ -464,10 +534,39 @@ function AdminInvoices() {
                                     </div>
 
                                     <div>
-                                        <span>Trạng thái</span>
+                                        <span>Trạng thái thanh toán</span>
                                         <strong>{getPaymentStatusLabel(selectedInvoice.paymentStatus)}</strong>
                                     </div>
+
+                                    {selectedInvoice.productOrderId && (
+                                        <div>
+                                            <span>Trạng thái đơn hàng</span>
+                                            <strong>{getOrderStatusLabel(selectedInvoice.orderStatus)}</strong>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {selectedInvoice.productOrderId && selectedInvoice.orderStatus !== "DELIVERED" && selectedInvoice.orderStatus !== "CANCELLED" && (
+                                    <div className="admin-invoice-order-status-update">
+                                        <div className="admin-invoice-order-status-heading">
+                                            <span className="admin-section-eyebrow">ORDER STATUS</span>
+                                            <h3>Cập nhật trạng thái đơn hàng</h3>
+                                            <p>Trạng thái này sẽ được cập nhật cho đơn hàng của khách hàng.</p>
+                                        </div>
+
+                                        <div className="admin-invoice-order-status-controls">
+                                            <select className="admin-form-select" value={orderStatus} onChange={(event) => setOrderStatus(event.target.value)} disabled={updatingOrderStatus}>
+                                                {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
+                                                    <option key={value} value={value}>{label}</option>
+                                                ))}
+                                            </select>
+
+                                            <button type="button" className="admin-primary-button" onClick={handleUpdateOrderStatus} disabled={updatingOrderStatus || orderStatus === selectedInvoice.orderStatus}>
+                                                {updatingOrderStatus ? "ĐANG CẬP NHẬT..." : "CẬP NHẬT"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="admin-invoice-detail-items">
                                     <div className="admin-section-heading">
@@ -493,32 +592,16 @@ function AdminInvoices() {
                                                 {selectedInvoice.items?.length ? (
                                                     selectedInvoice.items.map((item, index) => (
                                                         <tr key={item.id || index}>
-                                                            <td data-label="Loại">
-                                                                {item.serviceId ? "Dịch vụ" : "Sản phẩm"}
-                                                            </td>
-
-                                                            <td data-label="Tên">
-                                                                {item.serviceName || item.productName || "-"}
-                                                            </td>
-
-                                                            <td data-label="Số lượng">
-                                                                {item.quantity ?? "-"}
-                                                            </td>
-
-                                                            <td data-label="Đơn giá">
-                                                                {formatMoney(item.unitPrice)}
-                                                            </td>
-
-                                                            <td data-label="Thành tiền">
-                                                                <strong>{formatMoney(item.totalPrice)}</strong>
-                                                            </td>
+                                                            <td data-label="Loại">{item.serviceId ? "Dịch vụ" : "Sản phẩm"}</td>
+                                                            <td data-label="Tên">{item.serviceName || item.productName || "-"}</td>
+                                                            <td data-label="Số lượng">{item.quantity ?? "-"}</td>
+                                                            <td data-label="Đơn giá">{formatMoney(item.unitPrice)}</td>
+                                                            <td data-label="Thành tiền"><strong>{formatMoney(item.totalPrice)}</strong></td>
                                                         </tr>
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="5" className="admin-table-empty">
-                                                            Không có sản phẩm/dịch vụ.
-                                                        </td>
+                                                        <td colSpan="5" className="admin-table-empty">Không có sản phẩm/dịch vụ.</td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -555,7 +638,7 @@ function AdminInvoices() {
                                 )}
 
                                 <div className="admin-modal-actions">
-                                    <button type="button" className="admin-secondary-button" onClick={closeDetail}>
+                                    <button type="button" className="admin-secondary-button" onClick={closeDetail} disabled={updatingOrderStatus}>
                                         Đóng
                                     </button>
                                 </div>
@@ -569,3 +652,4 @@ function AdminInvoices() {
 }
 
 export default AdminInvoices;
+

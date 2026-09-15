@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { Link } from "react-router-dom";
 import api, { endpoints } from "../../configs/api/Apis";
-import "./Stylist.css";
+import "./StylistList.css";
 
 function StylistList() {
     const [stylists, setStylists] = useState([]);

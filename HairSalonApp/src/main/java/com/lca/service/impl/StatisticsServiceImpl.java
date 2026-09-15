@@ -343,4 +343,107 @@ public class StatisticsServiceImpl implements StatisticsService {
     private record PeriodRange(String label, LocalDate from, LocalDate to) {
 
     }
+
+    @Override
+    public StatisticsResponseDTO getStylistStats(String email, String statsType, int year, Integer month) {
+
+        Stylist stylist = stylistRepo.findAll().stream()
+                .filter(item -> item.getUser() != null
+                        && item.getUser().getEmail() != null
+                        && item.getUser().getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy stylist với email: " + email));
+
+        String type = normalizeStatsType(statsType);
+        List<PeriodRange> periods = buildPeriods(type, year, month);
+
+        LocalDate from = periods.get(0).from();
+        LocalDate to = periods.get(periods.size() - 1).to();
+
+        List<Appointment> appointments = appointmentRepo.findByAppointmentDateBetween(from, to)
+                .stream()
+                .filter(appointment -> appointment.getStylist() != null)
+                .filter(appointment -> appointment.getStylist().getId().equals(stylist.getId()))
+                .toList();
+
+        List<Invoice> invoices = invoiceRepo.findByPaymentStatusAndCreatedAtBetween(
+                        PaymentStatus.PAID,
+                        from.atStartOfDay(),
+                        to.atTime(LocalTime.MAX)
+                )
+                .stream()
+                .filter(invoice -> invoice.getAppointment() != null)
+                .filter(invoice -> invoice.getAppointment().getStylist() != null)
+                .filter(invoice -> invoice.getAppointment().getStylist().getId().equals(stylist.getId()))
+                .toList();
+
+        StatisticsResponseDTO dto = new StatisticsResponseDTO();
+
+        dto.setStatsType(type);
+        dto.setYear(year);
+        dto.setMonth(month);
+
+        dto.setTotalAppointments((int) appointments.stream().filter(a -> a.getStatus() == AppointmentStatus.COMPLETED).count());
+
+        dto.setConfirmedAppointments(countStatus(appointments, AppointmentStatus.CONFIRMED));
+
+        dto.setCompletedAppointments(countStatus(appointments, AppointmentStatus.COMPLETED));
+
+        dto.setCancelledAppointments(countStatus(appointments, AppointmentStatus.CANCELLED));
+
+        dto.setTotalRevenue(
+                appointments.stream()
+                        .filter(a -> a.getStatus() == AppointmentStatus.COMPLETED)
+                        .map(Appointment::getId)
+                        .filter(Objects::nonNull)
+                        .map(id -> invoices.stream()
+                                .filter(invoice -> invoice.getAppointment() != null)
+                                .filter(invoice -> invoice.getAppointment().getId().equals(id))
+                                .map(Invoice::getTotalAmount)
+                                .filter(Objects::nonNull)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        dto.setAppointmentsByStatus(countAppointmentsByStatus(appointments));
+
+        dto.setPeriodData(buildStylistPeriodData(periods, appointments, invoices));
+
+        return dto;
+    }
+
+    private List<StatisticsResponseDTO.PeriodStatisticsDTO> buildStylistPeriodData(
+            List<PeriodRange> periods,
+            List<Appointment> appointments,
+            List<Invoice> invoices
+    ) {
+        List<StatisticsResponseDTO.PeriodStatisticsDTO> result = new ArrayList<>();
+
+        for (PeriodRange period : periods) {
+
+            List<Appointment> periodAppointments = appointments.stream()
+                    .filter(a -> isBetween(a.getAppointmentDate(), period.from(), period.to()))
+                    .toList();
+
+            List<Invoice> periodInvoices = invoices.stream()
+                    .filter(i -> i.getCreatedAt() != null)
+                    .filter(i -> isBetween(i.getCreatedAt().toLocalDate(), period.from(), period.to()))
+                    .filter(i -> i.getAppointment() != null)
+                    .filter(i -> i.getAppointment().getStatus() == AppointmentStatus.COMPLETED)
+                    .toList();
+
+            result.add(new StatisticsResponseDTO.PeriodStatisticsDTO(
+                    period.label(),
+                    period.from(),
+                    period.to(),
+                    periodAppointments.size(),
+                    countStatus(periodAppointments, AppointmentStatus.CONFIRMED),
+                    countStatus(periodAppointments, AppointmentStatus.COMPLETED),
+                    countStatus(periodAppointments, AppointmentStatus.CANCELLED),
+                    sumRevenue(periodInvoices)
+            ));
+        }
+
+        return result;
+    }
 }

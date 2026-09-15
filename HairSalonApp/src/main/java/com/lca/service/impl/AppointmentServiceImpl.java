@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,15 +38,13 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final ServiceRepository serviceRepo;
     private final StylistScheduleRepository scheduleRepo;
     private final InvoiceRepository invoiceRepo;
-    private final PaymentTransactionRepository  paymentTransactionRepo;
+    private final PaymentTransactionRepository paymentTransactionRepo;
     private final UserRepository userRepo;
     private final NotificationService notificationService;
 
-
     private AppointmentResponseDTO createInternal(Customer customer, AppointmentRequestDTO request) {
         Stylist stylist = stylistRepo.findById(request.getStylistId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist với ID: " + request.getStylistId())
-        );
+                () -> new RuntimeException("Không tìm thấy stylist với ID: " + request.getStylistId()));
 
         Service service = serviceRepo.findById(request.getServiceId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy service với ID: " + request.getServiceId()));
@@ -99,15 +98,13 @@ public class AppointmentServiceImpl implements AppointmentService {
             }
 
             AppointmentResponseDTO response = AppointmentMapper.toResponse(saved);
-            notificationService.create(
-                    customer.getUser().getId(),
-                    "Đặt lịch thành công",
-                    "Lịch hẹn " + saved.getAppointmentCode() + " đã được tạo và đang chờ thanh toán tại salon."
-            );
+
+            notificationService.create(customer.getUser().getId(), "Đặt lịch thành công", "Lịch hẹn " + saved.getAppointmentCode() + " đã được tạo và đang chờ thanh toán tại salon.");
+
             return response;
 
         } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Khung giờ này vừa được người khác đặt. " + "Vui lòng chọn giờ khác.");
+            throw new RuntimeException("Khung giờ này vừa được người khác đặt. Vui lòng chọn giờ khác.");
         }
     }
 
@@ -137,6 +134,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         AppointmentStatus status = appointment.getStatus();
 
         ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+
         LocalDateTime now = LocalDateTime.now(vietnamZone);
 
         if (status == AppointmentStatus.CANCELLED) {
@@ -144,7 +142,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         if (status == AppointmentStatus.EXPIRED) {
-            throw new RuntimeException("Appointment đã hết hạn thanh toán");
+            throw new RuntimeException(
+                    "Appointment đã hết hạn thanh toán"
+            );
         }
 
         if (status == AppointmentStatus.COMPLETED) {
@@ -159,6 +159,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             releaseSlots(appointment.getId());
 
             appointment.setRefundAmount(BigDecimal.ZERO);
+
             appointment.setStatus(AppointmentStatus.CANCELLED);
 
             appointmentRepo.save(appointment);
@@ -168,7 +169,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             return;
         }
 
-        LocalDateTime appointmentTime = LocalDateTime.of(appointment.getAppointmentDate(), appointment.getStartTime());
+        LocalDateTime appointmentTime =
+                LocalDateTime.of(appointment.getAppointmentDate(), appointment.getStartTime());
 
         Duration remaining = Duration.between(now, appointmentTime);
 
@@ -177,25 +179,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         Invoice invoice = invoiceRepo.findByAppointmentId(appointment.getId()).orElse(null);
 
         if (canRefund && invoice != null && invoice.getPaymentStatus() == PaymentStatus.PAID) {
-
             BigDecimal refundAmount = invoice.getTotalAmount();
-
             appointment.setRefundAmount(refundAmount);
-
             invoice.setRefundAmount(refundAmount);
+
             invoice.setRefundTime(now);
+
             invoice.setPaymentStatus(PaymentStatus.REFUNDED);
 
             invoiceRepo.save(invoice);
 
-            paymentTransactionRepo
-                    .findByInvoiceId(invoice.getId())
+            paymentTransactionRepo.findByInvoiceId(invoice.getId())
                     .stream()
-                    .filter(transaction ->
-                            transaction.getPaymentStatus() == PaymentStatus.PAID)
+                    .filter(transaction -> transaction.getPaymentStatus() == PaymentStatus.PAID)
                     .findFirst()
                     .ifPresent(transaction -> {
                         transaction.setPaymentStatus(PaymentStatus.REFUNDED);
+
                         paymentTransactionRepo.save(transaction);
                     });
 
@@ -209,13 +209,17 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointmentRepo.save(appointment);
 
-        notificationService.create(
-                customer.getUser().getId(),
-                "Hủy lịch hẹn",
-                "Lịch hẹn " + appointment.getAppointmentCode() + " đã được hủy."
-                        + (appointment.getRefundAmount().signum() > 0
-                        ? " Số tiền hoàn: " + appointment.getRefundAmount()
-                        : " Không có hoàn tiền.")
+        notificationService.create(customer.getUser().getId(),
+                "Hủy lịch hẹn", "Lịch hẹn "
+                        + appointment.getAppointmentCode()
+                        + " đã được hủy."
+                        + (
+                        appointment.getRefundAmount()
+                                .signum() > 0
+                                ? " Số tiền hoàn: "
+                                  + appointment.getRefundAmount()
+                                : " Không có hoàn tiền."
+                )
         );
     }
 
@@ -230,27 +234,24 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-
             throw new RuntimeException("Không thể đổi lịch đã hủy");
         }
 
         if (appointment.getStatus() == AppointmentStatus.EXPIRED) {
-
             throw new RuntimeException("Appointment đã hết hạn");
         }
 
         if (request.getAppointmentDate().isBefore(LocalDate.now())) {
-
             throw new RuntimeException("Không thể đổi lịch sang ngày trong quá khứ");
         }
 
         Stylist stylist = stylistRepo.findById(request.getStylistId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist"));
+                        () -> new RuntimeException("Không tìm thấy stylist"));
 
-        Service service = serviceRepo.findById(request.getServiceId()).orElseThrow(() -> new RuntimeException("Không tìm thấy service"));
+        Service service = serviceRepo.findById(request.getServiceId()).orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy service"));
 
         if (!Boolean.TRUE.equals(service.getIsActive())) {
-
             throw new RuntimeException("Dịch vụ hiện không hoạt động");
         }
 
@@ -266,13 +267,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointment.setStylist(stylist);
         appointment.setService(service);
-
         appointment.setAppointmentDate(request.getAppointmentDate());
-
         appointment.setStartTime(startTime);
-
         appointment.setEndTime(endTime);
-
         appointment.setCustomerNote(request.getCustomerNote());
 
         Appointment updated = appointmentRepo.saveAndFlush(appointment);
@@ -282,8 +279,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         notificationService.create(
                 customer.getUser().getId(),
                 "Đổi lịch hẹn",
-                "Lịch hẹn " + updated.getAppointmentCode() + " đã được đổi sang " +
-                        updated.getAppointmentDate() + " " + updated.getStartTime() + "."
+                "Lịch hẹn "
+                        + updated.getAppointmentCode()
+                        + " đã được đổi sang "
+                        + updated.getAppointmentDate()
+                        + " "
+                        + updated.getStartTime()
+                        + "."
         );
 
         return AppointmentMapper.toResponse(updated);
@@ -298,24 +300,16 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional(readOnly = true)
     public AppointmentResponseDTO getById(Long id) {
-
         Appointment appointment = appointmentRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy appointment"));
+                        () -> new RuntimeException("Không tìm thấy appointment"));
 
         return AppointmentMapper.toResponse(appointment);
     }
 
     @Override
-    public AppointmentResponseDTO adminCreate(
-            AppointmentRequestDTO request
-    ) {
-        Customer customer = customerRepo.findById(request.getCustomerId())
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Không tìm thấy customer với ID: " +
-                                        request.getCustomerId()
-                        )
-                );
+    public AppointmentResponseDTO adminCreate(AppointmentRequestDTO request) {
+        Customer customer = customerRepo.findById(request.getCustomerId()).orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy customer với ID: " + request.getCustomerId()));
 
         return createInternal(customer, request);
     }
@@ -323,21 +317,19 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponseDTO update(Long id, AppointmentRequestDTO request) {
         Appointment appointment = appointmentRepo.findById(id).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy appointment"));
+                        () -> new RuntimeException("Không tìm thấy appointment"));
 
         Stylist stylist = stylistRepo.findById(request.getStylistId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy stylist"));
+                        () -> new RuntimeException("Không tìm thấy stylist"));
 
         Service service = serviceRepo.findById(request.getServiceId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy service"));
+                        () -> new RuntimeException("Không tìm thấy service"));
 
         if (!Boolean.TRUE.equals(service.getIsActive())) {
-
             throw new RuntimeException("Dịch vụ hiện không hoạt động");
         }
 
         if (request.getAppointmentDate().isBefore(LocalDate.now())) {
-
             throw new RuntimeException("Không thể cập nhật lịch trong quá khứ");
         }
 
@@ -354,7 +346,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setCustomerNote(request.getCustomerNote());
 
         appointment.setStylist(stylist);
-
         appointment.setService(service);
 
         appointment.setAppointmentDate(request.getAppointmentDate());
@@ -370,32 +361,34 @@ public class AppointmentServiceImpl implements AppointmentService {
         return AppointmentMapper.toResponse(updated);
     }
 
-
     @Override
     @Transactional(noRollbackFor = ResponseStatusException.class)
     public AppointmentResponseDTO confirm(Long id) {
-
-        Appointment appointment = appointmentRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy appointment"));
+        Appointment appointment = appointmentRepo.findById(id).orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy appointment"));
 
         if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chỉ lịch hẹn ở trạng thái CHỜ THANH TOÁN mới được xác nhận.");
         }
 
         ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+
         LocalDateTime now = LocalDateTime.now(vietnamZone);
 
         if (appointment.getPaymentDeadline() != null && now.isAfter(appointment.getPaymentDeadline())) {
-
             releaseSlots(appointment.getId());
 
-            appointment.setStatus(AppointmentStatus.EXPIRED);
+            appointment.setStatus(AppointmentStatus.CANCELLED);
+
+            appointment.setRefundAmount(BigDecimal.ZERO);
 
             appointmentRepo.saveAndFlush(appointment);
 
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian thanh toán đã hết. Lịch hẹn đã chuyển sang EXPIRED, vui lòng tạo lịch mới.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian thanh toán đã hết. Lịch hẹn đã tự động hủy, vui lòng tạo lịch mới.");
         }
 
         appointment.setStatus(AppointmentStatus.CONFIRMED);
+
         appointment.setPaymentDeadline(null);
 
         return AppointmentMapper.toResponse(appointmentRepo.saveAndFlush(appointment));
@@ -403,11 +396,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public void adminCancel(Long id) {
-
         Appointment appointment = appointmentRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy appointment"));
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-
             throw new RuntimeException("Appointment đã hoàn thành");
         }
 
@@ -422,23 +413,15 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentResponseDTO adminReschedule(Long id, AppointmentRequestDTO request) {
-
         return update(id, request);
     }
 
-
-
     @Override
     @Transactional(readOnly = true)
-    public Page<AppointmentResponseDTO> getMyAppointments(
-            String email,
-            Pageable pageable
-    ) {
+    public Page<AppointmentResponseDTO> getMyAppointments(String email, Pageable pageable) {
         Customer customer = getCustomerByEmail(email);
 
-        return appointmentRepo
-                .findByCustomerId(customer.getId(), pageable)
-                .map(AppointmentMapper::toResponse);
+        return appointmentRepo.findByCustomerId(customer.getId(), pageable).map(AppointmentMapper::toResponse);
     }
 
     @Override
@@ -452,12 +435,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private Appointment getCustomerAppointment(Long customerId, Long appointmentId) {
-
         Appointment appointment = appointmentRepo.findById(appointmentId).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy appointment"));
-
+                        () -> new RuntimeException("Không tìm thấy appointment"));
         if (!appointment.getCustomer().getId().equals(customerId)) {
-
             throw new RuntimeException("Appointment không thuộc customer này");
         }
 
@@ -465,9 +445,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private Appointment getAppointmentForStylist(Long stylistId, Long appointmentId) {
-
         Appointment appointment = appointmentRepo.findById(appointmentId).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy appointment"));
+                        () -> new RuntimeException("Không tìm thấy appointment"));
 
         if (!appointment.getStylist().getId().equals(stylistId)) {
             throw new RuntimeException("Appointment không thuộc stylist này");
@@ -479,34 +458,28 @@ public class AppointmentServiceImpl implements AppointmentService {
     private void checkConflict(Long stylistId, LocalDate appointmentDate, LocalTime startTime, LocalTime endTime, Long ignoredAppointmentId) {
         Page<Appointment> page = appointmentRepo.findByStylistIdAndAppointmentDate(stylistId, appointmentDate, Pageable.unpaged());
 
-        boolean conflict = page.getContent().stream()
-                .filter(appointment -> ignoredAppointmentId == null || !appointment.getId().equals(ignoredAppointmentId))
-                .filter(this::occupiesSlot)
-                .anyMatch(appointment -> isOverlapping(startTime, endTime, appointment.getStartTime(), appointment.getEndTime()));
-
+        boolean conflict = page.getContent()
+                .stream().filter(appointment -> ignoredAppointmentId == null || !appointment.getId().equals(ignoredAppointmentId))
+                        .filter(this::occupiesSlot)
+                        .anyMatch(appointment -> isOverlapping(startTime, endTime, appointment.getStartTime(), appointment.getEndTime()));
         if (conflict) {
             throw new RuntimeException("Khung giờ này đã có người đặt");
         }
     }
-    private boolean occupiesSlot(Appointment appointment) {
 
+    private boolean occupiesSlot(Appointment appointment) {
         AppointmentStatus status = appointment.getStatus();
-        return status != AppointmentStatus.CANCELLED && status != AppointmentStatus.NO_SHOW
-                && status != AppointmentStatus.EXPIRED;
+
+        return status != AppointmentStatus.CANCELLED && status != AppointmentStatus.NO_SHOW && status != AppointmentStatus.EXPIRED;
     }
 
-    private boolean isOverlapping(LocalTime start1, LocalTime end1,
-                                  LocalTime start2, LocalTime end2) {
-
+    private boolean isOverlapping(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
         return start1.isBefore(end2) && end1.isAfter(start2);
     }
 
-    private void checkSchedule(Long stylistId, LocalDate workDate,
-                               LocalTime startTime, LocalTime endTime) {
-
-        StylistSchedule schedule = scheduleRepo
-                .findFirstByStylistIdAndWorkDate(stylistId, workDate)
-                .orElseThrow(() -> new RuntimeException("Stylist không có lịch làm việc trong ngày này"));
+    private void checkSchedule(Long stylistId, LocalDate workDate, LocalTime startTime, LocalTime endTime) {
+        StylistSchedule schedule = scheduleRepo.findFirstByStylistIdAndWorkDate(stylistId, workDate).orElseThrow(
+                                () -> new RuntimeException("Stylist không có lịch làm việc trong ngày này"));
 
         if (Boolean.TRUE.equals(schedule.getIsOff())) {
             throw new RuntimeException("Stylist nghỉ trong ngày này");
@@ -532,11 +505,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private void reserveSlots(Appointment appointment, Stylist stylist, LocalDate slotDate, LocalTime startTime, LocalTime endTime) {
-
         List<LocalTime> slots = generateSlots(startTime, endTime);
 
         for (LocalTime slotTime : slots) {
-
             AppointmentSlot slot = new AppointmentSlot();
 
             slot.setAppointment(appointment);
@@ -554,37 +525,66 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private void releaseSlots(Long appointmentId) {
-
         appointmentSlotRepo.deleteByAppointmentId(appointmentId);
     }
 
     private String generateAppointmentCode() {
+        return "APM-"
+                + UUID.randomUUID()
+                .toString()
+                .substring(0, 8)
+                .toUpperCase();
+    }
 
-        return "APM-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    @Scheduled(fixedRate = 60000)
+    public void autoCancelExpiredPaymentAppointments() {
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+
+        LocalDateTime now = LocalDateTime.now(vietnamZone);
+
+        List<Appointment> expiredAppointments = appointmentRepo.findByStatusAndPaymentDeadlineBefore(AppointmentStatus.PENDING_PAYMENT, now);
+
+        for (Appointment appointment : expiredAppointments) {
+
+            releaseSlots(appointment.getId());
+
+            appointment.setStatus(AppointmentStatus.CANCELLED);
+
+            appointment.setRefundAmount(BigDecimal.ZERO);
+
+            appointmentRepo.save(appointment);
+
+            try {
+                notificationService.create(
+                        appointment.getCustomer().getUser().getId(), "Lịch hẹn đã bị hủy", "Lịch hẹn "
+                                + appointment.getAppointmentCode()
+                                + " đã tự động hủy vì quá thời gian thanh toán."
+                );
+            } catch (Exception e) {
+                System.err.println("Không thể tạo notification cho appointment " + appointment.getId());
+            }
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<AppointmentResponseDTO> search(Long customerId, Long stylistId, AppointmentStatus status, LocalDate date, LocalDate from, LocalDate to, Pageable pageable) {
         Specification<Appointment> specification = Specification.where(AppointmentSpecification.customerId(customerId))
-                .and(AppointmentSpecification.stylistId(stylistId))
-                .and(AppointmentSpecification.status(status))
-                .and(AppointmentSpecification.appointmentDate(date))
-                .and(AppointmentSpecification.dateFrom(from))
-                .and(AppointmentSpecification.dateTo(to));
+                        .and(AppointmentSpecification.stylistId(stylistId))
+                        .and(AppointmentSpecification.status(status))
+                        .and(AppointmentSpecification.appointmentDate(date))
+                        .and(AppointmentSpecification.dateFrom(from))
+                        .and(AppointmentSpecification.dateTo(to));
+
         return appointmentRepo.findAll(specification, pageable).map(AppointmentMapper::toResponse);
     }
 
     private Customer getCustomerByEmail(String email) {
-        User user = userRepo.findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy user")
-                );
+        User user = userRepo.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy user"));
 
-        return customerRepo.findByUserId(user.getId())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy customer")
-                );
+        return customerRepo.findByUserId(user.getId()).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy customer"));
     }
 
     @Override
@@ -602,9 +602,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     private Stylist getStylistByEmail(String email) {
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+        User user = userRepo.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy user"));
 
-        return stylistRepo.findByUserId(user.getId()).orElseThrow(() -> new RuntimeException("Không tìm thấy stylist"));
+        return stylistRepo.findByUserId(user.getId()).orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy stylist"));
     }
 
     @Override
@@ -647,5 +649,4 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return AppointmentMapper.toResponse(appointmentRepo.save(appointment));
     }
-
 }

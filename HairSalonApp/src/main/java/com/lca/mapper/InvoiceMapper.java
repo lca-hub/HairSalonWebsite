@@ -46,6 +46,10 @@ public class InvoiceMapper {
 
         dto.setCreatedAt(invoice.getCreatedAt());
 
+        dto.setProductOrderId(invoice.getProductOrder() != null ? invoice.getProductOrder().getId() : null);
+
+        dto.setOrderStatus(invoice.getProductOrder() != null && invoice.getProductOrder().getOrderStatus() != null ? invoice.getProductOrder().getOrderStatus().name() : null);
+
         if (invoice.getItems() != null) {
             dto.setItems(invoice.getItems().stream().map(InvoiceMapper::itemToResponse).toList());
         } else {

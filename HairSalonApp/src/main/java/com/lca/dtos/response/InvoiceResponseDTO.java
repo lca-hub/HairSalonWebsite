@@ -40,4 +40,8 @@ public class InvoiceResponseDTO {
     private LocalDateTime createdAt;
 
     private List<InvoiceItemResponseDTO> items;
+
+    private Long productOrderId;
+
+    private String orderStatus;
 }

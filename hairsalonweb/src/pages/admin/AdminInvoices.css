@@ -48,7 +48,7 @@
 }
 
 .admin-invoice-table {
-    min-width: 1180px;
+    min-width: 1360px;
 }
 
 .admin-invoice-customer {
@@ -107,6 +107,73 @@
     color: #58687f;
 }
 
+.admin-invoice-order-status-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-order-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-width: 100px;
+    padding: 5px 9px;
+    border: 1px solid #ddd6cd;
+    background: #faf9f6;
+    color: #655f57;
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.admin-order-status-pending {
+    border-color: #decfb5;
+    background: #fcf8ef;
+    color: #91703f;
+}
+
+.admin-order-status-confirmed {
+    border-color: #c7d2df;
+    background: #f5f8fb;
+    color: #5c6f84;
+}
+
+.admin-order-status-processing {
+    border-color: #d7c8df;
+    background: #faf6fc;
+    color: #765d84;
+}
+
+.admin-order-status-shipping {
+    border-color: #c7d8df;
+    background: #f4fafc;
+    color: #547681;
+}
+
+.admin-order-status-delivered {
+    border-color: #c8d8c6;
+    background: #f5faf4;
+    color: #557151;
+}
+
+.admin-order-status-cancelled {
+    border-color: #dfc5c0;
+    background: #fff7f5;
+    color: #95544c;
+}
+
+.admin-invoice-order-id {
+    color: #908980;
+    font-size: 9px;
+}
+
+.admin-invoice-no-order {
+    color: #9b958d;
+    font-size: 12px;
+}
+
 .admin-invoice-detail-button {
     min-height: 34px;
     padding: 0 12px;
@@ -135,17 +202,17 @@
     border-bottom: 1px solid #e5e0d8;
 }
 
-.admin-invoice-detail-summary > div {
+.admin-invoice-detail-summary>div {
     padding: 18px 22px;
     border-right: 1px solid #eee9e2;
     border-bottom: 1px solid #eee9e2;
 }
 
-.admin-invoice-detail-summary > div:nth-child(3n) {
+.admin-invoice-detail-summary>div:nth-child(3n) {
     border-right: none;
 }
 
-.admin-invoice-detail-summary > div:nth-last-child(-n + 3) {
+.admin-invoice-detail-summary>div:nth-last-child(-n + 3) {
     border-bottom: none;
 }
 
@@ -163,6 +230,54 @@
     color: #2a2621;
     font-size: 12px;
     font-weight: 600;
+}
+
+.admin-invoice-order-status-update {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 22px;
+    margin: 20px 22px 0;
+    padding: 18px;
+    border: 1px solid #e5ddd2;
+    background: #fbfaf7;
+}
+
+.admin-invoice-order-status-heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-invoice-order-status-heading h3 {
+    margin: 7px 0 5px;
+    color: #2a2621;
+    font-size: 17px;
+    font-weight: 400;
+}
+
+.admin-invoice-order-status-heading p {
+    margin: 0;
+    color: #817a72;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.admin-invoice-order-status-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 330px;
+    flex-shrink: 0;
+}
+
+.admin-invoice-order-status-controls .admin-form-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-invoice-order-status-controls .admin-primary-button {
+    min-width: 100px;
+    min-height: 40px;
 }
 
 .admin-invoice-detail-items {
@@ -190,7 +305,7 @@
     border-top: 1px solid #e5e0d8;
 }
 
-.admin-invoice-detail-total > div {
+.admin-invoice-detail-total>div {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -268,20 +383,29 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .admin-invoice-detail-summary > div:nth-child(3n) {
+    .admin-invoice-detail-summary>div:nth-child(3n) {
         border-right: 1px solid #eee9e2;
     }
 
-    .admin-invoice-detail-summary > div:nth-child(2n) {
+    .admin-invoice-detail-summary>div:nth-child(2n) {
         border-right: none;
     }
 
-    .admin-invoice-detail-summary > div:nth-last-child(-n + 3) {
+    .admin-invoice-detail-summary>div:nth-last-child(-n + 3) {
         border-bottom: 1px solid #eee9e2;
     }
 
-    .admin-invoice-detail-summary > div:nth-last-child(-n + 2) {
+    .admin-invoice-detail-summary>div:nth-last-child(-n + 2) {
         border-bottom: none;
+    }
+
+    .admin-invoice-order-status-update {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-invoice-order-status-controls {
+        width: 100%;
     }
 }
 
@@ -307,13 +431,28 @@
         grid-template-columns: 1fr;
     }
 
-    .admin-invoice-detail-summary > div {
+    .admin-invoice-detail-summary>div {
         border-right: none !important;
         border-bottom: 1px solid #eee9e2 !important;
     }
 
-    .admin-invoice-detail-summary > div:last-child {
+    .admin-invoice-detail-summary>div:last-child {
         border-bottom: none !important;
+    }
+
+    .admin-invoice-order-status-update {
+        margin-right: 14px;
+        margin-left: 14px;
+        padding: 14px;
+    }
+
+    .admin-invoice-order-status-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-invoice-order-status-controls .admin-primary-button {
+        width: 100%;
     }
 
     .admin-invoice-detail-items {

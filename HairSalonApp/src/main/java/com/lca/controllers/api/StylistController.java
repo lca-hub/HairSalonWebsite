@@ -3,13 +3,18 @@ package com.lca.controllers.api;
 import com.lca.dtos.response.ReviewResponseDTO;
 import com.lca.dtos.response.ServiceResponseDTO;
 import com.lca.dtos.response.StylistResponseDTO;
+import com.lca.entity.StylistSchedule;
+import com.lca.service.StylistScheduleService;
 import com.lca.service.StylistService;
 import com.lca.utils.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/stylists")
@@ -57,4 +62,5 @@ public class StylistController {
 
         return ResponseEntity.ok(stylistService.getReviews(stylistId, pageable));
     }
+
 }

@@ -10,7 +10,7 @@ import "./CustomerHome.css";
 const statusLabels = {
   PENDING: "Chờ xử lý",
   PENDING_PAYMENT: "Chờ thanh toán",
-  CONFIRMED: "Đã xác nhận",
+  CONFIRMED: "Đã thanh toán",
   IN_SERVICE: "Đang phục vụ",
   COMPLETED: "Hoàn thành",
   CANCELLED: "Đã hủy",
