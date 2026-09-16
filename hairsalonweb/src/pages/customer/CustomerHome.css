@@ -1,6 +1,4 @@
-/*          ===
-   CUSTOMER PAGE
-         === */
+
 
 .customer-page {
   min-height: 100vh;
@@ -15,10 +13,6 @@
   box-sizing: border-box;
 }
 
-/*          ===
-   ACCOUNT
-         === */
-
 .customer-account {
   padding: 54px 0 90px;
 }
@@ -28,9 +22,6 @@
   margin: 0 auto;
 }
 
-/*          ===
-   BREADCRUMB
-         === */
 
 .customer-breadcrumb {
   display: flex;
@@ -54,9 +45,7 @@
   color: #a47d3f;
 }
 
-/*          ===
-   TITLE
-         === */
+
 
 .customer-title-row {
   display: flex;
@@ -103,9 +92,7 @@
   line-height: 1.6;
 }
 
-/*          ===
-   BOOK BUTTON
-         === */
+
 
 .customer-book-button {
   padding: 13px 21px;
@@ -128,9 +115,7 @@
   background: #a47d3f;
 }
 
-/*          ===
-   ALERT
-         === */
+
 
 .customer-alert {
   margin-bottom: 20px;
@@ -148,9 +133,7 @@
   line-height: 1.6;
 }
 
-/*          ===
-   LAYOUT
-         === */
+
 
 .customer-layout {
   display: grid;
@@ -268,9 +251,7 @@
   gap: 36px;
 }
 
-/*          ===
-   AVATAR
-         === */
+
 
 .profile-avatar-column {
   display: flex;
@@ -323,9 +304,7 @@
   display: none;
 }
 
-/*          ===
-   PROFILE FIELDS
-         === */
+
 
 .profile-fields {
   display: grid;
@@ -377,9 +356,7 @@
   color: #98938b;
 }
 
-/*          ===
-   SAVE PROFILE
-         === */
+
 
 .profile-save-row {
   grid-column: 1 / -1;
@@ -423,9 +400,7 @@
   font-size: 11px;
 }
 
-/*          ===
-   APPOINTMENT LIST
-         === */
+
 
 .appointment-list {
   padding: 0 30px 8px;
@@ -449,9 +424,7 @@
   border-bottom: 0;
 }
 
-/*          ===
-   APPOINTMENT DATE
-         === */
+
 
 .appointment-date strong,
 .appointment-date span {
@@ -788,9 +761,6 @@
   }
 }
 
-/*          ===
-   ERROR
-         === */
 
 .appointments-error {
   min-height: 360px;

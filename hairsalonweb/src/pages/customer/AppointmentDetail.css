@@ -114,8 +114,6 @@
 }
 
 
-         === */
-
 .appointment-status {
   min-width: 135px;
 
@@ -195,9 +193,6 @@
   color: #777;
 }
 
-/*          ===
-   ALERT
-         === */
 
 .appointment-alert {
   margin-bottom: 20px;
@@ -215,9 +210,6 @@
   line-height: 1.6;
 }
 
-/*          ===
-   PAYMENT WARNING
-         === */
 
 .payment-warning {
   min-height: 62px;
@@ -1048,9 +1040,7 @@
   color: #fff;
 }
 
-/*          ===
-   TABLET
-         === */
+
 
 @media (max-width: 900px) {
   .appointment-content {
