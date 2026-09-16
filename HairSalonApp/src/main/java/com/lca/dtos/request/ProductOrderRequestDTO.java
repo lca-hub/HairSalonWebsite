@@ -4,7 +4,6 @@ import com.lca.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +34,6 @@ public class ProductOrderRequestDTO {
 
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    @NotEmpty(message = "Danh sách sản phẩm không được để trống")
     @Valid
     private List<ProductOrderItemRequestDTO> items = new ArrayList<>();
 
