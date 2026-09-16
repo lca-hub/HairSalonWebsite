@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import "../home/Home.css";
+import { authApis, endpoints } from "../../configs/api/Apis";
 
 function Home() {
     const [services, setServices] = useState([]);
@@ -11,17 +12,23 @@ function Home() {
         const loadHomeData = async () => {
             try {
                 const [servicesResponse, stylistsResponse] = await Promise.all([
-                    fetch(
-                        "http://localhost:8080/api/services?page=0&size=3&isActive=true"
-                    ),
-                    fetch(
-                        "http://localhost:8080/api/stylists?page=0&size=3&isActive=true"
-                    ),
+                    authApis().get(endpoints.services, {
+                        params: {
+                            page: 0,
+                            size: 3,
+                            isActive: true,
+                        },
+                    }),
+                    authApis().get(endpoints.stylists, {
+                        params: {
+                            page: 0,
+                            size: 3,
+                            isActive: true,
+                        },
+                    }),
                 ]);
-
                 if (servicesResponse.ok) {
                     const serviceData = await servicesResponse.json();
-
                     setServices(
                         Array.isArray(serviceData)
                             ? serviceData.slice(0, 3)
@@ -31,7 +38,6 @@ function Home() {
 
                 if (stylistsResponse.ok) {
                     const stylistData = await stylistsResponse.json();
-
                     setStylists(
                         Array.isArray(stylistData)
                             ? stylistData.slice(0, 3)

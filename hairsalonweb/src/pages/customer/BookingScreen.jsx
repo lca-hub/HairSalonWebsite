@@ -58,9 +58,13 @@ function BookingScreen() {
         setLoading(true);
         setError("");
 
-        const stylistListResponse = await fetch(
-          "http://localhost:8080/api/stylists?page=0&size=50&isActive=true",
-        );
+        const stylistListResponse = await authApis().get(endpoints.stylists, {
+          params: {
+            page: 0,
+            size: 50,
+            isActive: true,
+          },
+        });
 
         if (!stylistListResponse.ok) {
           throw new Error("Không thể tải danh sách stylist");
@@ -88,8 +92,14 @@ function BookingScreen() {
           setSelectedStylist(String(currentStylist.id));
           setStylist(currentStylist);
 
-          const serviceResponse = await fetch(
-            `http://localhost:8080/api/stylists/${queryStylistId}/services?page=0&size=50`,
+          const serviceResponse = await authApis().get(
+            endpoints.stylistServices(queryStylistId),
+            {
+              params: {
+                page: 0,
+                size: 50,
+              },
+            },
           );
 
           if (!serviceResponse.ok) {
@@ -97,7 +107,6 @@ function BookingScreen() {
           }
 
           const serviceData = await serviceResponse.json();
-
           const serviceList = serviceData.content || [];
 
           setServices(serviceList);
@@ -126,8 +135,8 @@ function BookingScreen() {
         // =========================================
 
         if (queryServiceId) {
-          const serviceResponse = await fetch(
-            `http://localhost:8080/api/services/${queryServiceId}`,
+          const serviceResponse = await authApis().get(
+            endpoints.serviceDetail(queryServiceId),
           );
 
           if (!serviceResponse.ok) {
@@ -135,7 +144,6 @@ function BookingScreen() {
           }
 
           const serviceData = await serviceResponse.json();
-
           setStylist(null);
           setServices([serviceData]);
           setSelectedService(String(serviceData.id));
@@ -195,17 +203,16 @@ function BookingScreen() {
       try {
         setError("");
 
-        const [stylistResponse, serviceResponse] =
-          await Promise.all([
-            fetch(
-              `http://localhost:8080/api/stylists/${selectedStylist}`,
-            ),
-            fetch(
-              `http://localhost:8080/api/stylists/${selectedStylist}/services?page=0&size=50`,
-            ),
-          ]);
-
-        if (!stylistResponse.ok || !serviceResponse.ok) {
+        const [stylistResponse, serviceResponse] = await Promise.all([
+          authApis().get(endpoints.stylistDetail(selectedStylist)),
+          authApis().get(endpoints.stylistServices(selectedStylist), {
+            params: {
+              page: 0,
+              size: 50,
+            },
+          }),
+        ]);
+        if (!stylistResponse.data || !serviceResponse.data) {
           throw new Error("Không thể tải thông tin stylist");
         }
 
@@ -548,8 +555,8 @@ function BookingScreen() {
                       type="button"
                       key={slot}
                       className={`slot-button ${selectedSlot === slot
-                          ? "selected"
-                          : ""
+                        ? "selected"
+                        : ""
                         }`}
                       onClick={() =>
                         setSelectedSlot(slot)

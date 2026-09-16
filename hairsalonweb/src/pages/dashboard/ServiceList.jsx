@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import "./ServiceList.css";
+import { authApis, endpoints } from "../../configs/api/Apis";
 
 function ServiceList() {
     const [services, setServices] = useState([]);
@@ -15,15 +16,15 @@ function ServiceList() {
                 setLoading(true);
                 setError("");
 
-                const response = await fetch(
-                    "http://localhost:8080/api/services?page=0&size=50&isActive=true"
-                );
+                const response = await authApis().get(endpoints.services, {
+                    params: {
+                        page: 0,
+                        size: 50,
+                        isActive: true,
+                    },
+                });
 
-                if (!response.ok) {
-                    throw new Error("Không thể tải danh sách dịch vụ.");
-                }
-
-                const data = await response.json();
+                const data = response.data;
 
                 setServices(
                     Array.isArray(data)
