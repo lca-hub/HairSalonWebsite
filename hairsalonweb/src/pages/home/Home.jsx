@@ -27,23 +27,21 @@ function Home() {
                         },
                     }),
                 ]);
-                if (servicesResponse.ok) {
-                    const serviceData = await servicesResponse.json();
-                    setServices(
-                        Array.isArray(serviceData)
-                            ? serviceData.slice(0, 3)
-                            : serviceData?.content?.slice(0, 3) || []
-                    );
-                }
 
-                if (stylistsResponse.ok) {
-                    const stylistData = await stylistsResponse.json();
-                    setStylists(
-                        Array.isArray(stylistData)
-                            ? stylistData.slice(0, 3)
-                            : stylistData?.content?.slice(0, 3) || []
-                    );
-                }
+                const serviceData = servicesResponse.data;
+                const stylistData = stylistsResponse.data;
+
+                setServices(
+                    Array.isArray(serviceData)
+                        ? serviceData.slice(0, 3)
+                        : serviceData?.content?.slice(0, 3) || []
+                );
+
+                setStylists(
+                    Array.isArray(stylistData)
+                        ? stylistData.slice(0, 3)
+                        : stylistData?.content?.slice(0, 3) || []
+                );
             } catch (error) {
                 console.error("LOAD HOME DATA ERROR:", error);
             }
@@ -57,20 +55,15 @@ function Home() {
     };
 
     const getServiceImage = (service) => {
-        return (
-            service?.imageUrl ||
-            service?.imageURL ||
-            "/images/service-default.jpg"
-        );
+        return service?.imageUrl || service?.imageURL || "";
     };
 
     const getStylistImage = (stylist) => {
-        return stylist?.avatar || "/images/stylist-default.jpg";
+        return stylist?.avatar || "";
     };
 
     const getStylistName = (stylist) => {
         const fullName = `${stylist?.firstName || ""} ${stylist?.lastName || ""}`.trim();
-
         return fullName || "Stylist";
     };
 
@@ -79,6 +72,7 @@ function Home() {
             <Header />
 
             {/* ================= HERO ================= */}
+
             <section className="hero-section">
                 <div className="hero-overlay"></div>
 
@@ -117,6 +111,7 @@ function Home() {
             </section>
 
             {/* ================= INTRO ================= */}
+
             <section className="intro-section">
                 <div className="section-container">
                     <div className="section-heading">
@@ -140,6 +135,7 @@ function Home() {
             </section>
 
             {/* ================= SERVICES ================= */}
+
             <section className="services-section">
                 <div className="section-container">
                     <div className="section-top">
@@ -168,10 +164,16 @@ function Home() {
                                 key={service.id}
                             >
                                 <div className="service-image-placeholder">
-                                    <img
-                                        src={getServiceImage(service)}
-                                        alt={service.name || "Dịch vụ salon"}
-                                    />
+                                    {getServiceImage(service) ? (
+                                        <img
+                                            src={getServiceImage(service)}
+                                            alt={service.name || "Dịch vụ salon"}
+                                        />
+                                    ) : (
+                                        <div className="service-image-empty">
+                                            Dịch vụ salon
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="service-info">
@@ -192,73 +194,22 @@ function Home() {
                         ))}
 
                         {services.length === 0 && (
-                            <>
-                                <div className="service-card">
-                                    <div className="service-image-placeholder">
-                                        <img
-                                            src="/images/service-default.jpg"
-                                            alt="Dịch vụ salon"
-                                        />
-                                    </div>
+                            <div className="service-empty">
+                                <h3>
+                                    Chưa có dịch vụ
+                                </h3>
 
-                                    <div className="service-info">
-                                        <h3>
-                                            Dịch vụ salon
-                                        </h3>
-
-                                        <p>
-                                            Khám phá các dịch vụ chăm sóc tóc
-                                            chuyên nghiệp tại salon.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="service-card">
-                                    <div className="service-image-placeholder">
-                                        <img
-                                            src="/images/service-default.jpg"
-                                            alt="Dịch vụ salon"
-                                        />
-                                    </div>
-
-                                    <div className="service-info">
-                                        <h3>
-                                            Dịch vụ salon
-                                        </h3>
-
-                                        <p>
-                                            Khám phá các dịch vụ chăm sóc tóc
-                                            chuyên nghiệp tại salon.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="service-card">
-                                    <div className="service-image-placeholder">
-                                        <img
-                                            src="/images/service-default.jpg"
-                                            alt="Dịch vụ salon"
-                                        />
-                                    </div>
-
-                                    <div className="service-info">
-                                        <h3>
-                                            Dịch vụ salon
-                                        </h3>
-
-                                        <p>
-                                            Khám phá các dịch vụ chăm sóc tóc
-                                            chuyên nghiệp tại salon.
-                                        </p>
-                                    </div>
-                                </div>
-                            </>
+                                <p>
+                                    Hiện tại chưa có dịch vụ đang hoạt động.
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>
             </section>
 
             {/* ================= STYLIST ================= */}
+
             <section className="stylist-section">
                 <div className="section-container">
                     <div className="section-top">
@@ -287,10 +238,16 @@ function Home() {
                                 key={stylist.id}
                             >
                                 <div className="stylist-image-placeholder">
-                                    <img
-                                        src={getStylistImage(stylist)}
-                                        alt={getStylistName(stylist)}
-                                    />
+                                    {getStylistImage(stylist) ? (
+                                        <img
+                                            src={getStylistImage(stylist)}
+                                            alt={getStylistName(stylist)}
+                                        />
+                                    ) : (
+                                        <div className="stylist-image-empty">
+                                            {getStylistName(stylist).charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <h3>
@@ -305,64 +262,22 @@ function Home() {
                         ))}
 
                         {stylists.length === 0 && (
-                            <>
-                                <div className="stylist-card">
-                                    <div className="stylist-image-placeholder">
-                                        <img
-                                            src="/images/stylist-default.jpg"
-                                            alt="Stylist"
-                                        />
-                                    </div>
+                            <div className="stylist-empty">
+                                <h3>
+                                    Chưa có stylist
+                                </h3>
 
-                                    <h3>
-                                        Stylist
-                                    </h3>
-
-                                    <p>
-                                        Hair Designer
-                                    </p>
-                                </div>
-
-                                <div className="stylist-card">
-                                    <div className="stylist-image-placeholder">
-                                        <img
-                                            src="/images/stylist-default.jpg"
-                                            alt="Stylist"
-                                        />
-                                    </div>
-
-                                    <h3>
-                                        Stylist
-                                    </h3>
-
-                                    <p>
-                                        Hair Designer
-                                    </p>
-                                </div>
-
-                                <div className="stylist-card">
-                                    <div className="stylist-image-placeholder">
-                                        <img
-                                            src="/images/stylist-default.jpg"
-                                            alt="Stylist"
-                                        />
-                                    </div>
-
-                                    <h3>
-                                        Stylist
-                                    </h3>
-
-                                    <p>
-                                        Hair Designer
-                                    </p>
-                                </div>
-                            </>
+                                <p>
+                                    Hiện tại chưa có stylist đang hoạt động.
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>
             </section>
 
             {/* ================= CTA ================= */}
+
             <section className="booking-section">
                 <div className="booking-content">
                     <p className="section-label">
@@ -388,6 +303,7 @@ function Home() {
             </section>
 
             {/* ================= FOOTER ================= */}
+
             <footer className="home-footer">
                 <div className="section-container">
                     <div className="footer-grid">

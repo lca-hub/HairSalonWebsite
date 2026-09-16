@@ -35,7 +35,9 @@ function ServiceList() {
                 console.error("LOAD SERVICES ERROR:", err);
 
                 setError(
-                    err.message || "Không thể tải danh sách dịch vụ."
+                    err.response?.data?.message ||
+                    err.message ||
+                    "Không thể tải danh sách dịch vụ."
                 );
             } finally {
                 setLoading(false);
@@ -47,6 +49,10 @@ function ServiceList() {
 
     const formatMoney = (value) => {
         return Number(value || 0).toLocaleString("vi-VN") + "đ";
+    };
+
+    const getServiceImage = (service) => {
+        return service?.imageUrl || service?.imageURL || service?.image || "";
     };
 
     const handleBooking = (serviceId) => {
@@ -88,7 +94,6 @@ function ServiceList() {
                         <h1>
                             Dịch vụ của salon
                         </h1>
-
                     </div>
 
                     <Link
@@ -123,15 +128,17 @@ function ServiceList() {
                                 key={service.id}
                             >
                                 <div className="service-image-wrapper">
-                                    <img
-                                        src={
-                                            service.imageUrl ||
-                                            service.image ||
-                                            "/images/service-default.jpg"
-                                        }
-                                        alt={service.name}
-                                        className="service-image"
-                                    />
+                                    {getServiceImage(service) ? (
+                                        <img
+                                            src={getServiceImage(service)}
+                                            alt={service.name || "Dịch vụ salon"}
+                                            className="service-image"
+                                        />
+                                    ) : (
+                                        <div className="service-image-empty">
+                                            Dịch vụ salon
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="service-card-content">

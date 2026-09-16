@@ -66,12 +66,7 @@ function BookingScreen() {
           },
         });
 
-        if (!stylistListResponse.ok) {
-          throw new Error("Không thể tải danh sách stylist");
-        }
-
-        const stylistListData = await stylistListResponse.json();
-
+        const stylistListData = stylistListResponse.data;
         const stylistList = stylistListData.content || [];
 
         setStylists(stylistList);
@@ -102,11 +97,7 @@ function BookingScreen() {
             },
           );
 
-          if (!serviceResponse.ok) {
-            throw new Error("Không thể tải dịch vụ của stylist");
-          }
-
-          const serviceData = await serviceResponse.json();
+          const serviceData = serviceResponse.data;
           const serviceList = serviceData.content || [];
 
           setServices(serviceList);
@@ -139,11 +130,8 @@ function BookingScreen() {
             endpoints.serviceDetail(queryServiceId),
           );
 
-          if (!serviceResponse.ok) {
-            throw new Error("Không tìm thấy dịch vụ");
-          }
+          const serviceData = serviceResponse.data;
 
-          const serviceData = await serviceResponse.json();
           setStylist(null);
           setServices([serviceData]);
           setSelectedService(String(serviceData.id));
@@ -162,7 +150,9 @@ function BookingScreen() {
         console.error("LOAD BOOKING DATA ERROR:", err);
 
         setError(
-          err.message || "Không thể tải dữ liệu đặt lịch.",
+          err.response?.data?.message ||
+          err.message ||
+          "Không thể tải dữ liệu đặt lịch.",
         );
       } finally {
         setLoading(false);
@@ -212,12 +202,9 @@ function BookingScreen() {
             },
           }),
         ]);
-        if (!stylistResponse.data || !serviceResponse.data) {
-          throw new Error("Không thể tải thông tin stylist");
-        }
 
-        const stylistData = await stylistResponse.json();
-        const serviceData = await serviceResponse.json();
+        const stylistData = stylistResponse.data;
+        const serviceData = serviceResponse.data;
 
         const serviceList = serviceData.content || [];
 
@@ -247,7 +234,9 @@ function BookingScreen() {
         console.error("LOAD STYLIST ERROR:", err);
 
         setError(
-          err.message || "Không thể tải stylist.",
+          err.response?.data?.message ||
+          err.message ||
+          "Không thể tải stylist.",
         );
       }
     };
@@ -360,8 +349,7 @@ function BookingScreen() {
         );
       }
 
-      window.location.href =
-        paymentResponse.data.paymentUrl;
+      window.location.href = paymentResponse.data.paymentUrl;
     } catch (err) {
       console.error(
         "CREATE APPOINTMENT ERROR:",
@@ -375,6 +363,7 @@ function BookingScreen() {
 
       setError(
         err.response?.data?.message ||
+        err.message ||
         "Đặt lịch thất bại.",
       );
     } finally {
@@ -427,9 +416,7 @@ function BookingScreen() {
 
           <h1>
             {stylist
-              ? `Đặt lịch với ${stylist.firstName || ""
-                } ${stylist.lastName || ""
-                }`.trim()
+              ? `Đặt lịch với ${stylist.firstName || ""} ${stylist.lastName || ""}`.trim()
               : "Đặt lịch hẹn"}
           </h1>
         </div>
@@ -554,10 +541,7 @@ function BookingScreen() {
                     <button
                       type="button"
                       key={slot}
-                      className={`slot-button ${selectedSlot === slot
-                        ? "selected"
-                        : ""
-                        }`}
+                      className={`slot-button ${selectedSlot === slot ? "selected" : ""}`}
                       onClick={() =>
                         setSelectedSlot(slot)
                       }
