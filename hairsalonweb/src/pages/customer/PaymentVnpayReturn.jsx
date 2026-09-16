@@ -15,46 +15,93 @@ export default function PaymentVnpayReturn() {
     const transactionStatus = searchParams.get("vnp_TransactionStatus");
     const txnRef = searchParams.get("txnRef") || searchParams.get("vnp_TxnRef");
     const appointmentId = searchParams.get("appointmentId");
+    const productOrderId = searchParams.get("productOrderId");
 
     const success =
         status === "success" ||
         (responseCode === "00" && transactionStatus === "00");
 
+    const isProductOrder = !!productOrderId;
+
     const handleRetryPayment = async () => {
-        if (!appointmentId) {
-            setError("Không tìm thấy lịch hẹn để thanh toán lại.");
+        if (appointmentId) {
+            try {
+                setRetrying(true);
+                setError("");
+
+                const response = await authApis().post(
+                    endpoints.vnpayCreate,
+                    null,
+                    {
+                        params: {
+                            appointmentId: Number(appointmentId),
+                        },
+                    }
+                );
+
+                if (!response.data?.paymentUrl) {
+                    throw new Error("Không nhận được đường dẫn thanh toán VNPay.");
+                }
+
+                window.location.href = response.data.paymentUrl;
+            } catch (err) {
+                console.error("RETRY APPOINTMENT VNPAY ERROR:", err);
+
+                setError(
+                    err.response?.data?.message ||
+                    "Không thể thanh toán lại cho lịch hẹn này."
+                );
+            } finally {
+                setRetrying(false);
+            }
+
             return;
         }
 
-        try {
-            setRetrying(true);
-            setError("");
+        if (productOrderId) {
+            try {
+                setRetrying(true);
+                setError("");
 
-            const response = await authApis().post(
-                endpoints.vnpayCreate,
-                null,
-                {
-                    params: {
-                        appointmentId: Number(appointmentId),
-                    },
+                const response = await authApis().post(
+                    endpoints.vnpayCreateOrder,
+                    null,
+                    {
+                        params: {
+                            orderId: Number(productOrderId),
+                        },
+                    }
+                );
+
+                if (!response.data?.paymentUrl) {
+                    throw new Error("Không nhận được đường dẫn thanh toán VNPay.");
                 }
-            );
 
-            if (!response.data?.paymentUrl) {
-                throw new Error("Không nhận được đường dẫn thanh toán VNPay.");
+                window.location.href = response.data.paymentUrl;
+            } catch (err) {
+                console.error("RETRY PRODUCT ORDER VNPAY ERROR:", err);
+
+                setError(
+                    err.response?.data?.message ||
+                    "Không thể thanh toán lại cho đơn hàng này."
+                );
+            } finally {
+                setRetrying(false);
             }
 
-            window.location.href = response.data.paymentUrl;
-        } catch (err) {
-            console.error("RETRY VNPAY PAYMENT ERROR:", err);
-
-            setError(
-                err.response?.data?.message ||
-                "Không thể thanh toán lại cho lịch hẹn này."
-            );
-        } finally {
-            setRetrying(false);
+            return;
         }
+
+        setError("Không tìm thấy đối tượng cần thanh toán.");
+    };
+
+    const handleBack = () => {
+        if (productOrderId) {
+            navigate(`/customer/orders/${productOrderId}`);
+            return;
+        }
+
+        navigate("/customer/appointments");
     };
 
     return (
@@ -76,8 +123,12 @@ export default function PaymentVnpayReturn() {
 
                 <p className="payment-result-message">
                     {success
-                        ? "Lịch hẹn của bạn đã được thanh toán và xác nhận."
-                        : "Giao dịch chưa hoàn tất. Lịch hẹn vẫn đang chờ thanh toán."}
+                        ? isProductOrder
+                            ? "Đơn hàng của bạn đã được thanh toán thành công."
+                            : "Lịch hẹn của bạn đã được thanh toán và xác nhận."
+                        : isProductOrder
+                            ? "Giao dịch chưa hoàn tất. Đơn hàng vẫn đang chờ thanh toán."
+                            : "Giao dịch chưa hoàn tất. Lịch hẹn vẫn đang chờ thanh toán."}
                 </p>
 
                 {txnRef && (
@@ -96,9 +147,11 @@ export default function PaymentVnpayReturn() {
                     <button
                         type="button"
                         className="payment-result-button"
-                        onClick={() => navigate("/customer/appointments")}
+                        onClick={handleBack}
                     >
-                        VỀ TRANG KHÁCH HÀNG
+                        {isProductOrder
+                            ? "XEM ĐƠN HÀNG"
+                            : "XEM LỊCH HẸN"}
                     </button>
                 ) : (
                     <div className="payment-result-actions">
@@ -106,7 +159,7 @@ export default function PaymentVnpayReturn() {
                             type="button"
                             className="payment-result-button"
                             onClick={handleRetryPayment}
-                            disabled={retrying || !appointmentId}
+                            disabled={retrying || (!appointmentId && !productOrderId)}
                         >
                             {retrying
                                 ? "ĐANG CHUYỂN ĐẾN THANH TOÁN..."
@@ -116,9 +169,11 @@ export default function PaymentVnpayReturn() {
                         <button
                             type="button"
                             className="payment-result-secondary-button"
-                            onClick={() => navigate("/customer/appointments")}
+                            onClick={handleBack}
                         >
-                            VỀ TRANG KHÁCH HÀNG
+                            {isProductOrder
+                                ? "VỀ ĐƠN HÀNG"
+                                : "VỀ TRANG KHÁCH HÀNG"}
                         </button>
                     </div>
                 )}
