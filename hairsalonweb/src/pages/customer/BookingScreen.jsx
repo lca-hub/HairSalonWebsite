@@ -30,9 +30,6 @@ function BookingScreen() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // =====================================================
-  // BACK
-  // =====================================================
 
   const handleBack = () => {
     if (queryStylistId) {
@@ -48,9 +45,6 @@ function BookingScreen() {
     navigate("/customer/appointments");
   };
 
-  // =====================================================
-  // LOAD STYLIST + SERVICES
-  // =====================================================
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,9 +65,6 @@ function BookingScreen() {
 
         setStylists(stylistList);
 
-        // =========================================
-        // CÓ STYLIST ID
-        // =========================================
 
         if (queryStylistId) {
           const currentStylist = stylistList.find(
@@ -102,7 +93,6 @@ function BookingScreen() {
 
           setServices(serviceList);
 
-          // Nếu URL có serviceId thì chọn sẵn
           if (queryServiceId) {
             const currentService = serviceList.find(
               (service) =>
@@ -121,9 +111,6 @@ function BookingScreen() {
           return;
         }
 
-        // =========================================
-        // CHỈ CÓ SERVICE ID
-        // =========================================
 
         if (queryServiceId) {
           const serviceResponse = await authApis().get(
@@ -139,9 +126,6 @@ function BookingScreen() {
           return;
         }
 
-        // =========================================
-        // VÀO TRỰC TIẾP
-        // =========================================
 
         setStylist(null);
         setServices([]);
@@ -162,10 +146,6 @@ function BookingScreen() {
     loadData();
   }, [queryStylistId, queryServiceId]);
 
-  // =====================================================
-  // KHI CHỌN STYLIST
-  // =====================================================
-
   useEffect(() => {
     const loadStylistData = async () => {
       if (!selectedStylist) {
@@ -182,7 +162,6 @@ function BookingScreen() {
         return;
       }
 
-      // Nếu stylist đã được load từ query
       if (
         queryStylistId &&
         String(selectedStylist) === String(queryStylistId)
@@ -211,7 +190,6 @@ function BookingScreen() {
         setStylist(stylistData);
         setServices(serviceList);
 
-        // Nếu có serviceId trên URL thì giữ lại nếu stylist cung cấp service đó
         if (queryServiceId) {
           const currentService = serviceList.find(
             (service) =>
@@ -244,9 +222,6 @@ function BookingScreen() {
     loadStylistData();
   }, [selectedStylist, queryStylistId, queryServiceId]);
 
-  // =====================================================
-  // LOAD AVAILABLE SLOTS
-  // =====================================================
 
   useEffect(() => {
     const loadSlots = async () => {
@@ -290,9 +265,9 @@ function BookingScreen() {
     loadSlots();
   }, [selectedStylist, selectedService, date]);
 
-  // =====================================================
+  //          =
   // SUBMIT
-  // =====================================================
+  //          =
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -371,9 +346,7 @@ function BookingScreen() {
     }
   };
 
-  // =====================================================
-  // LOADING
-  // =====================================================
+
 
   if (loading) {
     return (
@@ -388,15 +361,10 @@ function BookingScreen() {
     );
   }
 
-  // =====================================================
-  // UI
-  // =====================================================
 
   return (
     <div className="booking-page">
       <div className="booking-container">
-
-        {/* ================= BACK ================= */}
 
         <button
           type="button"
@@ -407,7 +375,6 @@ function BookingScreen() {
           <span>QUAY LẠI</span>
         </button>
 
-        {/* ================= TITLE ================= */}
 
         <div className="booking-title">
           <p className="page-label">
@@ -438,8 +405,6 @@ function BookingScreen() {
           onSubmit={handleSubmit}
         >
 
-          {/* ================= STYLIST ================= */}
-
           <div className="booking-field">
             <label>Stylist</label>
 
@@ -466,7 +431,6 @@ function BookingScreen() {
             </select>
           </div>
 
-          {/* ================= SERVICE ================= */}
 
           <div className="booking-field">
             <label>Dịch vụ</label>
@@ -498,7 +462,6 @@ function BookingScreen() {
             </select>
           </div>
 
-          {/* ================= DATE ================= */}
 
           <div className="booking-field">
             <label>Ngày</label>
@@ -519,7 +482,6 @@ function BookingScreen() {
             />
           </div>
 
-          {/* ================= TIME ================= */}
 
           <div className="booking-field">
             <label>Khung giờ</label>
@@ -554,7 +516,6 @@ function BookingScreen() {
             )}
           </div>
 
-          {/* ================= NOTE ================= */}
 
           <div className="booking-field">
             <label>Ghi chú</label>
@@ -569,7 +530,6 @@ function BookingScreen() {
             />
           </div>
 
-          {/* ================= SUBMIT ================= */}
 
           <button
             className="gold-button submit-booking"

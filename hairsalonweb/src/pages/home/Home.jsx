@@ -71,8 +71,6 @@ function Home() {
         <div className="home-page">
             <Header />
 
-            {/* ================= HERO ================= */}
-
             <section className="hero-section">
                 <div className="hero-overlay"></div>
 
@@ -110,7 +108,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* ================= INTRO ================= */}
 
             <section className="intro-section">
                 <div className="section-container">
@@ -134,7 +131,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* ================= SERVICES ================= */}
 
             <section className="services-section">
                 <div className="section-container">
@@ -208,7 +204,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* ================= STYLIST ================= */}
 
             <section className="stylist-section">
                 <div className="section-container">
@@ -276,7 +271,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* ================= CTA ================= */}
 
             <section className="booking-section">
                 <div className="booking-content">
@@ -302,7 +296,6 @@ function Home() {
                 </div>
             </section>
 
-            {/* ================= FOOTER ================= */}
 
             <footer className="home-footer">
                 <div className="section-container">

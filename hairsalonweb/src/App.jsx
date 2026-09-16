@@ -52,9 +52,7 @@ function App() {
         <Route path="/payment/vnpay/return" element={<PaymentVnpayReturn />} />
         <Route path="/products" element={<ProductList />} />
 
-        {/* =========================
-            CUSTOMER
-        ========================= */}
+
         <Route element={<ProtectedRoute roles={["CUSTOMER"]} />}>
           <Route path="/customer/profile" element={<CustomerHome />} />
           <Route path="/customer/appointments" element={<CustomerHome />} />
@@ -68,10 +66,6 @@ function App() {
           <Route path="/customer/notifications" element={<NotificationPage />} />
         </Route>
 
-
-        {/* =========================
-            ADMIN
-        ========================= */}
         <Route element={<ProtectedRoute roles={["ADMIN"]} />}>
 
           <Route path="/admin" element={<AdminDashboard />} />
@@ -84,15 +78,11 @@ function App() {
           <Route path="/admin/invoices" element={<AdminInvoices />} />
           <Route path="/admin/statistics" element={<AdminStatistics />} />
 
-          {/* Admin profile */}
           <Route path="/admin/profile" element={<AccountPage />} />
 
         </Route>
 
 
-        {/* =========================
-            RECEPTIONIST
-        ========================= */}
         <Route element={<ProtectedRoute roles={["RECEPTIONIST"]} />}>
 
           <Route path="/receptionist" element={<ReceptionistDashboard />} />
@@ -104,9 +94,7 @@ function App() {
         </Route>
 
 
-        {/* =========================
-            STYLIST
-        ========================= */}
+
         <Route element={<ProtectedRoute roles={["STYLIST"]} />}>
 
           <Route path="/stylist" element={<StylistDashboard />} />
@@ -117,10 +105,6 @@ function App() {
 
         </Route>
 
-
-        {/* =========================
-            404
-        ========================= */}
         <Route
           path="*"
           element={<Navigate to="/" replace />}

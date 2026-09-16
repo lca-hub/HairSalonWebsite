@@ -1,1138 +1,1094 @@
-/* =========================================================
+/*          ===
    CUSTOMER PAGE
-========================================================= */
+         === */
 
 .customer-page {
-    min-height: 100vh;
-    background: #faf9f6;
-    color: #222;
-    font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background: #faf9f6;
+  color: #222;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .customer-page *,
 .customer-page *::before,
 .customer-page *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-
-/* =========================================================
+/*          ===
    ACCOUNT
-========================================================= */
+         === */
 
 .customer-account {
-    padding: 54px 0 90px;
+  padding: 54px 0 90px;
 }
 
 .customer-shell {
-    width: min(1160px, 92%);
-    margin: 0 auto;
+  width: min(1160px, 92%);
+  margin: 0 auto;
 }
 
-
-/* =========================================================
+/*          ===
    BREADCRUMB
-========================================================= */
+         === */
 
 .customer-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 9px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
 
-    margin-bottom: 38px;
+  margin-bottom: 38px;
 
-    color: #8a857d;
+  color: #8a857d;
 
-    font-size: 11px;
+  font-size: 11px;
 }
 
 .customer-breadcrumb a {
-    color: #4e4b46;
-    text-decoration: none;
-    transition: color .2s ease;
+  color: #4e4b46;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .customer-breadcrumb a:hover {
-    color: #a47d3f;
+  color: #a47d3f;
 }
 
-
-/* =========================================================
+/*          ===
    TITLE
-========================================================= */
+         === */
 
 .customer-title-row {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 
-    gap: 25px;
+  gap: 25px;
 
-    margin-bottom: 36px;
-    padding-bottom: 30px;
+  margin-bottom: 36px;
+  padding-bottom: 30px;
 
-    border-bottom: 1px solid #ddd8d0;
+  border-bottom: 1px solid #ddd8d0;
 }
 
 .eyebrow {
-    margin: 0 0 8px;
+  margin: 0 0 8px;
 
-    color: #ae8748;
+  color: #ae8748;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    letter-spacing: 2px;
+  letter-spacing: 2px;
 }
 
 .customer-title-row h1 {
-    margin: 0;
+  margin: 0;
 
-    color: #1c1c1c;
+  color: #1c1c1c;
 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 36px;
-    font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 36px;
+  font-weight: 400;
 
-    letter-spacing: -.4px;
+  letter-spacing: -0.4px;
 }
 
 .customer-title-row p:last-child {
-    margin: 9px 0 0;
+  margin: 9px 0 0;
 
-    color: #777;
+  color: #777;
 
-    font-size: 13px;
-    line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-
-/* =========================================================
+/*          ===
    BOOK BUTTON
-========================================================= */
+         === */
 
 .customer-book-button {
-    padding: 13px 21px;
+  padding: 13px 21px;
 
-    background: #171717;
+  background: #171717;
 
-    color: #fff;
+  color: #fff;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    letter-spacing: 1px;
+  letter-spacing: 1px;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 .customer-book-button:hover {
-    background: #a47d3f;
+  background: #a47d3f;
 }
 
-
-/* =========================================================
+/*          ===
    ALERT
-========================================================= */
+         === */
 
 .customer-alert {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 
-    padding: 12px 15px;
+  padding: 12px 15px;
 
-    background: #fff8f2;
+  background: #fff8f2;
 
-    border: 1px solid #e7d6c8;
+  border: 1px solid #e7d6c8;
 
-    color: #934c3d;
+  color: #934c3d;
 
-    font-size: 12px;
+  font-size: 12px;
 
-    line-height: 1.6;
+  line-height: 1.6;
 }
 
-
-/* =========================================================
+/*          ===
    LAYOUT
-========================================================= */
+         === */
 
 .customer-layout {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 190px minmax(0, 1fr);
+  grid-template-columns: 190px minmax(0, 1fr);
 
-    gap: 52px;
+  gap: 52px;
 
-    align-items: start;
+  align-items: start;
 }
 
-
-/* =========================================================
+/*          ===
    SIDEBAR
-========================================================= */
+         === */
 
 .customer-sidebar {
-    border-top: 1px solid #d9d4cc;
+  border-top: 1px solid #d9d4cc;
 }
 
 .customer-sidebar a {
-    display: block;
+  display: block;
 
-    padding: 14px 2px;
+  padding: 14px 2px;
 
-    border-bottom: 1px solid #e4dfd7;
+  border-bottom: 1px solid #e4dfd7;
 
-    color: #57534d;
+  color: #57534d;
 
-    font-size: 12px;
+  font-size: 12px;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 .customer-sidebar a:hover {
-    color: #a47d3f;
+  color: #a47d3f;
 }
 
 .customer-sidebar a.active {
-    color: #a47d3f;
-    font-weight: 600;
+  color: #a47d3f;
+  font-weight: 600;
 }
 
-
-/* =========================================================
+/*          ===
    CONTENT
-========================================================= */
+         === */
 
 .customer-content {
-    min-width: 0;
+  min-width: 0;
 }
 
 .account-section {
-    margin-bottom: 22px;
+  margin-bottom: 22px;
 
-    background: #fff;
+  background: #fff;
 
-    border: 1px solid #ded9d1;
+  border: 1px solid #ded9d1;
 }
 
-
-/* =========================================================
+/*          ===
    SECTION HEADER
-========================================================= */
+         === */
 
 .section-heading-line {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 
-    gap: 20px;
+  gap: 20px;
 
-    padding: 28px 30px 22px;
+  padding: 28px 30px 22px;
 
-    border-bottom: 1px solid #e5e0d8;
+  border-bottom: 1px solid #e5e0d8;
 }
 
 .section-heading-line h2 {
-    margin: 0;
+  margin: 0;
 
-    color: #222;
+  color: #222;
 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 24px;
-    font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
 }
 
 .section-heading-line p {
-    margin: 5px 0 0;
+  margin: 5px 0 0;
 
-    color: #808080;
+  color: #808080;
 
-    font-size: 12px;
+  font-size: 12px;
 
-    line-height: 1.5;
+  line-height: 1.5;
 }
 
 .section-heading-line a {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 
-    color: #a47d3f;
+  color: #a47d3f;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    letter-spacing: .7px;
+  letter-spacing: 0.7px;
 
-    text-decoration: none;
-    text-transform: uppercase;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .section-heading-line a:hover {
-    color: #171717;
+  color: #171717;
 }
 
-
-/* =========================================================
+/*          ===
    PROFILE
-========================================================= */
+         === */
 
 .profile-overview .profile-grid {
-    padding: 30px;
+  padding: 30px;
 }
 
 .profile-grid {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 150px minmax(0, 1fr);
+  grid-template-columns: 150px minmax(0, 1fr);
 
-    gap: 36px;
+  gap: 36px;
 }
 
-
-/* =========================================================
+/*          ===
    AVATAR
-========================================================= */
+         === */
 
 .profile-avatar-column {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .profile-avatar-large {
-    width: 116px;
-    height: 116px;
+  width: 116px;
+  height: 116px;
 
-    display: grid;
-    place-items: center;
+  display: grid;
+  place-items: center;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    background: #eee9e0;
+  background: #eee9e0;
 
-    color: #9b7945;
+  color: #9b7945;
 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 34px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 34px;
 }
 
 .profile-avatar-large img {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-    object-fit: cover;
+  object-fit: cover;
 }
 
 .profile-upload {
-    margin-top: 12px;
+  margin-top: 12px;
 
-    color: #a47d3f;
+  color: #a47d3f;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: color .2s ease;
+  transition: color 0.2s ease;
 }
 
 .profile-upload:hover {
-    color: #171717;
+  color: #171717;
 }
 
 .profile-upload input {
-    display: none;
+  display: none;
 }
 
-
-/* =========================================================
+/*          ===
    PROFILE FIELDS
-========================================================= */
+         === */
 
 .profile-fields {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 
-    gap: 20px 28px;
+  gap: 20px 28px;
 }
 
 .profile-fields label {
-    color: #494640;
+  color: #494640;
 
-    font-size: 11px;
-    font-weight: 600;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .profile-fields input,
 .profile-fields select {
-    display: block;
+  display: block;
 
-    width: 100%;
+  width: 100%;
 
-    margin-top: 7px;
+  margin-top: 7px;
 
-    padding: 11px 0;
+  padding: 11px 0;
 
-    border: 0;
-    border-bottom: 1px solid #d9d4ca;
+  border: 0;
+  border-bottom: 1px solid #d9d4ca;
 
-    background: transparent;
+  background: transparent;
 
-    outline: none;
+  outline: none;
 
-    color: #222;
+  color: #222;
 
-    font: inherit;
+  font: inherit;
 
-    font-size: 13px;
+  font-size: 13px;
 
-    transition: border-color .2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .profile-fields input:focus,
 .profile-fields select:focus {
-    border-bottom-color: #ae8748;
+  border-bottom-color: #ae8748;
 }
 
 .profile-fields input:disabled {
-    color: #98938b;
+  color: #98938b;
 }
 
-
-/* =========================================================
+/*          ===
    SAVE PROFILE
-========================================================= */
+         === */
 
 .profile-save-row {
-    grid-column: 1 / -1;
+  grid-column: 1 / -1;
 
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    gap: 15px;
+  gap: 15px;
 
-    margin-top: 5px;
+  margin-top: 5px;
 }
 
 .profile-save-row button {
-    padding: 12px 19px;
+  padding: 12px 19px;
 
-    border: 0;
+  border: 0;
 
-    background: #171717;
+  background: #171717;
 
-    color: #fff;
+  color: #fff;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    letter-spacing: .7px;
+  letter-spacing: 0.7px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: background .2s ease;
+  transition: background 0.2s ease;
 }
 
 .profile-save-row button:hover {
-    background: #a47d3f;
+  background: #a47d3f;
 }
 
 .profile-saved-message {
-    grid-column: 1 / -1;
+  grid-column: 1 / -1;
 
-    color: #5c805b;
+  color: #5c805b;
 
-    font-size: 11px;
+  font-size: 11px;
 }
 
-
-/* =========================================================
+/*          ===
    APPOINTMENT LIST
-========================================================= */
+         === */
 
 .appointment-list {
-    padding: 0 30px 8px;
+  padding: 0 30px 8px;
 }
 
 .appointment-row {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 150px minmax(0, 1fr) 125px 80px;
+  grid-template-columns: 150px minmax(0, 1fr) 125px 80px;
 
-    gap: 18px;
+  gap: 18px;
 
-    align-items: center;
+  align-items: center;
 
-    padding: 19px 0;
+  padding: 19px 0;
 
-    border-bottom: 1px solid #e7e2da;
+  border-bottom: 1px solid #e7e2da;
 }
 
 .appointment-row:last-child {
-    border-bottom: 0;
+  border-bottom: 0;
 }
 
-
-/* =========================================================
+/*          ===
    APPOINTMENT DATE
-========================================================= */
+         === */
 
 .appointment-date strong,
 .appointment-date span {
-    display: block;
+  display: block;
 }
 
 .appointment-date strong {
-    color: #222;
+  color: #222;
 
-    font-size: 13px;
-    font-weight: 600;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .appointment-date span {
-    margin-top: 4px;
+  margin-top: 4px;
 
-    color: #777;
+  color: #777;
 
-    font-size: 11px;
+  font-size: 11px;
 }
 
-
-/* =========================================================
+/*          ===
    APPOINTMENT INFO
-========================================================= */
+         === */
 
 .appointment-info {
-    min-width: 0;
+  min-width: 0;
 }
 
 .appointment-info strong,
 .appointment-info span,
 .appointment-info small {
-    display: block;
+  display: block;
 }
 
 .appointment-info strong {
-    overflow: hidden;
+  overflow: hidden;
 
-    color: #222;
+  color: #222;
 
-    font-size: 13px;
-    font-weight: 600;
+  font-size: 13px;
+  font-weight: 600;
 
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .appointment-info span {
-    margin-top: 4px;
+  margin-top: 4px;
 
-    color: #777;
+  color: #777;
 
-    font-size: 11px;
+  font-size: 11px;
 }
 
 .appointment-info small {
-    margin-top: 4px;
+  margin-top: 4px;
 
-    color: #aaa;
+  color: #aaa;
 
-    font-size: 9px;
+  font-size: 9px;
 
-    letter-spacing: .3px;
+  letter-spacing: 0.3px;
 }
 
-
-/* =========================================================
+/*          ===
    STATUS
-========================================================= */
+         === */
 
 .appointment-status {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
 
-    width: fit-content;
+  width: fit-content;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    letter-spacing: .4px;
+  letter-spacing: 0.4px;
 
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
-
 
 /* CONFIRMED */
 
 .status-confirmed {
-    color: #557c4c;
+  color: #557c4c;
 }
-
 
 /* PENDING */
 
 .status-pending {
-    color: #9a7130;
+  color: #9a7130;
 }
-
 
 /* PENDING PAYMENT */
 
 .status-pending_payment,
 .status-pending-payment {
-    color: #a17a42;
+  color: #a17a42;
 }
-
 
 /* COMPLETED */
 
 .status-completed {
-    color: #4a4a4a;
+  color: #4a4a4a;
 }
-
 
 /* CANCELLED */
 
 .status-cancelled {
-    color: #a14b40;
+  color: #a14b40;
 }
-
 
 /* EXPIRED */
 
 .status-expired {
-    color: #a14b40;
+  color: #a14b40;
 }
-
 
 /* NO SHOW */
 
 .status-no_show {
-    color: #8c625b;
+  color: #8c625b;
 }
-
 
 /* IN SERVICE */
 
 .status-in_service {
-    color: #46708b;
+  color: #46708b;
 }
 
-
-/* =========================================================
+/*          ===
    DETAIL LINK
-========================================================= */
+         === */
 
 .appointment-detail-link {
-    color: #a47d3f;
+  color: #a47d3f;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    text-align: right;
+  text-align: right;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    letter-spacing: .5px;
+  letter-spacing: 0.5px;
 
-    transition: color .2s ease;
+  transition: color 0.2s ease;
 }
 
 .appointment-detail-link:hover {
-    color: #171717;
+  color: #171717;
 }
 
-
-/* =========================================================
+/*          ===
    EMPTY
-========================================================= */
+         === */
 
 .empty-state {
-    padding: 32px 30px;
+  padding: 32px 30px;
 
-    color: #888;
+  color: #888;
 
-    font-size: 13px;
+  font-size: 13px;
 }
 
-
-/* =========================================================
+/*          ===
    APPOINTMENT DETAIL
-========================================================= */
+         === */
 
 .appointment-detail-section {
-    padding: 28px 30px 36px;
+  padding: 28px 30px 36px;
 }
 
-
-/* =========================================================
+/*          ===
    BACK
-========================================================= */
+         === */
 
 .back-link {
-    display: inline-block;
+  display: inline-block;
 
-    margin-bottom: 22px;
+  margin-bottom: 22px;
 
-    color: #555;
+  color: #555;
 
-    font-size: 11px;
+  font-size: 11px;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    transition: color .2s ease;
+  transition: color 0.2s ease;
 }
 
 .back-link:hover {
-    color: #a47d3f;
+  color: #a47d3f;
 }
 
-
-/* =========================================================
+/*          ===
    DETAIL HEADER
-========================================================= */
+         === */
 
 .detail-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 
-    gap: 20px;
+  gap: 20px;
 
-    padding-bottom: 22px;
+  padding-bottom: 22px;
 
-    border-bottom: 1px solid #e5e0d7;
+  border-bottom: 1px solid #e5e0d7;
 }
 
 .detail-header h2 {
-    margin: 0 0 9px;
+  margin: 0 0 9px;
 
-    color: #222;
+  color: #222;
 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 25px;
-    font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-weight: 400;
 }
 
-
-/* =========================================================
+/*          ===
    CANCEL BUTTON
-========================================================= */
+         === */
 
 .cancel-button {
-    padding: 10px 15px;
+  padding: 10px 15px;
 
-    border: 1px solid #c8b9af;
+  border: 1px solid #c8b9af;
 
-    background: transparent;
+  background: transparent;
 
-    color: #934d40;
+  color: #934d40;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 .cancel-button:hover {
-    border-color: #934d40;
+  border-color: #934d40;
 
-    background: #fff7f5;
+  background: #fff7f5;
 
-    color: #7d3e34;
+  color: #7d3e34;
 }
 
 .cancel-button:disabled {
-    opacity: .5;
+  opacity: 0.5;
 
-    cursor: not-allowed;
+  cursor: not-allowed;
 }
 
-
-/* =========================================================
+/*          ===
    DETAIL GRID
-========================================================= */
+         === */
 
 .detail-grid {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 
-    gap: 0 35px;
+  gap: 0 35px;
 }
 
 .detail-grid > div {
-    padding: 18px 0;
+  padding: 18px 0;
 
-    border-bottom: 1px solid #ece8e1;
+  border-bottom: 1px solid #ece8e1;
 }
 
 .detail-grid span,
 .detail-grid strong {
-    display: block;
+  display: block;
 }
 
 .detail-grid span {
-    margin-bottom: 6px;
+  margin-bottom: 6px;
 
-    color: #888;
+  color: #888;
 
-    font-size: 10px;
+  font-size: 10px;
 }
 
 .detail-grid strong {
-    color: #222;
+  color: #222;
 
-    font-size: 13px;
-    font-weight: 500;
+  font-size: 13px;
+  font-weight: 500;
 
-    line-height: 1.5;
+  line-height: 1.5;
 }
 
-
-/* =========================================================
+/*          ===
    LOADING
-========================================================= */
+         === */
 
 .appointments-loading {
-    min-height: 320px;
+  min-height: 320px;
 
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 
-    gap: 14px;
+  gap: 14px;
 
-    color: #888;
+  color: #888;
 
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .loading-spinner {
-    width: 28px;
-    height: 28px;
+  width: 28px;
+  height: 28px;
 
-    border: 2px solid #ded8cf;
-    border-top-color: #a47d3f;
+  border: 2px solid #ded8cf;
+  border-top-color: #a47d3f;
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    animation: customerSpin .8s linear infinite;
+  animation: customerSpin 0.8s linear infinite;
 }
 
 @keyframes customerSpin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-
-/* =========================================================
+/*          ===
    ERROR
-========================================================= */
+         === */
 
 .appointments-error {
-    min-height: 360px;
+  min-height: 360px;
 
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 
-    padding: 40px;
+  padding: 40px;
 
-    background: #fff;
+  background: #fff;
 
-    border: 1px solid #ded9d1;
+  border: 1px solid #ded9d1;
 
-    text-align: center;
+  text-align: center;
 }
 
 .appointments-error .error-icon {
-    width: 45px;
-    height: 45px;
+  width: 45px;
+  height: 45px;
 
-    display: grid;
-    place-items: center;
+  display: grid;
+  place-items: center;
 
-    margin-bottom: 17px;
+  margin-bottom: 17px;
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    background: #f7e9e6;
+  background: #f7e9e6;
 
-    color: #a65a50;
+  color: #a65a50;
 
-    font-size: 18px;
-    font-weight: 700;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .appointments-error h2 {
-    margin: 0;
+  margin: 0;
 
-    color: #222;
+  color: #222;
 
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 25px;
-    font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-weight: 400;
 }
 
 .appointments-error p {
-    max-width: 430px;
+  max-width: 430px;
 
-    margin: 10px 0 22px;
+  margin: 10px 0 22px;
 
-    color: #888;
+  color: #888;
 
-    font-size: 12px;
+  font-size: 12px;
 
-    line-height: 1.6;
+  line-height: 1.6;
 }
 
-
-/* =========================================================
+/*          ===
    RETRY BUTTON
-========================================================= */
+         === */
 
 .retry-button {
-    padding: 11px 20px;
+  padding: 11px 20px;
 
-    border: 1px solid #d4c5ae;
+  border: 1px solid #d4c5ae;
 
-    background: #fff;
+  background: #fff;
 
-    color: #a17d43;
+  color: #a17d43;
 
-    font-size: 10px;
-    font-weight: 700;
+  font-size: 10px;
+  font-weight: 700;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition: all .2s ease;
+  transition: all 0.2s ease;
 }
 
 .retry-button:hover {
-    background: #a47d3f;
+  background: #a47d3f;
 
-    color: #fff;
+  color: #fff;
 
-    border-color: #a47d3f;
+  border-color: #a47d3f;
 }
 
-
-/* =========================================================
+/*          ===
    APPOINTMENT BACK LINK
-========================================================= */
+         === */
 
 .appointments-back-link {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
 
-    margin-bottom: 28px;
+  margin-bottom: 28px;
 
-    color: #777;
+  color: #777;
 
-    font-size: 11px;
+  font-size: 11px;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    transition: color .2s ease;
+  transition: color 0.2s ease;
 }
 
 .appointments-back-link:hover {
-    color: #a47d3f;
+  color: #a47d3f;
 }
 
-
-/* =========================================================
+/*          ===
    RESPONSIVE - TABLET
-========================================================= */
+         === */
 
 @media (max-width: 900px) {
+  .customer-layout {
+    grid-template-columns: 1fr;
 
-    .customer-layout {
-        grid-template-columns: 1fr;
+    gap: 25px;
+  }
 
-        gap: 25px;
-    }
+  .customer-sidebar {
+    display: grid;
 
-    .customer-sidebar {
-        display: grid;
+    grid-template-columns: repeat(3, 1fr);
 
-        grid-template-columns: repeat(3, 1fr);
+    gap: 0 15px;
+  }
 
-        gap: 0 15px;
-    }
+  .appointment-row {
+    grid-template-columns: 130px minmax(0, 1fr) 110px 70px;
 
-    .appointment-row {
-        grid-template-columns: 130px minmax(0, 1fr) 110px 70px;
-
-        gap: 14px;
-    }
+    gap: 14px;
+  }
 }
 
-
-/* =========================================================
+/*          ===
    RESPONSIVE - MOBILE
-========================================================= */
+         === */
 
 @media (max-width: 700px) {
+  .customer-account {
+    padding: 35px 0 60px;
+  }
 
-    .customer-account {
-        padding: 35px 0 60px;
-    }
+  .customer-title-row {
+    flex-direction: column;
 
-    .customer-title-row {
-        flex-direction: column;
+    align-items: flex-start;
 
-        align-items: flex-start;
+    margin-bottom: 28px;
 
-        margin-bottom: 28px;
+    padding-bottom: 24px;
+  }
 
-        padding-bottom: 24px;
-    }
+  .customer-title-row h1 {
+    font-size: 30px;
+  }
 
-    .customer-title-row h1 {
-        font-size: 30px;
-    }
+  .customer-book-button {
+    align-self: flex-start;
+  }
 
-    .customer-book-button {
-        align-self: flex-start;
-    }
+  .customer-sidebar {
+    grid-template-columns: 1fr 1fr;
 
-    .customer-sidebar {
-        grid-template-columns: 1fr 1fr;
+    gap: 0 15px;
+  }
 
-        gap: 0 15px;
-    }
+  .profile-grid {
+    grid-template-columns: 1fr;
 
-    .profile-grid {
-        grid-template-columns: 1fr;
+    gap: 28px;
+  }
 
-        gap: 28px;
-    }
+  .profile-fields {
+    grid-template-columns: 1fr;
+  }
 
-    .profile-fields {
-        grid-template-columns: 1fr;
-    }
+  .appointment-row {
+    grid-template-columns: 1fr;
 
-    .appointment-row {
-        grid-template-columns: 1fr;
+    gap: 9px;
 
-        gap: 9px;
+    padding: 18px 0;
+  }
 
-        padding: 18px 0;
-    }
+  .appointment-detail-link {
+    text-align: left;
+  }
 
-    .appointment-detail-link {
-        text-align: left;
-    }
+  .detail-header {
+    flex-direction: column;
 
-    .detail-header {
-        flex-direction: column;
-
-        align-items: flex-start;
-    }
+    align-items: flex-start;
+  }
 }
 
-
-/* =========================================================
+/*          ===
    RESPONSIVE - SMALL MOBILE
-========================================================= */
+         === */
 
 @media (max-width: 520px) {
+  .customer-shell {
+    width: calc(100% - 30px);
+  }
 
-    .customer-shell {
-        width: calc(100% - 30px);
-    }
+  .customer-breadcrumb {
+    margin-bottom: 28px;
+  }
 
-    .customer-breadcrumb {
-        margin-bottom: 28px;
-    }
+  .customer-title-row h1 {
+    font-size: 27px;
+  }
 
-    .customer-title-row h1 {
-        font-size: 27px;
-    }
+  .section-heading-line {
+    align-items: flex-start;
 
-    .section-heading-line {
-        align-items: flex-start;
+    flex-direction: column;
 
-        flex-direction: column;
+    padding: 22px 20px;
+  }
 
-        padding: 22px 20px;
-    }
+  .profile-overview .profile-grid {
+    padding: 24px 20px;
+  }
 
-    .profile-overview .profile-grid {
-        padding: 24px 20px;
-    }
+  .appointment-list {
+    padding: 0 20px 6px;
+  }
 
-    .appointment-list {
-        padding: 0 20px 6px;
-    }
+  .appointment-detail-section {
+    padding: 24px 20px 30px;
+  }
 
-    .appointment-detail-section {
-        padding: 24px 20px 30px;
-    }
+  .detail-grid {
+    grid-template-columns: 1fr;
 
-    .detail-grid {
-        grid-template-columns: 1fr;
+    gap: 0;
+  }
 
-        gap: 0;
-    }
+  .profile-avatar-large {
+    width: 100px;
+    height: 100px;
+  }
 
-    .profile-avatar-large {
-        width: 100px;
-        height: 100px;
-    }
+  .customer-sidebar {
+    grid-template-columns: 1fr;
+  }
 
-    .customer-sidebar {
-        grid-template-columns: 1fr;
-    }
+  .appointments-error {
+    min-height: 320px;
 
-    .appointments-error {
-        min-height: 320px;
-
-        padding: 30px 20px;
-    }
+    padding: 30px 20px;
+  }
 }
 
-
-/* =========================================================
+/*          ===
    VERY SMALL MOBILE
-========================================================= */
+         === */
 
 @media (max-width: 420px) {
+  .customer-shell {
+    width: calc(100% - 24px);
+  }
 
-    .customer-shell {
-        width: calc(100% - 24px);
-    }
+  .customer-title-row h1 {
+    font-size: 24px;
+  }
 
-    .customer-title-row h1 {
-        font-size: 24px;
-    }
+  .customer-sidebar {
+    grid-template-columns: 1fr;
+  }
 
-    .customer-sidebar {
-        grid-template-columns: 1fr;
-    }
+  .section-heading-line h2 {
+    font-size: 21px;
+  }
 
-    .section-heading-line h2 {
-        font-size: 21px;
-    }
+  .appointment-info strong {
+    font-size: 12px;
+  }
 
-    .appointment-info strong {
-        font-size: 12px;
-    }
-
-    .detail-header h2 {
-        font-size: 22px;
-    }
+  .detail-header h2 {
+    font-size: 22px;
+  }
 }

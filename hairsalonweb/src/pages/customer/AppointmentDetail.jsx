@@ -14,9 +14,7 @@ function AppointmentDetail() {
   const [paying, setPaying] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(null);
 
-  // ==============================
-  // LOAD DETAIL
-  // ==============================
+
   useEffect(() => {
     const loadAppointment = async () => {
       try {
@@ -45,9 +43,6 @@ function AppointmentDetail() {
     loadAppointment();
   }, [id]);
 
-  // ==============================
-  // PAYMENT COUNTDOWN
-  // ==============================
   useEffect(() => {
     if (!appointment) {
       return;
@@ -92,9 +87,6 @@ function AppointmentDetail() {
     return () => clearInterval(timer);
   }, [appointment]);
 
-  // ==============================
-  // CANCEL
-  // ==============================
   const handleCancel = async () => {
     const confirmed = window.confirm(
       "Bạn có chắc muốn hủy lịch hẹn này?",
@@ -132,9 +124,7 @@ function AppointmentDetail() {
     }
   };
 
-  // ==============================
-  // RETRY PAYMENT
-  // ==============================
+
   const handleRetryPayment = async () => {
     if (!appointment) {
       return;
@@ -200,9 +190,7 @@ function AppointmentDetail() {
     }
   };
 
-  // ==============================
-  // FORMAT DATE
-  // ==============================
+
   const formatDate = (value) => {
     if (!value) {
       return "--";
@@ -225,9 +213,7 @@ function AppointmentDetail() {
     );
   };
 
-  // ==============================
-  // FORMAT MONEY
-  // ==============================
+
   const formatMoney = (value) => {
     return (
       Number(value || 0).toLocaleString(
@@ -236,9 +222,7 @@ function AppointmentDetail() {
     );
   };
 
-  // ==============================
-  // FORMAT COUNTDOWN
-  // ==============================
+
   const formatCountdown = (seconds) => {
     if (
       seconds === null ||
@@ -259,9 +243,6 @@ function AppointmentDetail() {
     )}:${String(remaining).padStart(2, "0")}`;
   };
 
-  // ==============================
-  // STATUS
-  // ==============================
   const getStatusInfo = (status) => {
     switch (status) {
       case "PENDING":
@@ -320,9 +301,6 @@ function AppointmentDetail() {
     }
   };
 
-  // ==============================
-  // LOADING
-  // ==============================
   if (loading) {
     return (
       <div className="appointment-detail-page">
@@ -339,9 +317,6 @@ function AppointmentDetail() {
     );
   }
 
-  // ==============================
-  // ERROR
-  // ==============================
   if (error && !appointment) {
     return (
       <div className="appointment-detail-page">
@@ -376,9 +351,7 @@ function AppointmentDetail() {
     );
   }
 
-  // ==============================
-  // DATA
-  // ==============================
+
   const normalizedStatus = String(
     appointment?.status || "",
   )
@@ -399,8 +372,6 @@ function AppointmentDetail() {
     appointment?.service?.name ||
     "Dịch vụ làm tóc";
 
-  // LẤY GIÁ TRỰC TIẾP TỪ BACKEND
-  // bookingAmount là giá được backend lưu cho appointment.
   const servicePrice = Number(
     appointment?.bookingAmount ??
     appointment?.service?.price ??
@@ -408,7 +379,6 @@ function AppointmentDetail() {
     0,
   );
 
-  // Tổng tiền của appointment hiện tại chính là bookingAmount.
   const totalAmount = Number(
     appointment?.bookingAmount ??
     appointment?.totalAmount ??
@@ -429,16 +399,11 @@ function AppointmentDetail() {
     remainingSeconds !== null &&
     remainingSeconds > 0;
 
-  // ==============================
-  // RENDER
-  // ==============================
+
   return (
     <div className="appointment-detail-page">
       <div className="appointment-detail-container">
 
-        {/* ==============================
-            BACK
-        ============================== */}
 
         <button
           type="button"
@@ -456,9 +421,6 @@ function AppointmentDetail() {
           </span>
         </button>
 
-        {/* ==============================
-            PAGE HEADER
-        ============================== */}
 
         <div className="appointment-page-header">
           <div className="header-left">
@@ -488,9 +450,7 @@ function AppointmentDetail() {
           </div>
         </div>
 
-        {/* ==============================
-            ERROR ALERT
-        ============================== */}
+
 
         {error && (
           <div className="appointment-alert">
@@ -498,9 +458,6 @@ function AppointmentDetail() {
           </div>
         )}
 
-        {/* ==============================
-            PAYMENT WARNING
-        ============================== */}
 
         {normalizedStatus ===
           "PENDING_PAYMENT" && (
@@ -541,19 +498,13 @@ function AppointmentDetail() {
             </div>
           )}
 
-        {/* ==============================
-            CONTENT
-        ============================== */}
+
 
         <div className="appointment-content">
 
-          {/* =====================================
-              MAIN CARD
-          ===================================== */}
-
           <div className="appointment-main-card">
 
-            {/* SERVICE */}
+
 
             <div className="detail-row service-row">
               <div className="detail-label">
@@ -589,7 +540,6 @@ function AppointmentDetail() {
               </div>
             </div>
 
-            {/* STYLIST */}
 
             <div className="detail-row">
               <div className="detail-label">
@@ -635,7 +585,6 @@ function AppointmentDetail() {
               </div>
             </div>
 
-            {/* DATE TIME */}
 
             <div className="detail-row">
               <div className="detail-label">
@@ -686,7 +635,6 @@ function AppointmentDetail() {
               </div>
             </div>
 
-            {/* NOTE */}
 
             {appointment?.customerNote && (
               <div className="detail-row">
@@ -707,10 +655,6 @@ function AppointmentDetail() {
             )}
 
           </div>
-
-          {/* =====================================
-              RIGHT SUMMARY
-          ===================================== */}
 
           <aside className="appointment-summary">
 

@@ -9,9 +9,9 @@ function CustomerAppointments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =========================================
+  //        =
   // LOAD APPOINTMENTS
-  // =========================================
+  //        =
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -74,9 +74,9 @@ function CustomerAppointments() {
     }
   };
 
-  // =========================================
+  //        =
   // STATUS LABEL
-  // =========================================
+  //        =
   const getStatusLabel = (status) => {
     switch (status) {
       case "PENDING":
@@ -108,9 +108,9 @@ function CustomerAppointments() {
     }
   };
 
-  // =========================================
+  //        =
   // STATUS CLASS
-  // =========================================
+  //        =
   const getStatusClass = (status) => {
     switch (status) {
       case "PENDING":
@@ -142,9 +142,9 @@ function CustomerAppointments() {
     }
   };
 
-  // =========================================
+  //        =
   // STYLIST NAME
-  // =========================================
+  //        =
   const getStylistName = (appointment) => {
     if (appointment?.stylist) {
       const fullName =
@@ -157,9 +157,9 @@ function CustomerAppointments() {
     return appointment?.stylistName || "Stylist";
   };
 
-  // =========================================
+  //        =
   // SERVICE NAME
-  // =========================================
+  //        =
   const getServiceName = (appointment) => {
     return (
       appointment?.service?.name ||
@@ -168,9 +168,9 @@ function CustomerAppointments() {
     );
   };
 
-  // =========================================
+  //        =
   // SERVICE PRICE
-  // =========================================
+  //        =
   const getServicePrice = (appointment) => {
     return (
       appointment?.service?.price ||
@@ -180,9 +180,9 @@ function CustomerAppointments() {
     );
   };
 
-  // =========================================
+  //        =
   // FORMAT MONEY
-  // =========================================
+  //        =
   const formatMoney = (value) => {
     return (
       Number(value || 0).toLocaleString("vi-VN") +
@@ -190,9 +190,9 @@ function CustomerAppointments() {
     );
   };
 
-  // =========================================
+  //        =
   // FORMAT DATE
-  // =========================================
+  //        =
   const formatDate = (value) => {
     if (!value) {
       return "--";
@@ -212,9 +212,9 @@ function CustomerAppointments() {
     });
   };
 
-  // =========================================
+  //        =
   // LOADING
-  // =========================================
+  //        =
   if (loading) {
     return (
       <div className="customer-page">
@@ -235,9 +235,9 @@ function CustomerAppointments() {
     );
   }
 
-  // =========================================
+  //        =
   // ERROR
-  // =========================================
+  //        =
   if (error) {
     return (
       <div className="customer-page">
@@ -299,19 +299,12 @@ function CustomerAppointments() {
     );
   }
 
-  // =========================================
-  // RENDER
-  // =========================================
   return (
     <div className="customer-page">
       <Header />
 
       <main className="customer-account">
         <div className="customer-shell">
-
-          {/* =====================================
-              BREADCRUMB
-          ===================================== */}
 
           <div className="customer-breadcrumb">
             <Link to="/">
@@ -331,10 +324,6 @@ function CustomerAppointments() {
             </span>
           </div>
 
-          {/* =====================================
-              BACK
-          ===================================== */}
-
           <Link
             className="appointments-back-link"
             to="/customer/profile"
@@ -342,9 +331,7 @@ function CustomerAppointments() {
             ← Quay lại tài khoản
           </Link>
 
-          {/* =====================================
-              PAGE HEADER
-          ===================================== */}
+
 
           <div className="appointments-header">
             <div>
@@ -370,9 +357,6 @@ function CustomerAppointments() {
             </Link>
           </div>
 
-          {/* =====================================
-              EMPTY
-          ===================================== */}
 
           {appointments.length === 0 ? (
             <div className="appointments-empty">
@@ -399,10 +383,6 @@ function CustomerAppointments() {
             </div>
           ) : (
 
-            /* =====================================
-                APPOINTMENT LIST
-            ===================================== */
-
             <div className="appointments-list">
               {appointments.map((appointment) => {
 
@@ -421,8 +401,6 @@ function CustomerAppointments() {
                     to={`/customer/appointments/${appointment.id}`}
                     className="appointment-card"
                   >
-
-                    {/* DATE */}
 
                     <div className="appointment-date">
                       <span className="date-day">
@@ -447,7 +425,6 @@ function CustomerAppointments() {
                       </span>
                     </div>
 
-                    {/* INFO */}
 
                     <div className="appointment-info">
                       <div className="appointment-top">
@@ -502,7 +479,6 @@ function CustomerAppointments() {
 
                     </div>
 
-                    {/* ARROW */}
 
                     <div className="appointment-arrow">
                       →

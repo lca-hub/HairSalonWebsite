@@ -60,9 +60,7 @@ function LocationIcon() {
 export default function Footer() {
   return (
     <footer className="salon-footer">
-      {/* TOP FOOTER */}
       <div className="footer-container">
-        {/* BRAND */}
         <div className="footer-brand">
           <div className="footer-logo">
             <span>HAIR</span>
@@ -85,7 +83,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* QUICK LINKS */}
         <div className="footer-column">
           <h3>KHÁM PHÁ</h3>
 
@@ -98,7 +95,6 @@ export default function Footer() {
           <NavLink to="/products">Sản phẩm</NavLink>
         </div>
 
-        {/* CUSTOMER */}
         <div className="footer-column">
           <h3>DỊCH VỤ KHÁCH HÀNG</h3>
 
@@ -111,7 +107,6 @@ export default function Footer() {
           <NavLink to="/customer/notifications">Thông báo</NavLink>
         </div>
 
-        {/* CONTACT */}
         <div className="footer-column footer-contact">
           <h3>LIÊN HỆ</h3>
 
@@ -139,7 +134,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* BOTTOM */}
       <div className="footer-bottom">
         <div className="footer-bottom-container">
           <span>
