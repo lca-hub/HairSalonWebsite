@@ -2,7 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import cookies from "react-cookies";
 import { clearSession, decodeToken, getRoleFromToken } from "./ProtectedRoute";
-import { authApis, endpoints } from "../configs/api/Apis";
+import { authApis } from "../configs/api/Apis";
 import "./Header.css";
 
 const roleNames = {
@@ -30,8 +30,7 @@ const dashboardMenus = {
     ["Lịch hẹn", "/receptionist/appointments"],
     ["Khách hàng", "/receptionist/customers"],
     ["Hóa đơn & thanh toán", "/receptionist/invoices"],
-    ["Lịch làm việc", "/receptionist/schedules"],
-    ["Doanh thu", "/receptionist/revenue"],
+    ["Bán hàng", "/receptionist/sales"],
   ],
 
   STYLIST: [
@@ -80,7 +79,7 @@ function Header({ role: dashboardRole, title }) {
   const role = dashboardRole || tokenRole;
   const email = payload?.email || payload?.sub || "";
   const isCustomer = role === "CUSTOMER";
-  const isDashboard = ["ADMIN", "RECEPTIONIST", "STYLIST"].includes(role);
+  const isDashboard = Boolean(dashboardRole);
 
   useEffect(() => {
     if (!isCustomer || !token) {

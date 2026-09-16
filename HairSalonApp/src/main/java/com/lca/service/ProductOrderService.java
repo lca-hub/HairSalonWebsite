@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductOrderService {
+
     Page<ProductOrderResponseDTO> getAll(Pageable pageable);
 
     ProductOrderResponseDTO getById(Long id);
@@ -14,6 +15,8 @@ public interface ProductOrderService {
     ProductOrderResponseDTO updateStatus(Long id, ProductOrderStatus status);
 
     ProductOrderResponseDTO create(String email, ProductOrderRequestDTO request);
+
+    ProductOrderResponseDTO createAtStore(ProductOrderRequestDTO request);
 
     Page<ProductOrderResponseDTO> getMyOrders(String email, Pageable pageable);
 

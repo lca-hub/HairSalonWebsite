@@ -12,6 +12,7 @@ import com.lca.entity.User;
 import com.lca.enums.AppointmentStatus;
 import com.lca.enums.PaymentMethod;
 import com.lca.enums.PaymentStatus;
+import com.lca.enums.ProductOrderStatus;
 import com.lca.repository.AppointmentRepository;
 import com.lca.repository.AppointmentSlotRepository;
 import com.lca.repository.CustomerRepository;
@@ -475,14 +476,30 @@ public class PaymentServiceImpl implements PaymentService {
     private void processSuccessfulProductOrderPayment(PaymentTransaction transaction, Invoice invoice, LocalDateTime now) {
         ProductOrder order = invoice.getProductOrder();
 
+        if (order == null) {
+            throw new RuntimeException("Invoice không có product order");
+        }
+
         if (order.getPaymentStatus() == PaymentStatus.PAID) {
             transaction.setPaymentStatus(PaymentStatus.PAID);
             transaction.setTransactionTime(now);
             paymentTransactionRepo.save(transaction);
+
+            if (invoice.getPaymentStatus() != PaymentStatus.PAID) {
+                invoice.setPaymentStatus(PaymentStatus.PAID);
+                invoiceRepo.save(invoice);
+            }
+
+            if (order.getOrderStatus() == ProductOrderStatus.PENDING) {
+                order.setOrderStatus(ProductOrderStatus.CONFIRMED);
+                order.setUpdatedAt(now);
+                productOrderRepo.save(order);
+            }
+
             return;
         }
 
-        if (order.getOrderStatus().name().equals("CANCELLED")) {
+        if (order.getOrderStatus() == ProductOrderStatus.CANCELLED) {
             throw new RuntimeException("Đơn hàng đã bị hủy");
         }
 
@@ -495,6 +512,8 @@ public class PaymentServiceImpl implements PaymentService {
         invoice.setPaymentStatus(PaymentStatus.PAID);
 
         order.setPaymentStatus(PaymentStatus.PAID);
+        order.setOrderStatus(ProductOrderStatus.CONFIRMED);
+        order.setUpdatedAt(now);
 
         paymentTransactionRepo.save(transaction);
         invoiceRepo.save(invoice);

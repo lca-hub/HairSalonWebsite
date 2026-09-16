@@ -32,6 +32,11 @@ import NotificationPage from "./pages/customer/NotificationPage";
 import StylistDashboard from "./pages/stylist/StylistDashboard";
 import StylistAppointments from "./pages/stylist/StylistAppointments";
 import StylistSchedule from "./pages/stylist/StylistSchedule";
+import ReceptionistDashboard from "./pages/receptionist/ReceptionistDashboard";
+import ReceptionistAppointments from "./pages/receptionist/ReceptionistAppointments";
+import ReceptionistCustomers from "./pages/receptionist/ReceptionistCustomers";
+import ReceptionistInvoices from "./pages/receptionist/ReceptionistInvoices";
+import ReceptionistProductSale from "./pages/receptionist/ReceptionistProductSale";
 
 function App() {
   return (
@@ -90,10 +95,12 @@ function App() {
         ========================= */}
         <Route element={<ProtectedRoute roles={["RECEPTIONIST"]} />}>
 
-          <Route path="/receptionist" element={<ComingSoon title="Khu vực lễ tân" role="RECEPTIONIST" />} />
+          <Route path="/receptionist" element={<ReceptionistDashboard />} />
           <Route path="/receptionist/profile" element={<AccountPage />} />
-          <Route path="/receptionist/*" element={<ComingSoon title="Chức năng lễ tân" role="RECEPTIONIST" />} />
-
+          <Route path="/receptionist/customers" element={<ReceptionistCustomers />} />
+          <Route path="/receptionist/invoices" element={<ReceptionistInvoices />} />
+          <Route path="/receptionist/sales" element={<ReceptionistProductSale />} />
+          <Route path="/receptionist/appointments" element={<ReceptionistAppointments />} />
         </Route>
 
 

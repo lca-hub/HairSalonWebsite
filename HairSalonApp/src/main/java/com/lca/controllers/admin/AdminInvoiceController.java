@@ -1,6 +1,7 @@
 package com.lca.controllers.admin;
 
 import com.lca.dtos.request.InvoiceRequestDTO;
+import com.lca.dtos.request.ProductOrderRequestDTO;
 import com.lca.dtos.response.InvoiceResponseDTO;
 import com.lca.dtos.response.ProductOrderResponseDTO;
 import com.lca.enums.PaymentMethod;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/admin/invoices")
 @RequiredArgsConstructor
 public class AdminInvoiceController {
+
 
     private final InvoiceService invoiceService;
     private final ProductOrderService productOrderService;
@@ -60,5 +62,12 @@ public class AdminInvoiceController {
             @RequestParam ProductOrderStatus status) {
 
         return ResponseEntity.ok(productOrderService.updateStatus(orderId, status));
+    }
+
+    @PostMapping("/product-sale")
+    public ResponseEntity<InvoiceResponseDTO> createProductSale(@Valid @RequestBody ProductOrderRequestDTO request) {
+        ProductOrderResponseDTO order = productOrderService.createAtStore(request);
+        InvoiceResponseDTO invoice = invoiceService.createProductSaleInvoice(order.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(invoice);
     }
 }

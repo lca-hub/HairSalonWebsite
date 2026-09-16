@@ -1,7 +1,7 @@
 import axios from 'axios';
 import cookies from 'react-cookies';
 
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const endpoints = {
     register: `/auth/register`,
@@ -73,6 +73,7 @@ export const endpoints = {
     adminProducts: `/admin/products`,
     adminProductDetail: (id) => `/admin/products/${id}`,
     adminProductStatus: (id) => `/admin/products/${id}/status`,
+    adminProductSale: '/admin/invoices/product-sale',
     adminSuppliers: `/admin/suppliers`,
     adminSupplierDetail: (id) => `/admin/suppliers/${id}`,
     adminPurchaseOrders: `/admin/purchase-orders`,

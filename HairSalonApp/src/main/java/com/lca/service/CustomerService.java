@@ -17,4 +17,6 @@ public interface CustomerService {
     CustomerResponseDTO updateMe(String email, CustomerRequestDTO request);
 
     CustomerResponseDTO getByEmail(String email);
+
+    CustomerResponseDTO updateByAdmin(Long id, CustomerRequestDTO request);
 }

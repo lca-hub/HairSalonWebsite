@@ -55,8 +55,8 @@ public class ApiSecurityConfig {
                         .requestMatchers("/api/stylists/me/**").hasRole("STYLIST")
                         .requestMatchers(HttpMethod.GET, "/api/services/**", "/api/stylists/**", "/api/products/**").permitAll()
                         .requestMatchers("/api/admin/appointments/**", "/api/admin/invoices/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/admin/customers/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RECEPTIONIST")
                         .requestMatchers(
-                                "/api/admin/users/**",
                                 "/api/admin/services/**",
                                 "/api/admin/categories/**",
                                 "/api/admin/stylists/**",
@@ -64,7 +64,6 @@ public class ApiSecurityConfig {
                                 "/api/admin/products/**",
                                 "/api/admin/suppliers/**",
                                 "/api/admin/purchase-orders/**",
-                                "/api/admin/customers/**",
                                 "/api/admin/attendance/**",
                                 "/api/admin/reviews/**",
                                 "/api/admin/statistics/**",
@@ -72,6 +71,8 @@ public class ApiSecurityConfig {
                                 "/api/admin/orders/**",
                                 "/api/admin/payment-transactions/**"
                         ).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/users").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(
                                 "/api/cart/**",
                                 "/api/customers/me/**",

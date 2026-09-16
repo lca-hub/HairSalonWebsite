@@ -1,9 +1,11 @@
 package com.lca.controllers.admin;
 
+import com.lca.dtos.request.CustomerRequestDTO;
 import com.lca.dtos.response.CustomerResponseDTO;
 import com.lca.enums.Gender;
 import com.lca.service.CustomerService;
 import com.lca.utils.PaginationUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +32,13 @@ public class AdminCustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponseDTO> getById(@PathVariable Long id) {
-
         return ResponseEntity.ok(customerService.getById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponseDTO> update(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerRequestDTO request) {
+        return ResponseEntity.ok(customerService.updateByAdmin(id, request));
     }
 }

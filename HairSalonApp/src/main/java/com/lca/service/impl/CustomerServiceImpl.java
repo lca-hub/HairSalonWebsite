@@ -100,4 +100,48 @@ public class CustomerServiceImpl implements CustomerService {
 
         return CustomerMapper.toResponse(customer);
     }
+
+    @Override
+    @Transactional
+    public CustomerResponseDTO updateByAdmin(Long id, CustomerRequestDTO request) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer với ID: " + id));
+
+        User user = customer.getUser();
+
+        if (user == null) {
+            throw new RuntimeException("Customer chưa liên kết với user");
+        }
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
+
+        if (request.getDob() != null) {
+            customer.setDob(request.getDob());
+        }
+
+        if (request.getGender() != null) {
+            customer.setGender(request.getGender());
+        }
+
+        userRepository.save(user);
+        customerRepository.save(customer);
+
+        return CustomerMapper.toResponse(customer);
+    }
+
+
 }

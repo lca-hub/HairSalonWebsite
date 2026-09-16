@@ -24,4 +24,6 @@ public interface InvoiceService {
     Page<InvoiceResponseDTO> getMyInvoices(String email, Pageable pageable);
 
     InvoiceResponseDTO getMyInvoiceById(String email, Long id);
+
+    InvoiceResponseDTO createProductSaleInvoice(Long orderId);
 }
