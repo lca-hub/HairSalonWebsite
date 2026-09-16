@@ -162,10 +162,6 @@
   align-items: start;
 }
 
-/*          ===
-   SIDEBAR
-         === */
-
 .customer-sidebar {
   border-top: 1px solid #d9d4cc;
 }
@@ -195,10 +191,6 @@
   font-weight: 600;
 }
 
-/*          ===
-   CONTENT
-         === */
-
 .customer-content {
   min-width: 0;
 }
@@ -211,9 +203,6 @@
   border: 1px solid #ded9d1;
 }
 
-/*          ===
-   SECTION HEADER
-         === */
 
 .section-heading-line {
   display: flex;
@@ -265,9 +254,7 @@
   color: #171717;
 }
 
-/*          ===
-   PROFILE
-         === */
+
 
 .profile-overview .profile-grid {
   padding: 30px;
