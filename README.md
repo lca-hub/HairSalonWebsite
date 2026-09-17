@@ -45,8 +45,7 @@ Hệ thống đặt lịch hẹn làm tóc trực tuyến giúp khách hàng tì
 - Redux Toolkit
 - Bootstrap
 - React Hook Form
-- Zod
-
+  
 ## Cấu trúc dự án
 
 ```text
@@ -68,7 +67,7 @@ HairSalonWebsite/
 - Cấu hình các biến môi trường cho backend bao gồm cơ sở dữ liệu, email, Cloudinary và VNPay.
 - Chạy backend Spring Boot.
 - Di chuyển vào thư mục hairsalonweb và cài đặt các package bằng npm install.
-- Cấu hình file .env cho frontend theo file .env.example.
+- Cấu hình file .env cho backend, frontend theo file .env.example.
 - Chạy frontend bằng lệnh npm run dev.
 
 ## Triển khai
