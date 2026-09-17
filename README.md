@@ -1,7 +1,7 @@
 # HairSalonWebsite
 
 Hệ thống đặt lịch hẹn làm tóc trực tuyến giúp khách hàng tìm hiểu các dịch vụ của salon, xem thông tin stylist, lựa chọn lịch làm tóc, đặt lịch hẹn, thanh toán trực tuyến và quản lý lịch sử sử dụng dịch vụ. Hệ thống đồng thời hỗ trợ lễ tân và quản trị viên quản lý hoạt động của salon.
-Đây là website của đồ án: [https://hairsalon-0io0.onrender.com]([url](https://hairsalon-0io0.onrender.com/))
+Đây là website của đồ án: [https://hairsalon-0io0.onrender.com/](https://hairsalon-0io0.onrender.com/)
 
 ## Chức năng
 
