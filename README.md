@@ -45,7 +45,7 @@ Hệ thống đặt lịch hẹn làm tóc trực tuyến giúp khách hàng tì
 - Redux Toolkit
 - Bootstrap
 - React Hook Form
-  
+
 ## Cấu trúc dự án
 
 ```text
@@ -76,3 +76,12 @@ HairSalonWebsite/
 - Backend: Render Web Service
 - Database: Aiven MySQL
 - Lưu trữ hình ảnh: Cloudinary
+
+## Tài khoản
+
+- Admin:
+  Email: admin@test.com
+  Mật khẩu: 123456
+- Customer:
+  Email: customer1@test.com
+  Mật khẩu: 123456
