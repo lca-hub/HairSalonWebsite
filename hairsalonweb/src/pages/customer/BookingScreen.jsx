@@ -113,9 +113,7 @@ function BookingScreen() {
 
 
         if (queryServiceId) {
-          const serviceResponse = await authApis().get(
-            endpoints.serviceDetail(queryServiceId),
-          );
+          const serviceResponse = await authApis().get(endpoints.serviceDetail(queryServiceId),);
 
           const serviceData = serviceResponse.data;
 
@@ -174,12 +172,7 @@ function BookingScreen() {
 
         const [stylistResponse, serviceResponse] = await Promise.all([
           authApis().get(endpoints.stylistDetail(selectedStylist)),
-          authApis().get(endpoints.stylistServices(selectedStylist), {
-            params: {
-              page: 0,
-              size: 50,
-            },
-          }),
+          authApis().get(endpoints.stylistServices(selectedStylist), { params: { page: 0, size: 50, }, }),
         ]);
 
         const stylistData = stylistResponse.data;
@@ -211,11 +204,7 @@ function BookingScreen() {
       } catch (err) {
         console.error("LOAD STYLIST ERROR:", err);
 
-        setError(
-          err.response?.data?.message ||
-          err.message ||
-          "Không thể tải stylist.",
-        );
+        setError(err.response?.data?.message || err.message || "Không thể tải stylist.",);
       }
     };
 

@@ -446,10 +446,6 @@
   font-size: 11px;
 }
 
-/*          ===
-   APPOINTMENT INFO
-         === */
-
 .appointment-info {
   min-width: 0;
 }
@@ -490,10 +486,6 @@
   letter-spacing: 0.3px;
 }
 
-/*          ===
-   STATUS
-         === */
-
 .appointment-status {
   display: inline-flex;
   align-items: center;
@@ -508,58 +500,38 @@
   text-transform: uppercase;
 }
 
-/* CONFIRMED */
-
 .status-confirmed {
   color: #557c4c;
 }
 
-/* PENDING */
-
 .status-pending {
   color: #9a7130;
 }
-
-/* PENDING PAYMENT */
 
 .status-pending_payment,
 .status-pending-payment {
   color: #a17a42;
 }
 
-/* COMPLETED */
-
 .status-completed {
   color: #4a4a4a;
 }
-
-/* CANCELLED */
 
 .status-cancelled {
   color: #a14b40;
 }
 
-/* EXPIRED */
-
 .status-expired {
   color: #a14b40;
 }
-
-/* NO SHOW */
 
 .status-no_show {
   color: #8c625b;
 }
 
-/* IN SERVICE */
-
 .status-in_service {
   color: #46708b;
 }
-
-/*          ===
-   DETAIL LINK
-         === */
 
 .appointment-detail-link {
   color: #a47d3f;
@@ -580,10 +552,6 @@
   color: #171717;
 }
 
-/*          ===
-   EMPTY
-         === */
-
 .empty-state {
   padding: 32px 30px;
 
@@ -592,17 +560,9 @@
   font-size: 13px;
 }
 
-/*          ===
-   APPOINTMENT DETAIL
-         === */
-
 .appointment-detail-section {
   padding: 28px 30px 36px;
 }
-
-/*          ===
-   BACK
-         === */
 
 .back-link {
   display: inline-block;
@@ -621,10 +581,6 @@
 .back-link:hover {
   color: #a47d3f;
 }
-
-/*          ===
-   DETAIL HEADER
-         === */
 
 .detail-header {
   display: flex;
@@ -647,10 +603,6 @@
   font-size: 25px;
   font-weight: 400;
 }
-
-/*          ===
-   CANCEL BUTTON
-         === */
 
 .cancel-button {
   padding: 10px 15px;
@@ -682,10 +634,6 @@
 
   cursor: not-allowed;
 }
-
-/*          ===
-   DETAIL GRID
-         === */
 
 .detail-grid {
   display: grid;
@@ -722,10 +670,6 @@
 
   line-height: 1.5;
 }
-
-/*          ===
-   LOADING
-         === */
 
 .appointments-loading {
   min-height: 320px;
@@ -821,10 +765,6 @@
   line-height: 1.6;
 }
 
-/*          ===
-   RETRY BUTTON
-         === */
-
 .retry-button {
   padding: 11px 20px;
 
@@ -850,10 +790,6 @@
   border-color: #a47d3f;
 }
 
-/*          ===
-   APPOINTMENT BACK LINK
-         === */
-
 .appointments-back-link {
   display: inline-flex;
   align-items: center;
@@ -872,10 +808,6 @@
 .appointments-back-link:hover {
   color: #a47d3f;
 }
-
-/*          ===
-   RESPONSIVE - TABLET
-         === */
 
 @media (max-width: 900px) {
   .customer-layout {
@@ -898,10 +830,6 @@
     gap: 14px;
   }
 }
-
-/*          ===
-   RESPONSIVE - MOBILE
-         === */
 
 @media (max-width: 700px) {
   .customer-account {
@@ -961,10 +889,6 @@
   }
 }
 
-/*          ===
-   RESPONSIVE - SMALL MOBILE
-         === */
-
 @media (max-width: 520px) {
   .customer-shell {
     width: calc(100% - 30px);
@@ -1019,10 +943,6 @@
     padding: 30px 20px;
   }
 }
-
-/*          ===
-   VERY SMALL MOBILE
-         === */
 
 @media (max-width: 420px) {
   .customer-shell {

@@ -9,9 +9,6 @@ function CustomerAppointments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  //        =
-  // LOAD APPOINTMENTS
-  //        =
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -74,9 +71,6 @@ function CustomerAppointments() {
     }
   };
 
-  //        =
-  // STATUS LABEL
-  //        =
   const getStatusLabel = (status) => {
     switch (status) {
       case "PENDING":
