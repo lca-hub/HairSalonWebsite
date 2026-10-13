@@ -51,8 +51,7 @@ function OrderPaymentPage() {
             }
 
             setError(
-                err.response?.data?.message ||
-                "Không thể tải thông tin giỏ hàng."
+                err.response?.data?.message || "Không thể tải thông tin giỏ hàng.",
             );
         } finally {
             setLoading(false);
@@ -174,11 +173,14 @@ function OrderPaymentPage() {
 
             <main className="order-payment-main">
                 <div className="order-payment-shell">
-
                     <div className="order-payment-breadcrumb">
-                        <button type="button" onClick={() => navigate("/products")}>Sản phẩm</button>
+                        <button type="button" onClick={() => navigate("/products")}>
+                            Sản phẩm
+                        </button>
                         <span>/</span>
-                        <button type="button" onClick={() => navigate("/customer/cart")}>Giỏ hàng</button>
+                        <button type="button" onClick={() => navigate("/customer/cart")}>
+                            Giỏ hàng
+                        </button>
                         <span>/</span>
                         <span>Thanh toán</span>
                     </div>
@@ -187,18 +189,16 @@ function OrderPaymentPage() {
                         <div>
                             <span className="order-payment-eyebrow">ORDER & PAYMENT</span>
                             <h1>Thanh toán đơn hàng</h1>
-                            <p>Kiểm tra thông tin nhận hàng trước khi tiến hành thanh toán.</p>
+                            <p>
+                                Kiểm tra thông tin nhận hàng trước khi tiến hành thanh toán.
+                            </p>
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="order-payment-alert">{error}</div>
-                    )}
+                    {error && <div className="order-payment-alert">{error}</div>}
 
                     <form className="order-payment-layout" onSubmit={handleSubmit}>
-
                         <section className="order-payment-form-card">
-
                             <div className="order-payment-section">
                                 <div className="order-payment-section-title">
                                     <span>01</span>
@@ -209,32 +209,57 @@ function OrderPaymentPage() {
                                 </div>
 
                                 <div className="order-payment-fields">
-
                                     <label>
                                         Họ và tên
-                                        <input type="text" name="receiverName" value={form.receiverName} onChange={handleChange} placeholder="Nhập họ và tên" disabled={submitting} />
+                                        <input
+                                            type="text"
+                                            name="receiverName"
+                                            value={form.receiverName}
+                                            onChange={handleChange}
+                                            placeholder="Nhập họ và tên"
+                                            disabled={submitting}
+                                        />
                                     </label>
 
                                     <label>
                                         Số điện thoại
-                                        <input type="tel" name="receiverPhone" value={form.receiverPhone} onChange={handleChange} placeholder="Nhập số điện thoại" disabled={submitting} />
+                                        <input
+                                            type="tel"
+                                            name="receiverPhone"
+                                            value={form.receiverPhone}
+                                            onChange={handleChange}
+                                            placeholder="Nhập số điện thoại"
+                                            disabled={submitting}
+                                        />
                                     </label>
 
                                     <label className="order-payment-field-full">
                                         Địa chỉ nhận hàng
-                                        <input type="text" name="shippingAddress" value={form.shippingAddress} onChange={handleChange} placeholder="Nhập địa chỉ nhận hàng" disabled={submitting} />
+                                        <input
+                                            type="text"
+                                            name="shippingAddress"
+                                            value={form.shippingAddress}
+                                            onChange={handleChange}
+                                            placeholder="Nhập địa chỉ nhận hàng"
+                                            disabled={submitting}
+                                        />
                                     </label>
 
                                     <label className="order-payment-field-full">
                                         Ghi chú
-                                        <textarea name="note" value={form.note} onChange={handleChange} placeholder="Ghi chú cho đơn hàng (không bắt buộc)" rows="4" disabled={submitting}></textarea>
+                                        <textarea
+                                            name="note"
+                                            value={form.note}
+                                            onChange={handleChange}
+                                            placeholder="Ghi chú cho đơn hàng (không bắt buộc)"
+                                            rows="4"
+                                            disabled={submitting}
+                                        ></textarea>
                                     </label>
-
                                 </div>
                             </div>
 
                             <div className="order-payment-section">
-
                                 <div className="order-payment-section-title">
                                     <span>02</span>
                                     <div>
@@ -244,30 +269,46 @@ function OrderPaymentPage() {
                                 </div>
 
                                 <div className="payment-method-list">
-
-                                    <label className={`payment-method ${form.paymentMethod === "VNPAY" ? "selected" : ""}`}>
-                                        <input type="radio" name="paymentMethod" value="VNPAY" checked={form.paymentMethod === "VNPAY"} onChange={handleChange} disabled={submitting} />
+                                    <label
+                                        className={`payment-method ${form.paymentMethod === "VNPAY" ? "selected" : ""}`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="VNPAY"
+                                            checked={form.paymentMethod === "VNPAY"}
+                                            onChange={handleChange}
+                                            disabled={submitting}
+                                        />
                                         <div>
                                             <strong>VNPay</strong>
                                             <span>Thanh toán trực tuyến qua VNPay.</span>
                                         </div>
                                     </label>
 
-                                    <label className={`payment-method ${form.paymentMethod === "CASH" ? "selected" : ""}`}>
-                                        <input type="radio" name="paymentMethod" value="CASH" checked={form.paymentMethod === "CASH"} onChange={handleChange} disabled={submitting} />
+                                    <label
+                                        className={`payment-method ${form.paymentMethod === "CASH" ? "selected" : ""}`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="CASH"
+                                            checked={form.paymentMethod === "CASH"}
+                                            onChange={handleChange}
+                                            disabled={submitting}
+                                        />
                                         <div>
                                             <strong>Thanh toán tại salon</strong>
-                                            <span>Thanh toán trực tiếp theo chính sách đơn hàng.</span>
+                                            <span>
+                                                Thanh toán trực tiếp theo chính sách đơn hàng.
+                                            </span>
                                         </div>
                                     </label>
-
                                 </div>
                             </div>
-
                         </section>
 
                         <aside className="order-payment-summary">
-
                             <span className="order-payment-summary-eyebrow">YOUR ORDER</span>
                             <h2>Đơn hàng</h2>
 
@@ -275,15 +316,23 @@ function OrderPaymentPage() {
                                 {items.map((item) => (
                                     <div className="order-payment-item" key={item.id}>
                                         <div className="order-payment-item-image">
-                                            {item.imageUrl ? <img src={item.imageUrl} alt={item.productName} /> : <span>NO IMAGE</span>}
+                                            {item.imageUrl ? (
+                                                <img src={item.imageUrl} alt={item.productName} />
+                                            ) : (
+                                                <span>NO IMAGE</span>
+                                            )}
                                         </div>
 
                                         <div className="order-payment-item-info">
                                             <strong>{item.productName}</strong>
-                                            <span>{item.quantity} × {formatMoney(item.unitPrice)}</span>
+                                            <span>
+                                                {item.quantity} × {formatMoney(item.unitPrice)}
+                                            </span>
                                         </div>
 
-                                        <strong className="order-payment-item-total">{formatMoney(item.totalPrice)}</strong>
+                                        <strong className="order-payment-item-total">
+                                            {formatMoney(item.totalPrice)}
+                                        </strong>
                                     </div>
                                 ))}
                             </div>
@@ -305,14 +354,28 @@ function OrderPaymentPage() {
                                 <strong>{formatMoney(totalAmount)}</strong>
                             </div>
 
-                            <button type="submit" className="order-payment-submit" disabled={submitting}>{submitting ? "ĐANG XỬ LÝ..." : form.paymentMethod === "VNPAY" ? "TIẾN HÀNH THANH TOÁN VNPAY" : "ĐẶT ĐƠN HÀNG"}</button>
+                            <button
+                                type="submit"
+                                className="order-payment-submit"
+                                disabled={submitting}
+                            >
+                                {submitting
+                                    ? "ĐANG XỬ LÝ..."
+                                    : form.paymentMethod === "VNPAY"
+                                        ? "TIẾN HÀNH THANH TOÁN VNPAY"
+                                        : "ĐẶT ĐƠN HÀNG"}
+                            </button>
 
-                            <button type="button" className="order-payment-back" onClick={() => navigate("/customer/cart")} disabled={submitting}>QUAY LẠI GIỎ HÀNG</button>
-
+                            <button
+                                type="button"
+                                className="order-payment-back"
+                                onClick={() => navigate("/customer/cart")}
+                                disabled={submitting}
+                            >
+                                QUAY LẠI GIỎ HÀNG
+                            </button>
                         </aside>
-
                     </form>
-
                 </div>
             </main>
         </div>
